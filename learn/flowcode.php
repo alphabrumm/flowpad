@@ -7,7 +7,7 @@
  *
  * Gesucht wird in den Ordnern 9 … 13 neben dieser Datei nach .json, .zip und .html.
  * Der Code ist aus dem Pfad berechnet (FNV-1a, 32 Bit, untere 25 Bit als 5 Zeichen) –
- * genau wie in FlowPad (app/js/flowcode.js). Neue Dateien bekommen ihren Code also automatisch.
+ * genau wie in FlowPad (js/flowcode.js). Neue Dateien bekommen ihren Code also automatisch.
  */
 header('Cache-Control: no-store');
 

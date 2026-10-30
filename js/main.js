@@ -297,15 +297,21 @@ function applyLayout() {
     document.querySelectorAll('#bottomnav [data-view]').forEach(b => { b.classList.toggle('active', b.dataset.view === view || (mode === 'medium' && b.dataset.view === 'tabelle' && view !== 'lernpfad')); b.hidden = (b.dataset.view === 'lernpfad' && !has) || (mode === 'medium' && b.dataset.view === 'diagramm'); });
     $('#bottomnav').hidden = mode === 'wide' || (!has && mode === 'medium');
     document.body.classList.toggle('lp-wide', pref.get('lpWide', '0') === '1');
-    document.body.classList.toggle('lp-full', pref.get('lpFull', '0') === '1' && mode === 'wide' && has);
+    const collapsed = pref.get('lpCollapsed', '0') === '1' && mode === 'wide' && has;
+    document.body.classList.toggle('lp-collapsed', collapsed);
+    const cb = $('#btnLpCollapse');
+    cb.title = cb.ariaLabel = collapsed ? 'Lernpfad aufklappen' : 'Lernpfad einklappen';
+    cb.querySelector('path:last-child').setAttribute('d', collapsed ? 'M11 9l-3 3 3 3' : 'M8 9l3 3-3 3');
     const ratio = +pref.get('split', '0.45');
     document.documentElement.style.setProperty('--split', String(Math.max(0.2, Math.min(0.8, ratio))));
     setTimeout(() => editor.fit(), 30);
 }
 window.addEventListener('resize', () => applyLayout());
 document.querySelectorAll('#bottomnav [data-view]').forEach(b => b.addEventListener('click', () => showView(b.dataset.view)));
-$('#btnLpWide').addEventListener('click', () => { pref.set('lpWide', pref.get('lpWide', '0') === '1' ? '0' : '1'); pref.set('lpFull', '0'); applyLayout(); });
-$('#btnLpFull').addEventListener('click', () => { pref.set('lpFull', pref.get('lpFull', '0') === '1' ? '0' : '1'); applyLayout(); });
+$('#btnLpWide').addEventListener('click', () => { pref.set('lpWide', pref.get('lpWide', '0') === '1' ? '0' : '1'); applyLayout(); });
+$('#btnLpCollapse').addEventListener('click', e => { e.stopPropagation(); pref.set('lpCollapsed', pref.get('lpCollapsed', '0') === '1' ? '0' : '1'); applyLayout(); });
+// eingeklappt: Tippen auf die schmale Leiste klappt wieder auf
+$('#lpPane').addEventListener('click', () => { if (document.body.classList.contains('lp-collapsed')) { pref.set('lpCollapsed', '0'); applyLayout(); } });
 // Trennlinie zwischen Tabelle und Diagramm verschieben
 (() => {
     const sp = $('#splitter'); let drag = null;

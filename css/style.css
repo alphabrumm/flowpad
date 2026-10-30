@@ -96,8 +96,14 @@ code { font-family: var(--font-code); font-size: .9em; background: var(--surface
 .lp-pane { display: none; flex: 0 0 38%; min-width: 320px; border-left: 3px solid var(--bar); }
 body.has-lp .lp-pane { display: flex; }
 body.lp-wide .lp-pane { flex-basis: 52%; }
-body.lp-full .left { display: none; }
-body.lp-full .lp-pane { flex: 1 1 auto; border-left: 0; }
+/* eingeklappt: schmale Leiste rechts, der Lernpfad bleibt geladen (nur unsichtbar) */
+body.lp-collapsed .lp-pane { flex: 0 0 48px; min-width: 48px; cursor: pointer; }
+body.lp-collapsed .lp-head { flex-direction: column; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 0; flex: 1; }
+body.lp-collapsed .lp-head #btnLpWide { display: none; }
+body.lp-collapsed .lp-title { flex: 0 1 auto; flex-direction: column; writing-mode: vertical-rl; }
+body.lp-collapsed .lp-title .ic { writing-mode: horizontal-tb; }
+body.lp-collapsed .lp-head #btnLpCollapse { order: -1; }
+body.lp-collapsed .lp-host { position: absolute; width: 1px; height: 1px; overflow: hidden; visibility: hidden; }
 .lp-head { display: flex; align-items: center; gap: 4px; padding: 2px 6px 2px 12px; background: var(--surface-2); border-bottom: 1px solid var(--line); min-height: 42px; }
 .lp-title { flex: 1; display: flex; align-items: center; gap: 8px; font-family: var(--title-font); font-weight: 700; min-width: 0; }
 .lp-title span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -110,7 +116,10 @@ body.lp-full .lp-pane { flex: 1 1 auto; border-left: 0; }
 .bottomnav button.active { opacity: 1; background: var(--bar-2); color: var(--glow); }
 body:not([data-layout="wide"]) .only-wide { display: none; }
 body[data-layout="medium"][data-view="lernpfad"] .left, body[data-layout="narrow"][data-view="lernpfad"] .left { display: none; }
-body[data-layout="medium"]:not([data-view="lernpfad"]) .lp-pane, body[data-layout="narrow"]:not([data-view="lernpfad"]) .lp-pane { display: none; }
+/* Lernpfad nicht mit display:none verstecken: Safari zeigt ein so verstecktes iframe danach oft leer oder springt nach oben */
+.workspace { position: relative; }
+body.has-lp[data-layout="medium"]:not([data-view="lernpfad"]) .lp-pane, body.has-lp[data-layout="narrow"]:not([data-view="lernpfad"]) .lp-pane {
+  position: absolute; inset: 0; visibility: hidden; pointer-events: none; z-index: -1; }
 body[data-layout="medium"] .lp-pane, body[data-layout="narrow"] .lp-pane { flex: 1 1 auto; border-left: 0; min-width: 0; }
 body[data-layout="narrow"] .left { grid-template-rows: 1fr; }
 body[data-layout="narrow"] .splitter { display: none; }

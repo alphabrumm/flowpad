@@ -9,7 +9,7 @@ FlowPad ist eine touchfreundliche Web-App für den Informatikunterricht (Informa
 * FlowCodes (5 Zeichen) öffnen Lernprojekte, genau wie die JCodes von JPad.
 * Alles läuft lokal im Browser: kein Login, kein Server, keine Daten an Dritte. Projekte werden als Datei gesichert.
 
-Die App liegt in [`app/`](app/), die ausführliche Beschreibung in [`FLOWPAD.md`](FLOWPAD.md).
+Die App liegt direkt im Hauptverzeichnis (`index.html`, `js/`, `css/`, `learn/`), die ausführliche Beschreibung in [`FLOWPAD.md`](FLOWPAD.md).
 
 ## Bauen und testen
 
@@ -24,4 +24,4 @@ Es werden keine Pakete gebraucht, nur Node 18+. Jeder Push auf `main` baut die A
 ## Herkunft
 
 Rechenkern (MiniCalc) und DFD-Baukasten stammen aus der DFD-Werkstatt und den Lernpfaden zu Informatik 9.
-Bedienkonzept, Lernpfad-Einbettung und Codes folgen JPad und QPad. Schriften: Atkinson Hyperlegible, JetBrains Mono, Pixelify Sans (SIL OFL, in `app/fonts`).
+Bedienkonzept, Lernpfad-Einbettung und Codes folgen JPad und QPad. Schriften: Atkinson Hyperlegible, JetBrains Mono, Pixelify Sans (SIL OFL, in `fonts/`).

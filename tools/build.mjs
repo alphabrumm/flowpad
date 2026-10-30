@@ -1,4 +1,4 @@
-// FlowPad bauen: app/ nach dist/ kopieren, FlowCode-Liste und Lernpfad-Index erzeugen, Service Worker mit Dateiliste schreiben.
+// FlowPad bauen: die App-Dateien aus dem Hauptverzeichnis nach dist/ kopieren, FlowCode-Liste und Lernpfad-Index erzeugen, Service Worker mit Dateiliste schreiben.
 // Aufruf: node tools/build.mjs [zielordner]   – braucht nur Node (keine Pakete).
 import fs from 'node:fs';
 import path from 'node:path';
@@ -6,12 +6,13 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const src = path.join(root, 'app');
+// Was zur App gehört (alles andere – tools/, .github/, Doku – bleibt draußen)
+const APP = ['index.html', 'css', 'js', 'fonts', 'learn', 'icon.svg', 'icon-180.png', 'icon-192.png', 'icon-512.png', 'manifest.webmanifest'];
 const out = path.resolve(process.argv[2] || path.join(root, 'dist'));
 const KLASSEN = [9, 10, 11, 12, 13];
 const ALPHABET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
 
-// gleiche Rechnung wie app/js/flowcode.js und learn/flowcode.php
+// gleiche Rechnung wie js/flowcode.js und learn/flowcode.php
 function flowcode(rel) {
     let h = 0x811c9dc5;
     for (const b of Buffer.from(rel, 'utf8')) { h ^= b; h = Math.imul(h, 0x01000193) >>> 0; }
@@ -20,7 +21,8 @@ function flowcode(rel) {
 const copy = (a, b) => { fs.mkdirSync(b, { recursive: true }); for (const f of fs.readdirSync(a)) { const s = path.join(a, f), d = path.join(b, f); if (fs.statSync(s).isDirectory()) copy(s, d); else fs.copyFileSync(s, d); } };
 
 fs.rmSync(out, { recursive: true, force: true });
-copy(src, out);
+fs.mkdirSync(out, { recursive: true });
+for (const f of APP) { const s = path.join(root, f), d = path.join(out, f); if (fs.statSync(s).isDirectory()) copy(s, d); else fs.copyFileSync(s, d); }
 
 // Lernpfade und FlowCodes
 const codes = {}, index = [], seen = {};
@@ -39,8 +41,11 @@ for (const k of KLASSEN) {
         seen[code] = (seen[code] || 0) + 1;
     }
 }
-fs.writeFileSync(path.join(out, 'learn', 'flowcodes.json'), JSON.stringify(codes, null, 1));
-fs.writeFileSync(path.join(out, 'learn', 'index.json'), JSON.stringify(index, null, 1));
+// Listen auch ins Hauptverzeichnis schreiben: So funktionieren FlowCodes auch ohne Bauen (z. B. Pages „Deploy from branch“)
+for (const base of [out, root]) {
+    fs.writeFileSync(path.join(base, 'learn', 'flowcodes.json'), JSON.stringify(codes, null, 1) + '\n');
+    fs.writeFileSync(path.join(base, 'learn', 'index.json'), JSON.stringify(index, null, 1) + '\n');
+}
 for (const e of index) console.log(`${e.code}  ${e.path}`);
 
 // Service Worker: App-Dateien für die Offline-Nutzung (Lernpfade unter learn/ werden immer frisch geladen)

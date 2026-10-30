@@ -1,9 +1,9 @@
 // Kleine Selbsttests ohne Browser: node tools/test.mjs
 import assert from 'node:assert/strict';
-import E from '../app/js/engine.js';
-import DFD from '../app/js/dfd.js';
-import { toExcelFormula, fromExcelFormula } from '../app/js/zip.js';
-import { flowcodeOf } from '../app/js/flowcode.js';
+import E from '../js/engine.js';
+import DFD from '../js/dfd.js';
+import { toExcelFormula, fromExcelFormula } from '../js/zip.js';
+import { flowcodeOf } from '../js/flowcode.js';
 
 let n = 0; const t = (name, fn) => { fn(); n++; };
 const ctx = (raw, cell = 'Z30') => ({ raw, rows: 30, cols: 26, cell });

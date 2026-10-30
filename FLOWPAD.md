@@ -86,7 +86,7 @@ gemeldet bei **Prüfen**, **DFD → Zelle** und wenn eine Formel direkt in eine 
 ## FlowCodes
 
 Wie JCodes: 5 Zeichen aus `23456789ABCDEFGHJKLMNPQRSTUVWXYZ`, berechnet aus dem Pfad unter `learn/`
-(z. B. `9/FlowPad-Willkommen.html` → `B3JKZ`; FNV-1a 32 Bit, untere 25 Bit). Dateien in `app/learn/9` … `app/learn/13`
+(z. B. `9/FlowPad-Willkommen.html` → `B3JKZ`; FNV-1a 32 Bit, untere 25 Bit). Dateien in `learn/9` … `learn/13`
 bekommen ihren Code automatisch. Aufgelöst wird über `learn/flowcode.php` (Webspace mit PHP; ohne Parameter zeigt sie der
 Lehrkraft alle Codes mit Links, doppelte rot) oder die beim Bauen erzeugte `learn/flowcodes.json` (GitHub Pages).
 `tools/build.mjs` listet die Codes beim Bauen auf.
@@ -95,13 +95,13 @@ Lehrkraft alle Codes mit Links, doppelte rot) oder die beim Bauen erzeugte `lear
 
 | Datei | Aufgabe |
 |---|---|
-| `app/index.html`, `app/css/style.css` | Oberfläche, Themes (Werkstatt, Standard, Hacker; hell/dunkel) |
-| `app/js/engine.js` | MiniCalc: Tabellenkalkulation mit deutschen Funktionen (aus der DFD-Werkstatt) |
-| `app/js/dfd.js` | DFD: Katalog, Formel ↔ Diagramm, Layout, Regeln, Vergleich, Zeichenfläche |
-| `app/js/grid.js` | Tabellenblatt (Touch, Zeigen, Ausfüllen, Zellen für das Diagramm wählen) |
-| `app/js/main.js` | App: Projekte, Rückgängig, Aufgaben, Lernpfad-Schnittstelle, Menü, Layout |
-| `app/js/store.js` | Projekte in IndexedDB, Projektdatei |
-| `app/js/lernpfad.js` | Lernpfade einlesen (HTML/ZIP/Link), Brücke ins abgeschottete iframe |
-| `app/js/flowcode.js`, `app/learn/flowcode.php` | FlowCodes |
-| `app/js/zip.js` | ZIP lesen/schreiben, xlsx sichern und öffnen |
+| `index.html`, `css/style.css` | Oberfläche, Themes (Werkstatt, Standard, Hacker; hell/dunkel) |
+| `js/engine.js` | MiniCalc: Tabellenkalkulation mit deutschen Funktionen (aus der DFD-Werkstatt) |
+| `js/dfd.js` | DFD: Katalog, Formel ↔ Diagramm, Layout, Regeln, Vergleich, Zeichenfläche |
+| `js/grid.js` | Tabellenblatt (Touch, Zeigen, Ausfüllen, Zellen für das Diagramm wählen) |
+| `js/main.js` | App: Projekte, Rückgängig, Aufgaben, Lernpfad-Schnittstelle, Menü, Layout |
+| `js/store.js` | Projekte in IndexedDB, Projektdatei |
+| `js/lernpfad.js` | Lernpfade einlesen (HTML/ZIP/Link), Brücke ins abgeschottete iframe |
+| `js/flowcode.js`, `learn/flowcode.php` | FlowCodes |
+| `js/zip.js` | ZIP lesen/schreiben, xlsx sichern und öffnen |
 | `tools/build.mjs`, `tools/test.mjs` | Bauen, Selbsttests |
