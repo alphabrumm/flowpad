@@ -19,6 +19,7 @@ const expandMap = obj => { const out = {}; Object.entries(obj || {}).forEach(([r
  */
 export function Grid(root, host) {
     let sheet, R, C, style = {}, fmt = {}, editable = null, tds = {};
+    let lastTap = { a: null, t: 0 };
     let sel = 'A1', showF = false, clip = null, editing = false, justPointed = false, justPicked = false;
     let pick = null;            // { done(ref), a, b } – Zelle für das Diagramm wählen
     let marks = new Set(), hot = new Set();
@@ -167,6 +168,13 @@ export function Grid(root, host) {
         const td = ev.target.closest('td'); if (!td || pick) return;
         if (justPicked) { justPicked = false; return; }
         if (justPointed) { justPointed = false; try { input.focus({ preventScroll: true }); } catch (e) { } return; }
+        // Doppeltippen: Eingabezeile mit Schreibmarke am Ende, sofort losschreiben (Fokus im selben Tipp, sonst blockt iOS die Tastatur)
+        const now = Date.now(), dbl = lastTap.a === td.dataset.a && now - lastTap.t < 450;
+        lastTap = dbl ? { a: null, t: 0 } : { a: td.dataset.a, t: now };
+        if (dbl && sel === td.dataset.a && !input.disabled) {
+            try { input.focus({ preventScroll: true }); const n = input.value.length; input.setSelectionRange(n, n); } catch (e) { }
+            return;
+        }
         if (editing) commit(false);
         select(td.dataset.a);
     });

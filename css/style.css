@@ -377,3 +377,6 @@ button.taskbadge { cursor: pointer; font: inherit; font-size: .8em; font-weight:
 .hb-foot { color: var(--ink-2); font-size: .9em; margin-top: 16px; }
 
 @media (max-width: 700px) { .workspace { padding: 5px; gap: 5px; } .left, .lp-pane { border-radius: 10px; } }
+/* Doppeltippen öffnet die Eingabe – Safari soll dabei nicht zoomen */
+.grid td { touch-action: manipulation; }
+.grid.picking td { touch-action: none; }
