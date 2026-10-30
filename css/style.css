@@ -71,7 +71,7 @@ code { font-family: var(--font-code); font-size: .9em; background: var(--surface
 .topbar .iconbtn { min-width: 38px; min-height: 36px; }
 .topbar .ic { width: 19px; height: 19px; }
 .topbar .btn { min-height: 32px; padding: 0 10px; font-size: .92em; }
-.brand-mark { width: 24px; height: 24px; fill: var(--glow); stroke: var(--bar-ink); stroke-width: 2; display: block; }
+.brand-mark { width: 28px; height: 28px; display: block; }
 .brand-mark path { fill: none; }
 .project-name { min-width: 0; flex: 0 1 auto; border: 0; background: transparent; font-family: var(--title-font); font-weight: 700; font-size: 1.02em; padding: 3px 6px; border-radius: 6px; cursor: pointer;
   max-width: 40vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
