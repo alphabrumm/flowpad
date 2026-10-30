@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Willkommen bei FlowPad</title>
+<style>
+:root { --bg: #eef3f9; --surface: #fff; --surface-2: #e3ebf5; --ink: #142235; --ink-2: #546a84; --line: #c9d6e6; --term: #0f1a2b; --glow: #5fe08a;
+  --acc: #1f8f55; --blue: #2a6fd6; --sun-soft: #fff1c9; --good: #1f8a45; --bad: #c23b3b; --next: #fff0b3; --next-edge: #e9b622; }
+@media (prefers-color-scheme: dark) { :root { --bg: #0d1626; --surface: #142036; --surface-2: #1b2a45; --ink: #e8f0fa; --ink-2: #a5b7cc; --line: #2a3d5c; --sun-soft: #3d331a; --good: #6fd08b; --bad: #ff8a8a; --next: #4a3f17; --blue: #7fb0ff; color-scheme: dark; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.55 "Atkinson Hyperlegible", -apple-system, "Segoe UI", system-ui, sans-serif; }
+.hero { background: var(--term); color: #dfe9f7; padding: 22px 18px 18px; border-bottom: 4px solid var(--glow); }
+.hero small { font: 700 12px/1 ui-monospace, Menlo, monospace; letter-spacing: .12em; color: var(--glow); }
+.hero h1 { margin: 6px 0 4px; font: 700 28px/1.15 "Pixelify Sans", "Courier New", monospace; }
+main { padding: 6px 16px 40px; max-width: 760px; }
+h2 { font: 700 21px/1.2 "Pixelify Sans", "Courier New", monospace; margin: 26px 0 8px; display: flex; gap: 10px; align-items: center; }
+h2 .nr { display: inline-grid; place-items: center; width: 30px; height: 30px; background: var(--term); color: var(--glow); border-radius: 4px; font-size: 17px; }
+code { font: .9em ui-monospace, Menlo, monospace; background: var(--surface-2); padding: 1px 5px; border-radius: 4px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; margin: 10px 0; }
+.task { border-left: 5px solid var(--next-edge); }
+.task.flowpad-ok { border-left-color: var(--good); }
+.task.flowpad-ok .state::after { content: "✓ geschafft"; color: var(--good); }
+.task.flowpad-bad .state::after { content: "noch nicht"; color: var(--bad); }
+.state { float: right; font-weight: 700; font-size: .9em; }
+button.fp { min-height: 44px; padding: 0 16px; margin: 4px 6px 4px 0; border-radius: 6px; border: 2px solid var(--next-edge); background: var(--next); color: var(--ink); font: 700 16px/1 inherit; cursor: pointer; }
+button.fp.alt { border-color: var(--line); background: var(--surface); }
+ul { padding-left: 1.2em; } li { margin: 4px 0; }
+.legend { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; align-items: center; }
+.sym { width: 40px; height: 24px; display: inline-block; }
+.r { border: 2px solid #2a6fd6; background: #e6efff; } .o { border: 2px solid #1f8f55; background: #e3f6ea; } .e { border: 2px solid #a87400; background: #fff3c4; border-radius: 50%; }
+.d { width: 12px; height: 12px; border-radius: 50%; background: var(--ink); margin: 0 14px; } .k { font: 700 18px ui-monospace, monospace; text-align: center; }
+.debbie { background: var(--sun-soft); border-radius: 8px; padding: 10px 14px; margin: 12px 0; }
+.debbie b:first-child { font-family: "Pixelify Sans", monospace; }
+</style></head>
+<body>
+<div class="hero"><small>FLOWPAD · EINFÜHRUNG</small><h1>Willkommen bei FlowPad</h1>Tabellenkalkulation und Datenflussdiagramme – beides in einer App.</div>
+<main>
+<h2><span class="nr">1</span>So ist FlowPad aufgebaut</h2>
+<ul>
+  <li><b>Oben links</b> ist die Tabelle. Zelle antippen, oben in die Eingabezeile schreiben, mit ✓ übernehmen.</li>
+  <li><b>Unten links</b> steht das <b>Datenflussdiagramm der gewählten Zelle</b>.</li>
+  <li><b>Rechts</b> ist dieser Lernpfad. Auf dem iPad hochkant wechselst du unten zwischen den Ansichten.</li>
+</ul>
+<div class="card legend">
+  <span class="sym r"></span><span>Eingabe (eine Zelle oder ein Bereich), z. B. <b>Preis (B2)</b></span>
+  <span class="sym e"></span><span>Funktion – auch Rechenzeichen wie <code>*</code> oder <code>+</code> stehen in einer Ellipse</span>
+  <span class="k">2</span><span>Konstante: einfach die Zahl, ohne Rahmen</span>
+  <span><span class="sym d"></span></span><span>Verteiler: gibt ein Datum an mehrere Funktionen weiter</span>
+  <span class="sym o"></span><span>Ausgabe: die Zelle, in der das Ergebnis steht</span>
+</div>
+
+<h2><span class="nr">2</span>Von der Formel zum Diagramm</h2>
+<p>Lade zuerst eine kleine Tabelle für den Pausenverkauf.</p>
+<button class="fp" data-flowpad='{"action":"sheet","title":"Pausenverkauf","cells":{"A1":"Artikel","B1":"Preis","C1":"Anzahl","D1":"Gesamt","E1":"Endpreis","A2":"Brezel","B2":"0,9","C2":"14","A3":"Apfel","B3":"0,5","C3":"20","A4":"Wasser","B4":"1,2","C4":"9","A6":"Rabatt","B6":"10%","A8":"Einnahmen"},"widths":{"A":110,"D":100,"E":110},"styles":{"A1:E1":"head","B6":"inp"},"fmt":{"B2:B4":"eur","D2:E4":"eur","B6":"pct","B8":"eur"},"select":"D2"}'>Tabelle laden</button>
+<div class="card task" data-flowpad-cell="D2"><span class="state"></span>
+  <b>Aufgabe:</b> Schreibe in <b>D2</b> die Formel für den Gesamtpreis der Brezeln: Preis mal Anzahl.
+  <br><button class="fp alt" data-flowpad='{"action":"task","cell":"D2","target":"=B2*C2","title":"Gesamtpreis","prompt":"Preis mal Anzahl. Tippe in die Eingabezeile <code>=</code>, dann B2 antippen, <code>*</code>, C2 antippen, ✓.","mode":"formel"}'>Aufgabe in FlowPad öffnen</button>
+</div>
+<p>Tippe danach unten auf <b>Formel → DFD</b>. FlowPad zeichnet das Diagramm und beschriftet die Eingaben mit den Spaltenköpfen: <b>Preis (B2)</b>, <b>Anzahl (C2)</b>.</p>
+<div class="debbie"><b>Debbie Debug:</b> Fülle D2 mit <b>↓ Ausfüllen</b> nach unten aus und tippe D3 an. Das Diagramm von D3 ist noch leer – jede Zelle hat ihr eigenes. Mit <b>Formel → DFD</b> siehst du, dass jetzt <b>B3</b> und <b>C3</b> hineinfließen.</div>
+
+<h2><span class="nr">3</span>Vom Diagramm zur Formel</h2>
+<p>Jetzt andersherum: Der Endpreis ist der Gesamtpreis minus Rabatt. Der Rabatt ist Gesamtpreis mal Rabattsatz (B6).</p>
+<div class="card task" data-flowpad-cell="E2"><span class="state"></span>
+  <b>Aufgabe:</b> Baue das Diagramm für <b>E2</b> selbst. Der Gesamtpreis wird zweimal gebraucht – dafür gibt es den <b>Verteiler</b>.
+  <br><button class="fp alt" data-flowpad='{"action":"task","cell":"E2","target":"=D2-D2*$B$6","title":"Endpreis","prompt":"Endpreis = Gesamt minus Gesamt mal Rabatt. Eingaben: <b>Gesamt (D2)</b> und <b>Rabatt (B6)</b>. Baue das Diagramm, dann <b>Prüfen</b> und <b>DFD → Zelle</b>.","mode":"diagramm","dfd":"leer"}'>Aufgabe in FlowPad öffnen</button>
+</div>
+<ul>
+  <li><b>Eingabe</b> antippen, dann oben die Zelle antippen (für einen Bereich darüberziehen).</li>
+  <li><b>Funktion</b> antippen und das Rechenzeichen wählen.</li>
+  <li>Verbinden: Baustein antippen, dann am <b>orangen Pfeil</b> darunter zum Ziel ziehen.</li>
+  <li><b>Prüfen</b> vergleicht dein Diagramm mit vielen Testwerten. <b>DFD → Zelle</b> schreibt die Formel in die Zelle.</li>
+</ul>
+<div class="debbie"><b>Debbie Debug:</b> Willst du E2 nach unten ausfüllen, muss der Rabatt fest bleiben: <code>$B$6</code>. Schreib die Eingabe im Diagramm als <code>$B$6</code> (Baustein antippen, Feld „Zelle“).</div>
+
+<h2><span class="nr">4</span>Diagramme lesen</h2>
+<div class="card task" data-flowpad-cell="B8"><span class="state"></span>
+  <b>Aufgabe:</b> FlowPad zeigt dir ein Diagramm für <b>B8</b>. Schreibe die passende Formel selbst in <b>B8</b>.
+  <br><button class="fp alt" data-flowpad='{"action":"task","cell":"B8","target":"=RUNDEN(SUMME(E2:E4);1)","title":"Einnahmen","prompt":"Lies das Diagramm von oben nach unten und schreibe die Formel in B8.","mode":"formel"}'>Aufgabe öffnen</button>
+  <button class="fp alt" data-flowpad='{"action":"dfd","cell":"B8","term":"=RUNDEN(SUMME(E2:E4);1)"}'>Diagramm zeigen</button>
+</div>
+
+<h2><span class="nr">5</span>Sichern und weitermachen</h2>
+<ul>
+  <li>FlowPad speichert automatisch <b>in diesem Browser</b>. Nichts wird ins Internet geschickt.</li>
+  <li><b>Sichern</b> (oben rechts) lädt die Projektdatei herunter – am iPad in „Dateien“ ablegen.</li>
+  <li>Im Menü: <b>Als Excel-Datei sichern</b> für ByCS Drive, Excel oder Numbers.</li>
+  <li>Deine Lehrkraft gibt dir Lernpfade als <b>FlowCode</b> (5 Zeichen): Menü → <b>Projekt über FlowCode öffnen</b>.</li>
+</ul>
+</main>
+<script>
+// Fortschritt merken (FlowPad speichert ihn im Projekt)
+var done = {}; try { done = JSON.parse(localStorage.getItem('demo-done') || '{}'); } catch (e) { }
+function mark() { document.querySelectorAll('[data-flowpad-cell]').forEach(function (el) { if (done[el.getAttribute('data-flowpad-cell')]) el.classList.add('flowpad-ok'); }); }
+mark();
+if (window.FlowPad) FlowPad.onResult(function (r) { if (r.ok) { done[r.cell] = 1; try { localStorage.setItem('demo-done', JSON.stringify(done)); } catch (e) { } } mark(); });
+</script>
+</body></html>
