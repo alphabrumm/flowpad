@@ -27,6 +27,7 @@
     <button id="btnMenu" class="iconbtn" title="Menü" aria-label="Menü öffnen"><svg class="ic" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
     <span class="brand" aria-hidden="true"><svg viewBox="0 0 32 32" class="brand-mark"><rect x="3" y="4" width="11" height="8" rx="1"/><rect x="18" y="4" width="11" height="8" rx="1"/><ellipse cx="16" cy="19" rx="7" ry="4"/><path d="M8.5 12v3.5h4M23.5 12v3.5h-4M16 23v5"/></svg></span>
     <button id="projectName" class="project-name" title="Projekt umbenennen">FlowPad</button>
+    <span id="teachCode" class="teach-code" hidden title="FlowCode dieses Projekts"></span>
     <span id="saved" class="saved"></span>
     <span class="spacer"></span>
     <button id="btnUndo" class="iconbtn" title="Rückgängig" aria-label="Rückgängig" disabled><svg class="ic" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button>
@@ -118,6 +119,7 @@
 
         <h2>Hilfe</h2>
         <div class="menu-actions">
+            <button id="drawerTeacher" hidden><svg class="ic" viewBox="0 0 24 24"><path d="M3 7l9-4 9 4-9 4z"/><path d="M7 9v5c0 1.5 2.2 3 5 3s5-1.5 5-3V9"/><path d="M21 7v6"/></svg><span>Lehrkraft: alle Lernpfade</span></button>
             <button id="drawerHelp"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5"/></svg><span>Einführung in FlowPad</span></button>
         </div>
         <p class="about">FlowPad: Tabellenkalkulation und Datenflussdiagramme für den Informatikunterricht. Alles läuft in diesem Browser –

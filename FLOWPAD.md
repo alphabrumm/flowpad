@@ -86,6 +86,11 @@ Mit Skript: `FlowPad.sheet({...})`, `FlowPad.task({...})`, `FlowPad.select("D2")
 `FlowPad.onResult(r => …)`. Ergebnis: `{ type: "flowpad-result", cell, ok, how: "diagramm" | "formel", formula }` –
 gemeldet bei **Prüfen**, **DFD → Zelle** und wenn eine Formel direkt in eine Aufgabenzelle geschrieben wird.
 
+## Lehrkraft-Modus
+
+`…/flowpad/?lehrkraft` zeigt beim Start alle Lernpfade unter `learn/9` … `learn/13` mit FlowCode, kopierbarem Link und „Öffnen“ (frische Kopie).
+Gilt für diesen Tab: Im Menü steht dann „Lehrkraft: alle Lernpfade“, und neben dem Projektnamen steht der FlowCode des geöffneten Lernpfads. Schüler sehen davon nichts.
+
 ## FlowCodes
 
 Wie JCodes: 5 Zeichen aus `23456789ABCDEFGHJKLMNPQRSTUVWXYZ`, berechnet aus dem Pfad unter `learn/`

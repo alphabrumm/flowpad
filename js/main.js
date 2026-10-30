@@ -8,7 +8,7 @@ import { Grid } from './grid.js';
 import { openHandbuch } from './handbuch.js';
 import * as Store from './store.js';
 import { readLernpfadFile, loadLernpfadUrl, withBridge, titleOf, nameFromUrl } from './lernpfad.js';
-import { normalizeCode, codeFormatError, resolveCode, codeOfUrl } from './flowcode.js';
+import { normalizeCode, codeFormatError, resolveCode, codeOfUrl, loadLearnIndex } from './flowcode.js';
 import { sheetToXlsx, xlsxToSheet, isZip } from './zip.js';
 
 const $ = s => document.querySelector(s);
@@ -364,6 +364,7 @@ async function openProject(p, opts) {
     if (!opts || !opts.noSave) await Store.putProject(project).catch(() => { });
     $('#saved').textContent = 'gespeichert';
     renderProjectList();
+    if (typeof showTeacherCode === 'function') showTeacherCode();
 }
 async function createProject(name) { const p = Store.newProject(name); await openProject(p); return p; }
 function fileName(ext) { return (project.name || 'FlowPad').replace(/[\\/:*?"<>|]+/g, ' ').trim() + ext; }
@@ -511,11 +512,53 @@ $('#fontSmaller').addEventListener('click', () => { pref.set('font', String(Math
 $('#fontBigger').addEventListener('click', () => { pref.set('font', String(Math.min(140, +pref.get('font', '100') + 10))); applyTheme(); setTimeout(() => editor.fit(), 50); });
 matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', applyTheme);
 
+// ================= Lehrkraft-Modus (?lehrkraft) =================
+// Gilt für diesen Tab: Liste aller Lernpfade unter learn/ mit FlowCode und Link, FlowCode neben dem Projektnamen. Schüler sehen davon nichts.
+const isTeacher = () => { try { return sessionStorage.getItem('flowpad.lehrkraft') === '1'; } catch (e) { return false; } };
+function showTeacherCode() {
+    const c = isTeacher() && project && codeOfUrl(project.source);
+    $('#teachCode').hidden = !c; $('#teachCode').textContent = c || '';
+    $('#drawerTeacher').hidden = !isTeacher();
+}
+async function teacherList() {
+    let list;
+    try { list = await loadLearnIndex(); } catch (e) { alertBox('Lernpfade nicht gefunden', esc(e.message)); return; }
+    const base = location.origin + location.pathname;
+    const link = e => base + '?lernpfad=' + e.path;
+    const folders = [...new Set(list.map(e => e.folder))].sort((a, b) => +a - +b);
+    const kind = k => ({ html: 'Lernpfad', htm: 'Lernpfad', zip: 'Lernpfad (ZIP)', json: 'Projekt' })[k] || k;
+    const ov = document.createElement('div'); ov.className = 'fp-dialog-backdrop';
+    ov.innerHTML = `<div class="fp-dialog wide teach" role="dialog" aria-modal="true"><h3>Lernpfade und Projekte</h3>
+        <p class="teach-intro">Lehrkraft-Modus: Schüler öffnen einen Lernpfad über den <b>FlowCode</b> (Menü → „Projekt über FlowCode öffnen“) oder über den Link. „Öffnen“ lädt eine frische Kopie.</p>
+        <div class="teach-list">${folders.map(f => `<h4>Klasse ${esc(f)}</h4>` + list.filter(e => e.folder === f).map(e => `
+          <div class="teach-row"><div class="teach-head"><div><b>${esc(e.title)}</b><span>${esc(kind(e.kind))} · ${esc(e.path.split('/').pop())}</span></div><div class="teach-code-big" title="FlowCode">${esc(e.code || '–')}</div></div>
+          <div class="teach-actions"><input type="text" readonly value="${esc(link(e))}" aria-label="Link"><button type="button" class="btn" data-copy="${esc(link(e))}">Kopieren</button><button type="button" class="btn primary" data-open="${esc(e.path)}">Öffnen</button></div></div>`).join('')).join('') || '<p>Noch keine Lernpfade unter learn/9 … learn/13.</p>'}</div>
+        <div class="fp-dialog-buttons"><button type="button" class="btn" data-close>Schließen</button></div></div>`;
+    document.body.appendChild(ov);
+    const close = () => ov.remove();
+    ov.addEventListener('click', async e => {
+        if (e.target === ov || e.target.closest('[data-close]')) return close();
+        const o = e.target.closest('[data-open]');
+        if (o) { close(); closeDrawer(); await openLink(o.dataset.open, 'lernpfad', true); showTeacherCode(); return; }
+        const c = e.target.closest('[data-copy]');
+        if (c) {
+            let ok = false;
+            try { await navigator.clipboard.writeText(c.dataset.copy); ok = true; } catch (err) { }
+            if (!ok) { const i = c.parentElement.querySelector('input'); i.focus(); i.select(); try { ok = document.execCommand('copy'); } catch (err) { } }
+            c.textContent = ok ? 'Kopiert ✓' : 'Markiert'; setTimeout(() => c.textContent = 'Kopieren', 1600);
+        }
+        const i = e.target.closest('.teach-actions input'); if (i) i.select();
+    });
+}
+on('#drawerTeacher', teacherList);
+
 // ================= Start =================
 async function start() {
     applyTheme();
     Store.persist();
     const q = new URLSearchParams(location.search);
+    const teacherStart = q.has('lehrkraft');
+    if (teacherStart) { try { sessionStorage.setItem('flowpad.lehrkraft', '1'); } catch (e) { } }
     const lp = q.get('lernpfad'), pj = q.get('projekt'), code = q.get('code') || q.get('flowcode');
     try {
         if (code) {
@@ -539,9 +582,11 @@ async function start() {
         if (!project) await createProject('Mein erstes Projekt');
         alertBox('Das Projekt ließ sich nicht öffnen', esc(e.message || String(e)));
     }
-    if (lp || pj || code) history.replaceState(null, '', location.pathname);
+    if (lp || pj || code || teacherStart) history.replaceState(null, '', location.pathname);
     $('#loading').hidden = true;
     const c = project && codeOfUrl(project.source); if (c) $('#projectName').title = 'FlowCode ' + c;
+    showTeacherCode();
+    if (teacherStart) teacherList();
     if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => { });
 }
 start();

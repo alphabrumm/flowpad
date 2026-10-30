@@ -36,7 +36,7 @@ for (const k of KLASSEN) {
         codes[code] = rel;
         let title = f.replace(/\.(flowpad\.json|json|html?|zip)$/i, '').replace(/[_-]+/g, ' ');
         const text = /\.html?$/i.test(f) ? fs.readFileSync(path.join(dir, f), 'utf8') : '';
-        const m = text.match(/<title[^>]*>([^<]*)<\/title>/i); if (m) title = m[1].trim();
+        const m = text.match(/<title[^>]*>([^<]*)<\/title>/i); if (m) title = m[1].trim().replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
         index.push({ path: 'learn/' + rel, folder: String(k), code, title, kind: path.extname(f).slice(1).toLowerCase() });
         seen[code] = (seen[code] || 0) + 1;
     }

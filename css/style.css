@@ -383,3 +383,17 @@ button.taskbadge { cursor: pointer; font: inherit; font-size: .8em; font-weight:
 /* Doppeltippen öffnet die Eingabe – Safari soll dabei nicht zoomen */
 .grid td { touch-action: manipulation; }
 .grid.picking td { touch-action: none; }
+
+/* ---------- Lehrkraft-Modus ---------- */
+.teach-code { font-family: var(--font-code); font-weight: 800; letter-spacing: .08em; padding: 2px 8px; border-radius: 6px; background: var(--glow); color: var(--acc-ink, #000); font-size: .9em; }
+.fp-dialog.wide { width: min(760px, 100%); }
+.fp-dialog.teach { max-height: 84dvh; display: flex; flex-direction: column; }
+.teach-intro { margin: 0 0 8px; color: var(--ink-2); line-height: 1.45; }
+.teach-list { flex: 1; min-height: 0; overflow-y: auto; margin: 0 -4px 12px; padding: 0 4px; }
+.teach-list h4 { font-family: var(--title-font); margin: 12px 0 6px; color: var(--ink-2); }
+.teach-row { border: 1px solid var(--line); border-bottom-width: 3px; border-radius: 10px; padding: 10px; margin-bottom: 8px; display: grid; gap: 8px; }
+.teach-head { display: flex; align-items: center; gap: 10px; justify-content: space-between; }
+.teach-head span { display: block; font-size: .85em; color: var(--ink-2); }
+.teach-code-big { font: 800 1.35em var(--font-code); letter-spacing: .12em; padding: 4px 10px; border-radius: 8px; background: var(--next); border: 2px solid var(--next-edge); }
+.teach-actions { display: flex; gap: 6px; }
+.teach-actions input { flex: 1; min-width: 0; font: .85em var(--font-code); padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface-2); color: var(--ink); }
