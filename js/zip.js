@@ -134,27 +134,41 @@ export function sheetToXlsx(sheetData, title) {
 }
 
 /** Erstes Tabellenblatt einer .xlsx-Datei lesen → { cells, rows, cols, title } */
+/**
+ * Ein Tabellenblatt einer .xlsx-Datei lesen → { cells, rows, cols, title, sheets }.
+ * Hat die Datei mehrere Blätter (z. B. „Auftrag“ und „Weitsprung“), wird das Blatt mit den meisten Zahlen und Formeln genommen.
+ */
 export async function xlsxToSheet(bytes) {
     const entries = readZip(bytes), dec = new TextDecoder();
     const get = async name => { const e = entries.find(x => x.name === name); return e ? dec.decode(await e.read()) : null; };
     const wb = await get('xl/workbook.xml');
-    let sheetPath = 'xl/worksheets/sheet1.xml', title = 'Tabelle';
+    const list = [];
     if (wb) {
         const doc = new DOMParser().parseFromString(wb, 'application/xml');
-        const first = doc.getElementsByTagName('sheet')[0];
-        if (first) {
-            title = first.getAttribute('name') || title;
-            const rid = first.getAttribute('r:id') || first.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'id');
-            const rels = await get('xl/_rels/workbook.xml.rels');
-            if (rels && rid) {
-                const rd = new DOMParser().parseFromString(rels, 'application/xml');
-                const rel = [...rd.getElementsByTagName('Relationship')].find(r => r.getAttribute('Id') === rid);
-                if (rel) { const t = rel.getAttribute('Target').replace(/^\//, ''); sheetPath = t.startsWith('xl/') ? t : 'xl/' + t; }
-            }
+        const rels = await get('xl/_rels/workbook.xml.rels');
+        const rd = rels ? new DOMParser().parseFromString(rels, 'application/xml') : null;
+        for (const sh of doc.getElementsByTagName('sheet')) {
+            const rid = sh.getAttribute('r:id') || sh.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'id');
+            const rel = rd && [...rd.getElementsByTagName('Relationship')].find(r => r.getAttribute('Id') === rid);
+            if (!rel) continue;
+            const t = rel.getAttribute('Target').replace(/^\//, '');
+            list.push({ title: sh.getAttribute('name') || 'Tabelle', path: t.startsWith('xl/') ? t : 'xl/' + t });
         }
     }
-    const xml = await get(sheetPath);
-    if (!xml) throw new Error('In der Datei wurde kein Tabellenblatt gefunden.');
+    if (!list.length) list.push({ title: 'Tabelle', path: 'xl/worksheets/sheet1.xml' });
+    let best = null;
+    for (const s of list) {
+        const xml = await get(s.path); if (!xml) continue;
+        const r = await readSheet(xml, get);
+        r.title = s.title;
+        r.score = Object.values(r.cells).filter(v => /^=|^-?\d+(,\d+)?$/.test(v)).length;
+        if (!best || r.score > best.score) best = r;
+    }
+    if (!best) throw new Error('In der Datei wurde kein Tabellenblatt gefunden.');
+    best.sheets = list.map(s => s.title);
+    return best;
+}
+async function readSheet(xml, get) {
     const ssXml = await get('xl/sharedStrings.xml');
     const shared = ssXml ? [...new DOMParser().parseFromString(ssXml, 'application/xml').getElementsByTagName('si')].map(si => [...si.getElementsByTagName('t')].map(t => t.textContent).join('')) : [];
     const doc = new DOMParser().parseFromString(xml, 'application/xml');
@@ -180,5 +194,5 @@ export async function xlsxToSheet(bytes) {
         if (raw === undefined || raw === '') continue;
         cells[a] = raw; maxR = Math.max(maxR, p.r + 1); maxC = Math.max(maxC, p.c + 1);
     }
-    return { cells, rows: maxR, cols: maxC, title, skipped };
+    return { cells, rows: maxR, cols: maxC, skipped };
 }

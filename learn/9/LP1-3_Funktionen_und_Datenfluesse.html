@@ -1,0 +1,1934 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Funktionen &amp; Datenflüsse</title>
+<style>
+:root {
+  --bg: #eef3f9; --surface: #ffffff; --surface-2: #e3ebf5; --ink: #142235; --ink-2: #546a84; --line: #c9d6e6;
+  --acc: #1f8f55; --acc-soft: #dcf3e5; --acc-deep: #146b3e; --term: #0f1a2b; --term-2: #172742; --glow: #5fe08a; --cyan: #2bb8d6;
+  --sun: #ffc23d; --sun-soft: #fff1c9; --pink: #d63aa8; --pink-soft: #fbe1f3; --blue: #2a6fd6; --blue-soft: #dfeaff;
+  --good: #1f8a45; --good-soft: #dcf1e1; --bad: #c23b3b; --bad-soft: #fbe0e0; --next: #fff0b3; --next-edge: #e9b622;
+  --font-display: "Pixelify Sans", "Courier New", monospace;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --font-code: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  --radius: 12px;
+  --r0: #2a6fd6; --r1: #d63a3a; --r2: #8a3bc9; --r3: #1f8f55; --r4: #e07a12; --r5: #128a9a;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1626; --surface: #142036; --surface-2: #1b2a45; --ink: #e8f0fa; --ink-2: #a5b7cc; --line: #2a3d5c;
+    --acc: #5fe08a; --acc-soft: #183a2a; --acc-deep: #8af0ad; --sun-soft: #3d331a; --pink-soft: #3d1c34; --blue-soft: #1b2f52;
+    --good: #6fd08b; --good-soft: #1f3a2a; --bad: #ff8a8a; --bad-soft: #452326; --next: #4a3f17;
+    --r0: #7fb0ff; --r1: #ff8a8a; --r2: #d0a3ff; --r3: #6fd08b; --r4: #ffb35c; --r5: #6fd6e0;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 76px; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: calc(18px * var(--fz, 1)); line-height: 1.6; -webkit-text-size-adjust: 100%; }
+body, code, pre, kbd, button, input { font-variant-ligatures: none; font-feature-settings: "calt" 0, "liga" 0; }
+.wrap { max-width: 840px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { text-wrap: balance; line-height: 1.2; }
+h2 { font-family: var(--font-display); font-weight: 700; font-size: calc(clamp(26px, 5vw, 34px) * var(--fz, 1)); margin: 0; }
+h3 { font-family: var(--font-display); font-size: calc(22px * var(--fz, 1)); margin: 26px 0 10px; }
+p { margin: 0 0 14px; }
+a { color: var(--blue); text-underline-offset: 3px; }
+code { font-family: var(--font-code); font-size: 0.86em; background: var(--surface-2); padding: 1px 6px; border-radius: 5px; overflow-wrap: anywhere; }
+img { max-width: 100%; height: auto; display: block; }
+img.pix, .pix { image-rendering: pixelated; image-rendering: crisp-edges; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; border-radius: 6px; }
+
+/* ---------- Hero: Terminal ---------- */
+.hero-band { background: var(--term); color: #dfe9f7; border-bottom: 4px solid var(--glow); }
+.hero { padding-block: 34px 26px; }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 28px; align-items: center; }
+.eyebrow { display: inline-flex; gap: 8px; align-items: center; font-family: var(--font-display); color: var(--glow); font-size: calc(16px * var(--fz, 1)); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 10px; flex-wrap: wrap; }
+.eyebrow b { background: var(--glow); color: var(--term); padding: 0 8px; border-radius: 3px; letter-spacing: .04em; }
+.hero h1 { font-family: var(--font-display); font-weight: 700; font-size: calc(clamp(36px, 7vw, 56px) * var(--fz, 1)); margin: 0 0 12px; color: #fff; text-shadow: 3px 3px 0 #000; }
+.hero .lead { font-size: calc(19px * var(--fz, 1)); color: #b8c8de; }
+.goals { list-style: none; padding: 0; margin: 16px 0 0; display: grid; gap: 6px; }
+.goals li { position: relative; padding-left: 30px; color: #dfe9f7; }
+.goals li::before { content: ">"; position: absolute; left: 4px; top: 0; font-family: var(--font-code); color: var(--glow); font-weight: 700; }
+.hero-art { position: relative; border: 4px solid #2c3f63; background: #070d18; aspect-ratio: 4 / 3; overflow: hidden; box-shadow: 0 0 0 4px #0a1220, 8px 8px 0 #000; }
+.hero-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; }
+.hero-art .typing { position: absolute; left: 7%; right: 7%; top: 8%; height: 50%; font-family: var(--font-code); font-size: calc(13px * var(--fz, 1)); color: var(--glow); white-space: pre; overflow: hidden; line-height: 1.5; text-shadow: 0 0 6px rgba(95, 224, 138, .6); }
+.hero-art .typing::after { content: "█"; animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.hero code { background: #1b2a45; color: var(--glow); }
+.rank span, .rank b { white-space: nowrap; }
+.rank { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin-top: 16px; padding: 6px 12px; border: 2px solid #2c3f63; background: #0a1324; font-family: var(--font-display); color: #b8c8de; }
+.rank b { color: var(--sun); }
+@media (max-width: 680px) { .hero-grid { grid-template-columns: minmax(0, 1fr); } .hero-art { max-width: 440px; } }
+
+/* ---------- Stationsleiste ---------- */
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--bg); }
+.trail { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.trail-inner { display: flex; align-items: center; gap: 12px; padding-block: 10px; padding-right: 84px; }
+.trail-stops { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; flex: 1; min-width: 0; padding: 2px; }
+.trail-stops::-webkit-scrollbar { display: none; }
+.trail-stops a { flex: none; width: 38px; height: 38px; display: grid; place-items: center; font-family: var(--font-display); font-size: calc(17px * var(--fz, 1)); text-decoration: none; color: var(--ink-2); background: var(--surface); border: 2px solid var(--line); border-radius: 4px; }
+.trail-stops a.is-done { background: var(--acc); border-color: var(--acc); color: #fff; }
+.trail-stops a.is-heft { border-color: var(--pink); }
+.trail-count { flex: none; font-family: var(--font-display); font-size: calc(16px * var(--fz, 1)); color: var(--ink-2); white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* ---------- Stationen ---------- */
+.station { padding-block: 44px 20px; border-bottom: 2px dashed var(--line); }
+.station-head { display: flex; gap: 16px; align-items: center; margin-bottom: 18px; }
+.station-num { flex: none; width: 58px; height: 58px; display: grid; place-items: center; font-family: var(--font-display); font-size: calc(26px * var(--fz, 1)); font-weight: 700; color: var(--glow); background: var(--term); border: 3px solid var(--term); box-shadow: inset 0 0 0 2px #2c3f63, 4px 4px 0 var(--line); position: relative; }
+.station-num::before, .station-num::after { content: ""; position: absolute; left: 8px; right: 8px; height: 4px; background: repeating-linear-gradient(90deg, #8d97ab 0 4px, transparent 4px 8px); }
+.station-num::before { top: -7px; } .station-num::after { bottom: -7px; }
+.station-num.heft { color: #fff; background: var(--pink); border-color: var(--pink); }
+.station-head small { display: block; font-family: var(--font-display); color: var(--ink-2); font-size: calc(15px * var(--fz, 1)); letter-spacing: .06em; text-transform: uppercase; }
+.done-row { display: flex; justify-content: flex-end; margin-top: 22px; }
+.done { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; -webkit-user-select: none; padding: 10px 16px; border-radius: 999px; border: 2px solid var(--line); background: var(--surface); font-weight: 700; }
+.done input { width: 22px; height: 22px; accent-color: var(--acc); margin: 0; }
+.done:has(input:checked) { border-color: var(--acc); background: var(--acc-soft); }
+ul.facts { padding-left: 22px; } ul.facts li { margin: 6px 0; }
+ol.steps { list-style: none; counter-reset: s; padding: 0; margin: 10px 0 18px; display: grid; gap: 12px; }
+ol.steps > li { counter-increment: s; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; align-items: start; }
+ol.steps > li::before { content: counter(s); width: 30px; height: 30px; display: grid; place-items: center; font-family: var(--font-display); font-size: calc(16px * var(--fz, 1)); color: var(--acc-deep); border: 2px solid var(--acc); border-radius: 4px; margin-top: 1px; }
+.ui { font-weight: 700; }
+.key { display: inline-flex; align-items: center; justify-content: center; padding: 0 7px; min-height: 28px; min-width: 28px; vertical-align: middle; border: 1px solid var(--line); border-bottom-width: 3px; border-radius: 6px; background: var(--surface); font-family: var(--font-code); font-size: .85em; font-weight: 600; }
+
+.note { padding: 14px 16px; border-radius: var(--radius); background: var(--blue-soft); margin: 18px 0; }
+.note.warn { background: var(--sun-soft); }
+.note.rule { background: var(--acc-soft); border-left: 6px solid var(--acc); }
+.note.expert { background: var(--pink-soft); border-left: 6px solid var(--pink); }
+.note p:last-child, .note ul:last-child { margin-bottom: 0; }
+.note-title { font-weight: 700; display: block; margin-bottom: 4px; }
+.note.expert .note-title::before { content: "★ ALPHA-AUFGABE · "; font-family: var(--font-display); color: var(--pink); font-weight: 700; }
+
+/* Quietscheente Debbie */
+.duck { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 12px; align-items: start; margin: 20px 0; }
+.duck img { width: 64px; image-rendering: pixelated; }
+.duck .bubble { position: relative; background: var(--sun-soft); border: 2px solid var(--sun); border-radius: 12px; padding: 12px 14px; }
+.duck .bubble::before { content: ""; position: absolute; left: -10px; top: 18px; border: 8px solid transparent; border-right-color: var(--sun); border-left: 0; }
+.duck .bubble b.who { font-family: var(--font-display); display: block; color: #9a6a00; font-size: .9em; }
+.duck .bubble p:last-child { margin-bottom: 0; }
+
+.task { margin: 22px 0; border: 2px solid var(--acc); border-radius: 6px; background: var(--surface); }
+.task-head { display: flex; align-items: center; gap: 10px; padding: 8px 14px; background: var(--acc-soft); border-bottom: 2px solid var(--acc); font-family: var(--font-display); font-size: calc(18px * var(--fz, 1)); color: var(--acc-deep); }
+.task-head::before { content: ">_"; font-family: var(--font-code); font-weight: 700; }
+.task-body { padding: 14px 16px 6px; }
+details.reveal { margin: 4px 0 14px; border-top: 1px dashed var(--line); padding-top: 10px; }
+details.reveal summary { cursor: pointer; font-weight: 700; color: var(--blue); list-style: none; display: inline-flex; align-items: center; gap: 8px; min-height: 36px; }
+details.reveal summary::-webkit-details-marker { display: none; }
+details.reveal summary::before { content: "▸"; transition: transform .15s; }
+details.reveal[open] summary::before { transform: rotate(90deg); }
+details.reveal .answer { padding: 8px 0 4px; }
+figure { margin: 16px 0 20px; }
+figcaption { font-size: calc(15px * var(--fz, 1)); color: var(--ink-2); margin-top: 6px; text-align: center; }
+.cols2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 640px) { .cols2 { grid-template-columns: minmax(0, 1fr); } }
+table.plain { border-collapse: collapse; margin: 10px 0 18px; font-size: .95em; display: block; max-width: 100%; overflow-x: auto; }
+table.plain code { overflow-wrap: normal; white-space: nowrap; }
+table.plain th, table.plain td { border: 1px solid var(--line); padding: 6px 10px; text-align: left; vertical-align: top; }
+table.plain th { background: var(--surface-2); }
+.svgbox { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px; }
+.svgbox svg { display: block; width: 100%; height: auto; max-height: 420px; }
+
+/* ---------- Quiz ---------- */
+.quiz { display: grid; gap: 18px; margin: 14px 0; }
+.q { padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.q-text { font-weight: 700; margin-bottom: 10px; }
+.q-opts { display: grid; gap: 8px; }
+.q-opt { text-align: left; padding: 10px 14px; min-height: 46px; border-radius: 8px; border: 2px solid var(--line); background: var(--surface); cursor: pointer; display: flex; gap: 10px; align-items: center; }
+.q-opt code { background: transparent; padding: 0; font-size: .95em; }
+.q-opt.is-right { border-color: var(--good); background: var(--good-soft); }
+.q-opt.is-wrong { border-color: var(--bad); background: var(--bad-soft); }
+.q-fb { margin-top: 10px; font-size: calc(16px * var(--fz, 1)); }
+.q-fb.good { color: var(--good); } .q-fb.bad { color: var(--bad); }
+
+/* ---------- Download / ByCS Drive ---------- */
+.dl { margin: 20px 0; border: 2px solid var(--blue); border-radius: 6px; background: var(--surface); }
+.dl-head { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--blue-soft); border-bottom: 2px solid var(--blue); flex-wrap: wrap; }
+.dl-file { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 200px; font-family: var(--font-code); font-weight: 600; overflow-wrap: anywhere; }
+.dl-file svg { width: 30px; height: 30px; flex: none; }
+.dl-btn { display: inline-flex; align-items: center; gap: 8px; min-height: 46px; padding: 0 16px; border-radius: 6px; border: 0; background: var(--blue); color: #fff; font-weight: 700; cursor: pointer; box-shadow: inset 0 -4px 0 rgba(0, 0, 0, .25); }
+.dl-btn svg { width: 20px; height: 20px; }
+.dl-body { padding: 12px 16px 4px; }
+
+/* ---------- Mini-Tabellenkalkulation ---------- */
+.calc { margin: 18px 0 22px; border: 2px solid var(--term); border-radius: 6px; background: var(--surface); overflow: hidden; box-shadow: 4px 4px 0 var(--line); }
+.calc-title { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: var(--term); color: #dfe9f7; font-family: var(--font-display); font-size: calc(16px * var(--fz, 1)); }
+.calc-title::before { content: ""; width: 12px; height: 12px; background: var(--glow); box-shadow: 18px 0 0 var(--sun), 36px 0 0 #ff6b6b; margin-right: 44px; }
+.calc-fx { display: flex; gap: 6px; align-items: stretch; padding: 8px; background: var(--surface-2); border-bottom: 1px solid var(--line); }
+.calc-name { flex: none; min-width: 52px; display: grid; place-items: center; font-family: var(--font-code); font-weight: 700; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 0 6px; }
+.calc-fxlabel { flex: none; display: grid; place-items: center; font-family: var(--font-code); font-style: italic; color: var(--ink-2); padding: 0 2px; }
+.calc-input { flex: 1; min-width: 0; font-family: var(--font-code); font-size: 17px; padding: 8px 10px; border: 2px solid var(--line); border-radius: 4px; background: var(--surface); color: var(--ink); }
+.calc-input:focus { border-color: var(--blue); outline: none; }
+.calc-input:disabled { opacity: .6; }
+.calc-ok { flex: none; min-width: 46px; border: 0; border-radius: 4px; background: var(--acc); color: #fff; font-weight: 700; cursor: pointer; }
+.calc-keys { display: flex; flex-wrap: wrap; gap: 6px; padding: 6px 8px; background: var(--surface-2); border-bottom: 1px solid var(--line); }
+.calc-keys button { min-width: 40px; min-height: 38px; padding: 0 10px; border: 1px solid var(--line); border-bottom-width: 3px; border-radius: 6px; background: var(--surface); font-family: var(--font-code); font-weight: 700; cursor: pointer; }
+.calc-keys .sep { flex: 1; }
+.calc-keys button.tool { font-family: var(--font-body); font-size: .85em; }
+.calc-keys button[aria-pressed="true"] { background: var(--next); border-color: var(--next-edge); }
+.calc-keys button:disabled { opacity: .4; }
+.calc-preview { padding: 4px 12px; min-height: 30px; font-family: var(--font-code); font-size: .9em; border-bottom: 1px solid var(--line); color: var(--ink-2); overflow-wrap: anywhere; }
+.calc-preview .rf { font-weight: 700; }
+.calc-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.calc table { border-collapse: collapse; font-family: var(--font-code); font-size: calc(15px * var(--fz, 1)); min-width: 100%; }
+.calc th { background: var(--surface-2); color: var(--ink-2); font-weight: 600; border: 1px solid var(--line); padding: 2px 6px; min-width: 32px; font-size: .9em; user-select: none; -webkit-user-select: none; }
+.calc th.hl { background: color-mix(in srgb, var(--blue) 22%, var(--surface-2)); color: var(--ink); }
+.calc td { border: 1px solid var(--line); padding: 6px 8px; min-width: 70px; height: 38px; white-space: nowrap; cursor: cell; position: relative; user-select: none; -webkit-user-select: none; text-align: left; }
+.calc td.num { text-align: right; }
+.calc td.lock { background: color-mix(in srgb, var(--surface-2) 55%, var(--surface)); cursor: default; }
+.calc td.head { font-weight: 700; background: color-mix(in srgb, var(--acc) 14%, var(--surface)); }
+.calc td.inp { background: color-mix(in srgb, var(--sun) 22%, var(--surface)); }
+.calc td.out { background: color-mix(in srgb, var(--acc) 12%, var(--surface)); }
+.calc td.err { color: var(--bad); font-weight: 700; }
+.calc td.fx { color: var(--blue); }
+.calc td.sel { outline: 3px solid var(--blue); outline-offset: -3px; z-index: 2; }
+.calc td.copysrc { outline: 2px dashed var(--ink); outline-offset: -4px; }
+.calc td.rf0 { box-shadow: inset 0 0 0 3px var(--r0); } .calc td.rf1 { box-shadow: inset 0 0 0 3px var(--r1); } .calc td.rf2 { box-shadow: inset 0 0 0 3px var(--r2); }
+.calc td.rf3 { box-shadow: inset 0 0 0 3px var(--r3); } .calc td.rf4 { box-shadow: inset 0 0 0 3px var(--r4); } .calc td.rf5 { box-shadow: inset 0 0 0 3px var(--r5); }
+.calc .c0 { color: var(--r0); } .calc .c1 { color: var(--r1); } .calc .c2 { color: var(--r2); } .calc .c3 { color: var(--r3); } .calc .c4 { color: var(--r4); } .calc .c5 { color: var(--r5); }
+.calc-foot { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 12px; border-top: 1px solid var(--line); background: var(--surface-2); }
+.calc-msg { flex: 1 1 260px; min-width: 0; font-size: calc(16px * var(--fz, 1)); line-height: 1.45; }
+.calc-msg.good { color: var(--good); font-weight: 700; } .calc-msg.bad { color: var(--bad); }
+.fbtn { min-height: 44px; padding: 0 16px; border-radius: 6px; border: 2px solid var(--line); background: var(--surface); cursor: pointer; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
+.fbtn.primary { background: var(--next); border-color: var(--next-edge); color: #2b2410; }
+.calc.solved { border-color: var(--good); }
+.calc.solved .calc-title { background: var(--good); }
+
+/* ---------- Hefteintrag ---------- */
+.heft-wrap { margin: 18px 0; }
+.heft { position: relative; margin: 26px 0 16px; padding: 30px 26px 22px; border: 3px dashed #59657a; border-radius: 4px; background-color: #fffef8; color: #1c2533;
+  background-image: linear-gradient(#e6edf6 1px, transparent 1px), linear-gradient(90deg, #e6edf6 1px, transparent 1px); background-size: 22px 22px; font-size: calc(17px * var(--fz, 1)); }
+.heft .scissors { position: absolute; top: -19px; left: 22px; width: 34px; height: 34px; background: var(--bg); padding: 2px; }
+.heft .scissors svg { width: 30px; height: 30px; color: #59657a; }
+.heft-title { font-family: var(--font-display); font-weight: 700; font-size: calc(25px * var(--fz, 1)); margin: 0 0 4px; color: #146b3e; }
+.heft-sub { font-family: var(--font-display); color: #6b7890; font-size: calc(14px * var(--fz, 1)); margin-bottom: 12px; letter-spacing: .05em; }
+.heft h4 { font-family: var(--font-display); font-size: calc(18px * var(--fz, 1)); margin: 14px 0 6px; color: #2a4a7a; }
+.heft p, .heft li { line-height: 2.1; }
+.heft ul { padding-left: 22px; margin: 4px 0 10px; }
+.heft code { background: #eef2f8; color: #1c2533; }
+.heft .svgbox { background: #fff; border-color: #d6dde8; }
+.heft table.plain th, .heft table.plain td { border-color: #b9c4d4; }
+.heft table.plain th { background: #eef2f8; }
+.gap { display: inline-block; min-width: 110px; min-height: 34px; padding: 0 10px; margin: 0 2px; line-height: 30px; vertical-align: middle; border: 2px dashed #8b97ab; border-radius: 6px; background: #f2f5fa; text-align: center; font-weight: 700; cursor: pointer; color: #1c2533; }
+.gap.filled { border-style: solid; border-color: #2a6fd6; background: #e6efff; }
+.gap.drop-hover { border-color: #e9b622; background: #fff4c7; }
+.gap.ok { border-color: #1f8a45; background: #dcf1e1; }
+.gap.bad { border-color: #c23b3b; background: #fbe0e0; }
+.heft.solved .gap { border: 0; border-bottom: 2px solid #146b3e; border-radius: 0; background: transparent; min-width: 0; padding: 0 2px; color: #146b3e; cursor: default; }
+.bank { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; border: 2px solid var(--line); border-radius: 8px; background: var(--surface); }
+.bank-label { width: 100%; font-family: var(--font-display); color: var(--ink-2); font-size: calc(14px * var(--fz, 1)); letter-spacing: .06em; text-transform: uppercase; }
+.chip { min-height: 40px; padding: 4px 12px; border-radius: 6px; border: 2px solid var(--term); background: var(--surface); font-weight: 700; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; box-shadow: 0 3px 0 var(--term); font-family: var(--font-body); }
+.chip.picked { background: var(--next); border-color: var(--next-edge); box-shadow: 0 3px 0 var(--next-edge); }
+.chip.used { visibility: hidden; position: absolute; }
+.chip.ghost { position: fixed; z-index: 100; pointer-events: none; opacity: .92; transform: rotate(-3deg); }
+.heft-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
+.heft-msg { flex: 1 1 240px; font-size: calc(16px * var(--fz, 1)); }
+.heft-msg.good { color: var(--good); font-weight: 700; } .heft-msg.bad { color: var(--bad); }
+.shot-help { display: none; }
+.heft-wrap.is-solved .shot-help { display: block; }
+.heft-wrap.is-solved .bank { display: none; }
+
+.footer { padding-block: 40px 60px; color: var(--ink-2); font-size: calc(15px * var(--fz, 1)); }
+.next-level { margin: 22px 0; padding: 18px; background: var(--term); color: #dfe9f7; border: 3px solid var(--glow); box-shadow: 6px 6px 0 #000; }
+.next-level h3 { color: var(--glow); margin-top: 0; }
+.next-level img { width: 72px; float: right; margin-left: 12px; image-rendering: pixelated; }
+
+/* Schriftgröße */
+.fontsize { position: fixed; z-index: 40; top: calc(env(safe-area-inset-top, 0px) + 8px); right: max(8px, env(safe-area-inset-right, 0px)); display: flex; gap: 4px; }
+.fs-btn { width: 34px; height: 30px; border-radius: 6px; border: 1px solid color-mix(in srgb, var(--ink-2) 35%, transparent); background: color-mix(in srgb, var(--surface) 70%, transparent); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); color: var(--ink); font-size: 13px; font-weight: 700; cursor: pointer; opacity: .85; }
+.fs-btn.fs-big { font-size: 16px; }
+.fs-btn:disabled { opacity: .3; cursor: default; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } html { scroll-behavior: auto; } }
+
+/* ---------- DFD-Baukasten ---------- */
+.dfd [hidden] { display: none !important; }
+.dfd .slot-hit, .dfd .handle-hit { fill: transparent; stroke: none; }
+.dfd .slot .slot-hit { fill: transparent; stroke: none; }
+.dfd { margin: 18px 0 22px; border: 2px solid var(--term); border-radius: 6px; background: var(--surface); box-shadow: 4px 4px 0 var(--line); overflow: hidden; }
+.dfd.solved { border-color: var(--good); }
+.dfd-title { padding: 6px 12px; background: var(--term); color: #dfe9f7; font-family: var(--font-display); font-size: calc(16px * var(--fz, 1)); }
+.dfd.solved .dfd-title { background: var(--good); }
+.dfd-prompt { padding: 10px 14px; border-bottom: 1px solid var(--line); background: var(--blue-soft); }
+.dfd-prompt code { font-size: 1em; }
+.dfd-palette { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px; background: var(--surface-2); border-bottom: 1px solid var(--line); }
+.dfd-pal { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px; border: 1px solid var(--line); border-bottom-width: 3px; border-radius: 6px; background: var(--surface); font-weight: 700; cursor: pointer; font-family: var(--font-code); font-size: calc(15px * var(--fz, 1)); }
+.dfd-pal:disabled { opacity: .35; }
+.dfd-pal .sym-rect { width: 22px; height: 14px; border: 2px solid #2a6fd6; background: #e6efff; }
+.dfd-pal .sym-rect.out { border-color: #1f8f55; background: #e3f6ea; }
+.dfd-pal .sym-ell { width: 24px; height: 14px; border: 2px solid #a87400; background: #fff3c4; border-radius: 50%; }
+.dfd-pal .sym-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--ink); }
+.dfd-pal .sym-const { font-weight: 700; color: var(--ink); }
+.dfd-edit { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 8px 12px; border-bottom: 1px solid var(--line); background: var(--sun-soft); font-size: calc(15px * var(--fz, 1)); }
+.dfd-edit .sig { flex: 1 1 260px; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+.dfd-edit .sig span { font-family: var(--font-code); font-size: .9em; padding: 1px 6px; border-radius: 4px; border: 1px dashed #a87400; }
+.dfd-edit .sig span.on { border-style: solid; background: #fff3c4; color: #4a3600; }
+.dfd-edit input { font-family: var(--font-code); font-size: 17px; padding: 6px 8px; border: 2px solid var(--line); border-radius: 4px; min-width: 120px; max-width: 220px; background: var(--surface); color: var(--ink); }
+.dfd-canvas { background: #fff; background-image: radial-gradient(#d5dfec 1px, transparent 1px); background-size: 20px 20px; }
+.dfd-canvas svg { display: block; width: 100%; height: auto; max-height: 72vh; touch-action: none; user-select: none; -webkit-user-select: none; font-family: "JetBrains Mono", Menlo, monospace; }
+.dfd .edge { fill: none; stroke: #33415a; stroke-width: 2.4; }
+.dfd .edge.is-sel { stroke: #e07a12; stroke-width: 4; }
+.dfd .hit { fill: none; stroke: transparent; stroke-width: 22; cursor: pointer; }
+.dfd .node { cursor: grab; }
+.dfd .node .lab { text-anchor: middle; font-size: 17px; font-weight: 700; fill: #14315a; pointer-events: none; }
+.dfd .k-in .shape { fill: #e6efff; stroke: #2a6fd6; stroke-width: 2.4; }
+.dfd .k-out .shape { fill: #e3f6ea; stroke: #1f8f55; stroke-width: 2.4; }
+.dfd .k-out .lab { fill: #145a32; }
+.dfd .k-fn .shape { fill: #fff3c4; stroke: #a87400; stroke-width: 2.6; }
+.dfd .k-fn .lab { fill: #5a3e00; }
+.dfd .k-const .pad, .dfd .k-split .pad { fill: transparent; stroke: none; }
+.dfd .k-const .lab { fill: #1c2533; font-size: 19px; }
+.dfd .k-split .dot { fill: #1c2533; }
+.dfd .node.is-sel .shape, .dfd .node.is-sel .pad { stroke: #e07a12; stroke-width: 4; stroke-dasharray: 5 4; }
+.dfd .node.is-sel.k-const .pad, .dfd .node.is-sel.k-split .pad { stroke: #e07a12; stroke-width: 2; }
+.dfd .node.is-src .handle { fill: #e07a12; }
+.dfd .handle { fill: #fff; stroke: #33415a; stroke-width: 2.5; cursor: crosshair; }
+.dfd .slot circle { fill: #fff; stroke: #a87400; stroke-width: 2; }
+.dfd .slot.opt circle { stroke-dasharray: 3 2; }
+.dfd .slot.full circle { fill: #a87400; }
+.dfd .slot text { text-anchor: middle; font-size: 13px; font-weight: 700; fill: #5a3e00; pointer-events: none; }
+.dfd .slot.full text { fill: #fff; }
+.dfd-formula { padding: 8px 14px; border-top: 1px solid var(--line); font-family: var(--font-code); background: var(--surface-2); overflow-wrap: anywhere; }
+.dfd-formula span { font-family: var(--font-body); color: var(--ink-2); }
+.dfd-foot { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 12px; border-top: 1px solid var(--line); background: var(--surface-2); }
+.dfd-msg { flex: 1 1 260px; min-width: 0; font-size: calc(16px * var(--fz, 1)); line-height: 1.45; }
+.dfd-msg.good { color: var(--good); font-weight: 700; } .dfd-msg.bad { color: var(--bad); }
+.dfd-picker { position: fixed; inset: 0; z-index: 200; background: rgba(8, 14, 26, .6); display: grid; place-items: center; padding: 12px; }
+.dfd-picker-in { width: min(760px, 100%); max-height: 88vh; display: flex; flex-direction: column; background: var(--surface); border: 3px solid var(--term); border-radius: 8px; box-shadow: 6px 6px 0 #000; }
+.dfd-picker-head { display: flex; gap: 10px; align-items: center; padding: 10px 12px; background: var(--term); color: #fff; font-family: var(--font-display); }
+.dfd-picker-head input { flex: 1; min-width: 0; font-size: 17px; padding: 6px 10px; border-radius: 4px; border: 0; }
+.dfd-picker-list { overflow-y: auto; padding: 6px 12px 14px; -webkit-overflow-scrolling: touch; }
+.dfd-picker-list h4 { font-family: var(--font-display); margin: 12px 0 6px; color: var(--ink-2); }
+.dfd-picker-list .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 6px; }
+.dfd-picker-list button { text-align: left; display: grid; gap: 1px; padding: 8px 10px; min-height: 48px; border: 1px solid var(--line); border-bottom-width: 3px; border-radius: 6px; background: var(--surface); cursor: pointer; }
+.dfd-picker-list button b { font-family: var(--font-code); font-size: 1.05em; }
+.dfd-picker-list button span { font-family: var(--font-code); font-size: .8em; color: var(--ink-2); }
+.dfd-picker-list button i { font-size: .8em; color: var(--ink-2); font-style: normal; }
+.dfd circle.slot-hit, .dfd circle.handle-hit { fill: transparent !important; stroke: none !important; }
+.dfd-picker-head .fbtn { color: var(--ink); min-width: 46px; justify-content: center; }
+
+/* Funktionsauswahl: nur die Liste scrollt, nicht die Seite darunter */
+html.dfd-lock, html.dfd-lock body { overflow: hidden; }
+.dfd-picker { overscroll-behavior: contain; touch-action: none; }
+.dfd-picker-in { overflow: hidden; touch-action: auto; }
+.dfd-picker-list { flex: 1 1 auto; min-height: 0; overscroll-behavior: contain; touch-action: pan-y; }
+
+/* Anfasser und Eingänge: keine Kreise mehr, die wie Verteiler aussehen */
+.dfd .grip { cursor: crosshair; }
+.dfd .grip rect:not(.handle-hit) { fill: #e07a12; }
+.dfd .grip path { fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.dfd .grip .handle-hit { fill: transparent; }
+.dfd .slot text { fill: #8a6a20; font-size: 12px; }
+.dfd .slot.full text { fill: #8a6a20; }
+.dfd .slot .ring { fill: rgba(224, 122, 18, .15) !important; stroke: #e07a12 !important; stroke-width: 2.5; stroke-dasharray: 4 3; }
+.dfd .slot.target text { fill: #b05a00; font-weight: 700; }
+
+</style>
+<style>/* Schriften von FlowPad (lokal) */
+@font-face { font-family: "Atkinson Hyperlegible"; src: url(../../fonts/AtkinsonHyperlegible-Regular.ttf) format("truetype"); font-weight: 400; }
+@font-face { font-family: "Atkinson Hyperlegible"; src: url(../../fonts/AtkinsonHyperlegible-Bold.ttf) format("truetype"); font-weight: 700; }
+@font-face { font-family: "JetBrains Mono"; src: url(../../fonts/JetBrainsMono.ttf) format("truetype"); font-weight: 100 800; }
+@font-face { font-family: "Pixelify Sans"; src: url(../../fonts/PixelifySans.ttf) format("truetype"); font-weight: 400 700; }
+</style>
+</head>
+<body>
+<div class="fontsize" role="group" aria-label="Schriftgröße"><button class="fs-btn" type="button" data-fs="-1" aria-label="Schrift kleiner">A<span>−</span></button><button class="fs-btn fs-big" type="button" data-fs="1" aria-label="Schrift größer">A<span>+</span></button></div>
+<div class="hero-band">
+<header class="hero wrap">
+  <div class="hero-grid">
+    <div>
+      <div class="eyebrow"><b>LERNPFAD</b> Informatik 9 · Level 1.3</div>
+      <h1>Funktionen &amp; Datenflüsse</h1>
+      <p class="lead">Jetzt wird es professionell: Statt jede Rechnung selbst zu bauen, nutzt du fertige Funktionen. Und du zeichnest, wie die Daten durch deine Formeln fließen – wie ein Netzwerkplan.</p>
+      <ul class="goals"><li>Funktionen als Verarbeitung mit Eingaben (Parametern) und genau einer Ausgabe deuten</li><li>Datenflussdiagramme mit Verteiler lesen und zeichnen</li><li>SUMME, MITTELWERT, MIN, MAX, ANZAHL und RUNDEN einsetzen</li><li>Funktionen verketten, z. B. <code>=RUNDEN(MITTELWERT(B2:D2);1)</code></li><li>Formeln mit geeigneten Eingaben testen</li></ul>
+      <div class="rank"><span>Dein Rang:</span><b>HACKER NEWBIE</b><span>→ Ziel: Badge Level 1.3</span></div>
+    </div>
+    <div class="hero-art"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAIAAAC6s0uzAAAKQklEQVR42u3dT4jUdRjH8c/Gxgixh6KVFSsFsZXCiE2LQKqDILLUNekgHjp2CwIRDKQQgg7dO3mqcywmeKgwogiJysi8aBiKG3lYAiWNbrNfYX42szPzmz+/1+s02DblKPvm8fGZmWnNLQQAqNcDXgIAEGAAEGAAQIABQIABAAEGAAEGAAQYAAQYABBgABBgAGiKWS8Bk+71P661H3+6dYsXZMrcevVM+/Gmzw54QTABAwACDAACDADc38ygPg9459KyVxOARrl0fsUEDADxR9AAgAADgAADAAIMAAIMAAIMAAgwAAgwACDAACDAAEDG6POAf/3pE684ABNh1+5DJmAAiD+CBgAEGABiB3z/2m960CsOACZgABBgABBgACDTsQP+99Y/XnEAMAEDgAADgAADAHEHDAAmYABAgAFAgAGAuAMGABMwACDAACDAABA7YHfAAGACBgABBgAEGABiBxx3wABgAgYAAQYABBgA4g4YAEzAAIAAA4AAAwBxBwwAJmAAQIABQIABgCTugAHABAwAAgwACDAAxA447oABwAQMAAIMAAgwAMQdMABgAgYAAQYAAQYA4g4YAEzAAIAAA4AAAwBxBwwAJmAAQIABQIABIHbAcQcMACZgABBgAECAASB2wO6AAcAEDAACDAAIMADEHTAAmIABAAEGAAEGAOIOGABMwACAAAOAAAMAiTtgADABA4AAAwACDACxA3YHDAAmYAAQYABAgAEg7oC94gBgAgYAAQYAAQYA4g4YAEzAAIAAA4AAAwBxBwwAJmAAQIABQIABIHbA7oABwAQMAAIMAAgwAMQOOO6AAcAEDAACDAAIMADEHTAAmIABAAEGAAEGAOIOGABMwACAAAOAAAMASdwBA4AJGAAEGAAQYACIHXDcAQOACRgABBgAEGAAiDtgAMAEDAACDAACDADEHTAAmIABAAEGAAEGAOIOGABMwACAAAOAAANA7IDjDhgATMAAIMAAgAADQOyA3QEDgAkYAAQYABBgAIg7YAAwAQMAAgwAAgwAxB0wAJiAAQABBgABBgASd8AAYAIGAAEGAAQYAGIH7A4YAEzAACDAAIAAA0DcAXvFAcAEDAACDAACDADEHTAAmIABAAEGAAEGAOIOGABMwACAAAOAAANA7IDd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" alt="Pixelbild: Ein Hacker mit Tastatur vor einem großen Bildschirm, daneben die Quietscheente Debbie und ein Bug"><div class="typing" data-lines='["> trace datenfluss", "  B2 ─┐", "  C2 ─┼─> [MITTELWERT] ─> [RUNDEN] ─> F2", "  D2 ─┘", "  ACCESS GRANTED"]' aria-hidden="true"></div></div>
+  </div>
+</header>
+</div>
+<nav class="trail" aria-label="Stationen"><div class="wrap trail-inner"><div class="trail-stops" id="trailStops"></div><span class="trail-count" id="trailCount"></span></div></nav>
+<main>
+
+<section class="station" id="s1" data-station="1">
+<div class="wrap">
+  <div class="station-head"><span class="station-num" aria-hidden="true">1</span><div><small>Die Maschine</small><h2>Was ist eine Funktion?</h2></div></div>
+  
+<p>Stell dir eine Funktion als <b>Maschine</b> vor: Oben werfen wir Werte hinein, die Maschine verarbeitet sie, und unten kommt <b>genau ein</b> Ergebnis heraus.</p>
+<ul class="facts">
+<li>Die Eingabewerte heißen <b>Parameter</b>.</li>
+<li>Das Ergebnis heißt <b>Funktionswert</b> (Ausgabe).</li>
+<li>Es gibt Funktionen mit einem, zwei oder beliebig vielen Parametern – aber immer nur <b>einen</b> Funktionswert.</li>
+</ul>
+<p>Aus Mathe kennst du <code>f(x) = 2x + 1</code>: ein Parameter x, ein Funktionswert. In der Tabellenkalkulation sieht das so aus:</p>
+<table class="plain"><tr><th>Formel</th><th>Funktionsname</th><th>Parameter</th><th>Funktionswert</th></tr>
+<tr><td><code>=SUMME(B2:B6)</code></td><td>SUMME</td><td>der Bereich B2:B6</td><td>die Summe</td></tr>
+<tr><td><code>=RUNDEN(B2;1)</code></td><td>RUNDEN</td><td>Zahl in B2; Anzahl Stellen 1</td><td>die gerundete Zahl</td></tr>
+<tr><td><code>=B2*C2</code></td><td>(mal)</td><td>B2; C2</td><td>das Produkt</td></tr></table>
+<div class="task"><div class="task-head">Check: Funktionen</div><div class="task-body"><div class="quiz" data-quiz="funktion"></div></div></div>
+
+  <div class="done-row"><label class="done"><input type="checkbox" data-done="1"> Station erledigt</label></div>
+</div>
+</section>
+<section class="station" id="s2" data-station="2">
+<div class="wrap">
+  <div class="station-head"><span class="station-num" aria-hidden="true">2</span><div><small>Netzwerkplan</small><h2>Datenflussdiagramme</h2></div></div>
+  
+<p>Ein <b>Datenflussdiagramm</b> zeigt, wie Daten durch eine Formel fließen. Diese Symbole verwenden wir:</p>
+<figure class="svgbox"><svg viewBox="0 0 520 64" xmlns="http://www.w3.org/2000/svg" role="img" font-family="JetBrains Mono, Menlo, monospace"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#33415a"/></marker></defs><rect x="13.399999999999999" y="11.0" width="93.2" height="38" fill="#e6efff" stroke="#2a6fd6" stroke-width="2.2"/><text x="60" y="35.0" text-anchor="middle" font-size="16" font-weight="700" fill="#14315a">Eingabe</text><text x="150" y="35.0" text-anchor="middle" font-size="16" font-weight="700" fill="#1c2533">2</text><ellipse cx="250" cy="30" rx="57.4" ry="23.0" fill="#fff3c4" stroke="#a87400" stroke-width="2.5"/><text x="250" y="35.0" text-anchor="middle" font-size="16" font-weight="700" fill="#5a3e00">Funktion</text><circle cx="350" cy="30" r="5.5" fill="#1c2533"/><rect x="403.4" y="11.0" width="93.2" height="38" fill="#e3f6ea" stroke="#1f8f55" stroke-width="2.2"/><text x="450" y="35.0" text-anchor="middle" font-size="16" font-weight="700" fill="#145a32">Ausgabe</text></svg></figure>
+<p><b>Eingaben</b> (Zellen, Werte) und die <b>Ausgabe</b> stehen in Rechtecken, <b>Funktionen</b> in Ellipsen. <b>Konstanten</b> wie 2 oder 0,19 schreibt man einfach als Zahl ohne Rahmen hin. Ein <b>Verteiler</b> ist ein kleiner ausgefüllter Kreis. Pfeile zeigen den <b>Datenfluss</b>.
+Kommen mehrere Pfeile in eine Funktion, gilt die Reihenfolge der Parameter <b>von links nach rechts</b>.</p>
+<div class="cols2"><div><figure class="svgbox"><svg viewBox="0 0 360 230" xmlns="http://www.w3.org/2000/svg" role="img" font-family="JetBrains Mono, Menlo, monospace"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#33415a"/></marker></defs><path d="M90,49.0 L90,70.5 L165.0,70.5 L165.0,92.0" fill="none" stroke="#33415a" stroke-width="2.2" marker-end="url(#ah)"/><path d="M270,49.0 L270,70.5 L195.0,70.5 L195.0,92.0" fill="none" stroke="#33415a" stroke-width="2.2" marker-end="url(#ah)"/><path d="M180,138.0 L180.0,181.0" fill="none" stroke="#33415a" stroke-width="2.2" marker-end="url(#ah)"/><rect x="53.0" y="11.0" width="74.0" height="38" fill="#e6efff" stroke="#2a6fd6" stroke-width="2.2"/><text x="90" y="35.0" text-anchor="middle" font-size="16" font-weight="700" fill="#14315a">Preis</text><rect x="228.2" y="11.0" width="83.6" height="38" fill="#e6efff" stroke="#2a6fd6" stroke-width="2.2"/><text x="270" y="35.0" text-anchor="middle" font-size="16" font-weight="700" fill="#14315a">Anzahl</text><ellipse cx="180" cy="115" rx="51.0" ry="23.0" fill="#fff3c4" stroke="#a87400" stroke-width="2.5"/><text x="180" y="120.0" text-anchor="middle" font-size="16" font-weight="700" fill="#5a3e00">*</text><rect x="114.2" y="181.0" width="131.6" height="38" fill="#e3f6ea" stroke="#1f8f55" stroke-width="2.2"/><text x="180" y="205.0" text-anchor="middle" font-size="16" font-weight="700" fill="#145a32">Gesamtpreis</text></svg><figcaption>Datenflussdiagramm zu <code>=B2*C2</code> (Preis in B2, Anzahl in C2)</figcaption></figure></div><div><figure class="svgbox"><svg viewBox="0 0 420 380" xmlns="http://www.w3.org/2000/svg" role="img" font-family="JetBrains Mono, Menlo, monospace"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#33415a"/></marker></defs><path d="M110,49.0 L110,84" fill="none" stroke="#33415a" stroke-width="2.2" marker-end="url(#ah)"/><path d="M110,90 L110,166.0 L135.0,166.0 L135.0,242.0" fill="none" stroke="#33415a" stroke-width="2.2" marker-end="url(#ah)"/><path d="M110,90 L110,121.0 L245.0,121.0 L245.0,152.0" fill="none" stroke="#33415a" stroke-width="2.2" marker-end="url(#ah)"/><path d="M330,109.0 L330,130.5 L275.0,130.5 L275.0,152.0" fill="none" stroke="#33415a" stroke-width="2.2" marker-end="url(#ah)"/><path d="M260,198.0 L260,220.0 L165.0,220.0 L165.0,242.0" fill="none" stroke="#33415a" stroke-width="2.2" marker-end="url(#ah)"/><path d="M150,288.0 L150.0,326.0" fill="none" stroke="#33415a" stroke-width="2.2" marker-end="url(#ah)"/><rect x="73.0" y="11.0" width="74.0" height="38" fill="#e6efff" stroke="#2a6fd6" stroke-width="2.2"/><text x="110" y="35.0" text-anchor="middle" font-size="16" font-weight="700" fill="#14315a">Preis</text><circle cx="110" cy="90" r="5.5" fill="#1c2533"/><rect x="288.2" y="71.0" width="83.6" height="38" fill="#e6efff" stroke="#2a6fd6" stroke-width="2.2"/><text x="330" y="95.0" text-anchor="middle" font-size="16" font-weight="700" fill="#14315a">Rabatt</text><ellipse cx="260" cy="175" rx="51.0" ry="23.0" fill="#fff3c4" stroke="#a87400" stroke-width="2.5"/><text x="260" y="180.0" text-anchor="middle" font-size="16" font-weight="700" fill="#5a3e00">*</text><ellipse cx="150" cy="265" rx="51.0" ry="23.0" fill="#fff3c4" stroke="#a87400" stroke-width="2.5"/><text x="150" y="270.0" text-anchor="middle" font-size="16" font-weight="700" fill="#5a3e00">-</text><rect x="98.6" y="326.0" width="102.8" height="38" fill="#e3f6ea" stroke="#1f8f55" stroke-width="2.2"/><text x="150" y="350.0" text-anchor="middle" font-size="16" font-weight="700" fill="#145a32">Endpreis</text></svg><figcaption>Der <b>Verteiler</b> gibt den Preis an zwei Funktionen weiter: <code>=B1-B1*B2</code></figcaption></figure></div></div>
+<p>Aus jedem Rechteck, jeder Konstante und jeder Ellipse geht <b>genau ein Pfeil</b>. Wird ein Datum an mehrere Funktionen gebraucht – rechts der Preis –, führt sein Pfeil in einen <b>Verteiler</b>. Aus dem Verteiler gehen mehrere Pfeile heraus. Das gilt genauso für die Ausgabe einer Funktion:</p>
+<div style="max-width:460px"><figure class="svgbox"><svg viewBox="0 0 460 465" xmlns="http://www.w3.org/2000/svg" role="img" font-family="JetBrains Mono, Menlo, monospace"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#33415a"/></marker></defs><path d="M230,49.0 L230.0,82.0" fill="none" stroke="#33415a" stroke-width="2.2" marker-end="url(#ah)"/><path d="M230,128.0 L230,164" fill="none" stroke="#33415a" stroke-width="2.2" marker-end="url(#ah)"/><path d="M230,170 L230,206.0 L85.0,206.0 L85.0,242.0" fill="none" stroke="#33415a" stroke-width="2.2" marker-end="url(#ah)"/><path d="M150,211.0 L150,226.5 L115.0,226.5 L115.0,242.0" fill="none" stroke="#33415a" stroke-width="2.2" marker-end="url(#ah)"/><path d="M230,170 L230,206.0 L315.0,206.0 L315.0,242.0" fill="none" stroke="#33415a" stroke-width="2.2" marker-end="url(#ah)"/><path d="M330,211.0 L330,226.5 L345.0,226.5 L345.0,242.0" fill="none" stroke="#33415a" stroke-width="2.2" marker-end="url(#ah)"/><path d="M100,288.0 L100,310.0 L202.5,310.0 L202.5,332.0" fill="none" stroke="#33415a" stroke-width="2.2" marker-end="url(#ah)"/><path d="M330,288.0 L330,310.0 L230.0,310.0 L230.0,332.0" fill="none" stroke="#33415a" stroke-width="2.2" marker-end="url(#ah)"/><path d="M230,170 L230,251.0 L257.5,251.0 L257.5,332.0" fill="none" stroke="#33415a" stroke-width="2.2" marker-end="url(#ah)"/><path d="M230,378.0 L230.0,416.0" fill="none" stroke="#33415a" stroke-width="2.2" marker-end="url(#ah)"/><rect x="193.0" y="11.0" width="74.0" height="38" fill="#e6efff" stroke="#2a6fd6" stroke-width="2.2"/><text x="230" y="35.0" text-anchor="middle" font-size="16" font-weight="700" fill="#14315a">B2:B6</text><ellipse cx="230" cy="105" rx="61.0" ry="23.0" fill="#fff3c4" stroke="#a87400" stroke-width="2.5"/><text x="230" y="110.0" text-anchor="middle" font-size="16" font-weight="700" fill="#5a3e00">SUMME</text><circle cx="230" cy="170" r="5.5" fill="#1c2533"/><text x="150" y="205.0" text-anchor="middle" font-size="16" font-weight="700" fill="#1c2533">100</text><ellipse cx="100" cy="265" rx="51.0" ry="23.0" fill="#fff3c4" stroke="#a87400" stroke-width="2.5"/><text x="100" y="270.0" text-anchor="middle" font-size="16" font-weight="700" fill="#5a3e00">&gt;=</text><text x="330" y="205.0" text-anchor="middle" font-size="16" font-weight="700" fill="#1c2533">0,9</text><ellipse cx="330" cy="265" rx="51.0" ry="23.0" fill="#fff3c4" stroke="#a87400" stroke-width="2.5"/><text x="330" y="270.0" text-anchor="middle" font-size="16" font-weight="700" fill="#5a3e00">*</text><ellipse cx="230" cy="355" rx="61.0" ry="23.0" fill="#fff3c4" stroke="#a87400" stroke-width="2.5"/><text x="230" y="360.0" text-anchor="middle" font-size="16" font-weight="700" fill="#5a3e00">WENN</text><rect x="173.8" y="416.0" width="112.39999999999999" height="38" fill="#e3f6ea" stroke="#1f8f55" stroke-width="2.2"/><text x="230" y="440.0" text-anchor="middle" font-size="16" font-weight="700" fill="#145a32">Endbetrag</text></svg><figcaption>Die Ausgabe von SUMME wird dreimal gebraucht. Der <b>Verteiler</b> gibt sie an drei Funktionen weiter: <code>=WENN(SUMME(B2:B6)&gt;=100;SUMME(B2:B6)*0,9;SUMME(B2:B6))</code></figcaption></figure></div>
+<div class="duck"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFQAAABOCAYAAAC+JjE8AAABGklEQVR42u3bsQ3CMBBGYYNYAInUoWaJjMdKtCxBndRBoqIOC+DCki3HyfcGcODpTr+dc0IAAADb5FDrwZdzv5Rc//2Zqvy3o5oilFBCQehaONVK8/l5LfrcbghLjfRXoYQSSigI3d5ZvnSad8MYcqwfWydX+qtQLU8ooSBUylfjMaftCu7fpF2BCtXyhBIKQsNu3tivjVhqq1AtTygIJXQ/Z/nY2Tx2hk29TVd+Lj8Gc3ktD0IJJVTK53gDn2tuXvwsH/mdIdNdfRWq5QklFIRuL+VzMb3+z837W7eqXYG5vJYnFIQSGszlE9O8lfRXoYQSCkIJ3d4d+2bu0lea46tQLU8ooSB0P1/StYLv5bU8oSCUUAAAgEb4AR5+T9UJMMc5AAAAAElFTkSuQmCC" alt="Quietscheente Debbie"><div class="bubble"><b class="who">Debbie Debug:</b><p>Ein Verteiler ist wie ein Netzwerk-Switch: Ein Datenpaket kommt rein, mehrere gleiche gehen raus. So muss SUMME nur einmal rechnen, und ihr Ergebnis kommt trotzdem an drei Stellen an.</p></div></div>
+<div class="task"><div class="task-head">Check: Diagramme lesen</div><div class="task-body"><div class="quiz" data-quiz="dfd"></div></div></div>
+
+  <div class="done-row"><label class="done"><input type="checkbox" data-done="2"> Station erledigt</label></div>
+</div>
+</section>
+<section class="station" id="s3" data-station="3">
+<div class="wrap">
+  <div class="station-head"><span class="station-num" aria-hidden="true">3</span><div><small>Werkzeugkiste</small><h2>Vordefinierte Funktionen</h2></div></div>
+  
+<p>Tabellenkalkulationen bringen Hunderte fertige Funktionen mit. Diese sechs brauchst du ständig:</p>
+<table class="plain"><tr><th>Funktion</th><th>liefert</th><th>Beispiel</th></tr>
+<tr><td><code>SUMME(Bereich)</code></td><td>die Summe aller Zahlen</td><td><code>=SUMME(B2:B7)</code></td></tr>
+<tr><td><code>MITTELWERT(Bereich)</code></td><td>den Durchschnitt (leere Zellen zählen nicht mit)</td><td><code>=MITTELWERT(B2:B7)</code></td></tr>
+<tr><td><code>MAX(Bereich)</code> / <code>MIN(Bereich)</code></td><td>größten / kleinsten Wert</td><td><code>=MAX(B2:B7)</code></td></tr>
+<tr><td><code>ANZAHL(Bereich)</code></td><td>wie viele Zellen eine Zahl enthalten</td><td><code>=ANZAHL(B2:B7)</code></td></tr>
+<tr><td><code>RUNDEN(Zahl; Stellen)</code></td><td>die gerundete Zahl</td><td><code>=RUNDEN(B2;1)</code></td></tr></table>
+<p>Der <b>Doppelpunkt</b> heißt „bis“: <code>B2:B7</code> ist der <b>Bereich</b> von B2 bis B7. Das <b>Semikolon</b> trennt Parameter.</p>
+<div class="calc" data-calc="funktionen"></div>
+
+  <div class="done-row"><label class="done"><input type="checkbox" data-done="3"> Station erledigt</label></div>
+</div>
+</section>
+<section class="station" id="s4" data-station="4">
+<div class="wrap">
+  <div class="station-head"><span class="station-num" aria-hidden="true">4</span><div><small>Kettenreaktion</small><h2>Funktionen verketten</h2></div></div>
+  
+<p>Der Funktionswert einer Funktion kann direkt <b>Parameter einer anderen</b> Funktion sein. Das heißt <b>Verkettung</b>:</p>
+<figure class="svgbox"><svg viewBox="0 0 420 330" xmlns="http://www.w3.org/2000/svg" role="img" font-family="JetBrains Mono, Menlo, monospace"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#33415a"/></marker></defs><path d="M70,49.0 L70,73.0 L127.5,73.0 L127.5,97.0" fill="none" stroke="#33415a" stroke-width="2.2" marker-end="url(#ah)"/><path d="M170,49.0 L170.0,97.0" fill="none" stroke="#33415a" stroke-width="2.2" marker-end="url(#ah)"/><path d="M270,49.0 L270,73.0 L212.5,73.0 L212.5,97.0" fill="none" stroke="#33415a" stroke-width="2.2" marker-end="url(#ah)"/><path d="M170,143.0 L170,167.5 L205.0,167.5 L205.0,192.0" fill="none" stroke="#33415a" stroke-width="2.2" marker-end="url(#ah)"/><text x="211.0" y="184.0" font-size="13" fill="#5a6b85">Zahl</text><path d="M330,131.0 L330,161.5 L255.0,161.5 L255.0,192.0" fill="none" stroke="#33415a" stroke-width="2.2" marker-end="url(#ah)"/><text x="261.0" y="184.0" font-size="13" fill="#5a6b85">Stellen</text><path d="M230,238.0 L230.0,281.0" fill="none" stroke="#33415a" stroke-width="2.2" marker-end="url(#ah)"/><rect x="40.0" y="11.0" width="60" height="38" fill="#e6efff" stroke="#2a6fd6" stroke-width="2.2"/><text x="70" y="35.0" text-anchor="middle" font-size="16" font-weight="700" fill="#14315a">B2</text><rect x="140.0" y="11.0" width="60" height="38" fill="#e6efff" stroke="#2a6fd6" stroke-width="2.2"/><text x="170" y="35.0" text-anchor="middle" font-size="16" font-weight="700" fill="#14315a">C2</text><rect x="240.0" y="11.0" width="60" height="38" fill="#e6efff" stroke="#2a6fd6" stroke-width="2.2"/><text x="270" y="35.0" text-anchor="middle" font-size="16" font-weight="700" fill="#14315a">D2</text><ellipse cx="170" cy="120" rx="91.0" ry="23.0" fill="#fff3c4" stroke="#a87400" stroke-width="2.5"/><text x="170" y="125.0" text-anchor="middle" font-size="16" font-weight="700" fill="#5a3e00">MITTELWERT</text><text x="330" y="125.0" text-anchor="middle" font-size="16" font-weight="700" fill="#1c2533">1</text><ellipse cx="230" cy="215" rx="81.0" ry="23.0" fill="#fff3c4" stroke="#a87400" stroke-width="2.5"/><text x="230" y="220.0" text-anchor="middle" font-size="16" font-weight="700" fill="#5a3e00">RUNDEN</text><rect x="200.0" y="281.0" width="60" height="38" fill="#e3f6ea" stroke="#1f8f55" stroke-width="2.2"/><text x="230" y="305.0" text-anchor="middle" font-size="16" font-weight="700" fill="#145a32">F2</text></svg><figcaption>Verkettung: <code>=RUNDEN(MITTELWERT(B2:D2);1)</code></figcaption></figure>
+<p>Gelesen wird <b>von innen nach außen</b>: Zuerst berechnet <code>MITTELWERT(B2:D2)</code> den Durchschnitt. Dieses Ergebnis ist der erste Parameter von <code>RUNDEN</code>, der zweite ist die 1 (eine Nachkommastelle).</p>
+<div class="calc" data-calc="verkettet"></div>
+<div class="duck"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFQAAABOCAYAAAC+JjE8AAABGklEQVR42u3bsQ3CMBBGYYNYAInUoWaJjMdKtCxBndRBoqIOC+DCki3HyfcGcODpTr+dc0IAAADb5FDrwZdzv5Rc//2Zqvy3o5oilFBCQehaONVK8/l5LfrcbghLjfRXoYQSSigI3d5ZvnSad8MYcqwfWydX+qtQLU8ooSBUylfjMaftCu7fpF2BCtXyhBIKQsNu3tivjVhqq1AtTygIJXQ/Z/nY2Tx2hk29TVd+Lj8Gc3ktD0IJJVTK53gDn2tuXvwsH/mdIdNdfRWq5QklFIRuL+VzMb3+z837W7eqXYG5vJYnFIQSGszlE9O8lfRXoYQSCkIJ3d4d+2bu0lea46tQLU8ooSB0P1/StYLv5bU8oSCUUAAAgEb4AR5+T9UJMMc5AAAAAElFTkSuQmCC" alt="Quietscheente Debbie"><div class="bubble"><b class="who">Debbie Debug:</b><p>Zähl die Klammern: Jede Klammer, die aufgeht, muss auch wieder zu. <code>=RUNDEN(MITTELWERT(B2:D2);2)</code> hat zwei auf und zwei zu.</p></div></div>
+
+  <div class="done-row"><label class="done"><input type="checkbox" data-done="4"> Station erledigt</label></div>
+</div>
+</section>
+<section class="station" id="s5" data-station="5">
+<div class="wrap">
+  <div class="station-head"><span class="station-num" aria-hidden="true">5</span><div><small>Hin und zurück</small><h2>Vom Diagramm zur Formel – und testen</h2></div></div>
+  
+<p>Profis planen eine schwierige Formel zuerst als Datenflussdiagramm und bauen sie dann in der Tabelle. Andersherum hilft ein Diagramm, eine fremde Formel zu verstehen.</p>
+<div style="max-width:420px"><figure class="svgbox"><svg viewBox="0 0 400 360" xmlns="http://www.w3.org/2000/svg" role="img" font-family="JetBrains Mono, Menlo, monospace"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#33415a"/></marker></defs><path d="M200,49.0 L200,79" fill="none" stroke="#33415a" stroke-width="2.2" marker-end="url(#ah)"/><path d="M200,85 L200,111.0 L110.0,111.0 L110.0,137.0" fill="none" stroke="#33415a" stroke-width="2.2" marker-end="url(#ah)"/><path d="M200,85 L200,111.0 L290.0,111.0 L290.0,137.0" fill="none" stroke="#33415a" stroke-width="2.2" marker-end="url(#ah)"/><path d="M110,183.0 L110,205.0 L185.0,205.0 L185.0,227.0" fill="none" stroke="#33415a" stroke-width="2.2" marker-end="url(#ah)"/><path d="M290,183.0 L290,205.0 L215.0,205.0 L215.0,227.0" fill="none" stroke="#33415a" stroke-width="2.2" marker-end="url(#ah)"/><path d="M200,273.0 L200.0,311.0" fill="none" stroke="#33415a" stroke-width="2.2" marker-end="url(#ah)"/><rect x="163.0" y="11.0" width="74.0" height="38" fill="#e6efff" stroke="#2a6fd6" stroke-width="2.2"/><text x="200" y="35.0" text-anchor="middle" font-size="16" font-weight="700" fill="#14315a">B2:B9</text><circle cx="200" cy="85" r="5.5" fill="#1c2533"/><ellipse cx="110" cy="160" rx="51.0" ry="23.0" fill="#fff3c4" stroke="#a87400" stroke-width="2.5"/><text x="110" y="165.0" text-anchor="middle" font-size="16" font-weight="700" fill="#5a3e00">MAX</text><ellipse cx="290" cy="160" rx="51.0" ry="23.0" fill="#fff3c4" stroke="#a87400" stroke-width="2.5"/><text x="290" y="165.0" text-anchor="middle" font-size="16" font-weight="700" fill="#5a3e00">MIN</text><ellipse cx="200" cy="250" rx="51.0" ry="23.0" fill="#fff3c4" stroke="#a87400" stroke-width="2.5"/><text x="200" y="255.0" text-anchor="middle" font-size="16" font-weight="700" fill="#5a3e00">-</text><rect x="170.0" y="311.0" width="60" height="38" fill="#e3f6ea" stroke="#1f8f55" stroke-width="2.2"/><text x="200" y="335.0" text-anchor="middle" font-size="16" font-weight="700" fill="#145a32">?</text></svg><figcaption>Welche Formel gehört zu diesem Datenflussdiagramm?</figcaption></figure></div>
+<div class="note rule"><span class="note-title">Mit geeigneten Eingaben testen</span>
+<ul class="facts"><li>Wähle einfache Testwerte, deren Ergebnis du im Kopf kennst (z. B. 2, 4, 6 → Mittelwert 4).</li>
+<li>Teste <b>Grenzfälle</b>: leere Zellen, 0, sehr große Werte.</li>
+<li>Vergleiche das Ergebnis der Tabelle mit deiner Erwartung.</li></ul></div>
+<div class="task"><div class="task-head">Check: Diagramm und Testen</div><div class="task-body"><div class="quiz" data-quiz="spanne"></div></div></div>
+
+  <div class="done-row"><label class="done"><input type="checkbox" data-done="5"> Station erledigt</label></div>
+</div>
+</section>
+<section class="station" id="s6" data-station="6">
+<div class="wrap">
+  <div class="station-head"><span class="station-num" aria-hidden="true">6</span><div><small>Selbst bauen</small><h2>DFD-Werkstatt</h2></div></div>
+  
+<p>Jetzt zeichnest du selbst. Baue zu jedem Term oder jeder Beschreibung das passende Datenflussdiagramm und tippe auf <b>Prüfen</b>.
+Der Baukasten rechnet dein Diagramm mit Testwerten durch und vergleicht es mit der richtigen Lösung.</p>
+<div class="note"><span class="note-title">So bedienst du den DFD-Baukasten</span>
+<ul class="facts">
+<li><b>Baustein einfügen:</b> unten in der Leiste antippen (Eingabe, Konstante, Funktion, Verteiler, Ausgabe). Bausteine kannst du mit dem Finger verschieben.</li>
+<li><b>Verbinden:</b> Baustein antippen – darunter erscheint ein <b>oranger Pfeil</b>. Ihn auf den gewünschten Eingang der Funktion ziehen (die freien Eingänge leuchten orange). Oder: orangen Pfeil antippen, dann das Ziel antippen.</li>
+<li><b>Reihenfolge:</b> Eingang 1 ist der erste Parameter, Eingang 2 der zweite usw. Die kleinen Ziffern an der Ellipse zeigen die Nummer des Eingangs. Tippe eine Funktion an, dann siehst du oben die Namen der Eingänge.</li>
+<li>Aus jedem Baustein geht <b>nur ein Pfeil</b>. Wird ein Datum (Eingabe, Konstante oder Ergebnis einer Funktion) mehrfach gebraucht, führt sein Pfeil in einen <b>Verteiler</b>, aus dem mehrere Pfeile herausgehen.</li>
+<li><b>Löschen:</b> Baustein oder Pfeil antippen, dann <b>✕ Löschen</b>. Unter dem Diagramm siehst du immer die Formel, die dein Diagramm gerade darstellt.</li>
+</ul></div>
+<div data-dfd="d1"></div><div data-dfd="d2"></div><div data-dfd="d3"></div><div data-dfd="d4"></div><div data-dfd="d5"></div><div data-dfd="d6"></div><div data-dfd="d9"></div>
+<div class="note expert"><span class="note-title">Text- und Datumsfunktionen</span><p>Im Baukasten findest du unter <b>Funktion</b> noch viele weitere Funktionen, zum Beispiel für Texte und Datumsangaben.</p></div>
+<div data-dfd="d7"></div><div data-dfd="d8"></div>
+
+  <div class="done-row"><label class="done"><input type="checkbox" data-done="6"> Station erledigt</label></div>
+</div>
+</section>
+<section class="station" id="s7" data-station="7">
+<div class="wrap">
+  <div class="station-head"><span class="station-num" aria-hidden="true">7</span><div><small>Mission</small><h2>Echter Einsatz: Bundesjugendspiele</h2></div></div>
+  
+<p>Die Sportlehrkraft braucht die Auswertung des Weitsprungs. Leere Zellen sind ungültige Versuche.</p>
+<div class="dl" data-file="L1-3_Sportfest_Auswertung.xlsx"><p>Zu Aufgabe 3 zeichnest du ein Datenflussdiagramm in dein digitales Heft.</p></div>
+<p><b>Prüfe am Ende selbst:</b></p>
+<ul class="facts">
+<li>Emil hat den besten Versuch (4,62 m), sein Durchschnitt ist 4,53 m.</li>
+<li>Bens Durchschnitt ist 3,91 m (nur zwei gültige Versuche).</li>
+<li>Insgesamt gibt es 34 gültige Versuche.</li>
+<li>Alle Formeln in Spalte E und F sind durch Ausfüllen entstanden.</li>
+</ul>
+
+  <div class="done-row"><label class="done"><input type="checkbox" data-done="7"> Station erledigt</label></div>
+</div>
+</section>
+<section class="station heft-st" id="s8" data-station="8">
+<div class="wrap">
+  <div class="station-head"><span class="station-num heft" aria-hidden="true">✂</span><div><small>Hefteintrag</small><h2>Sichern: Funktionen</h2></div></div>
+  
+<p>Fülle die Lücken. Es gibt mehr Begriffe als Lücken. Danach: Screenshot vom gestrichelten Kasten ins digitale Heft.</p>
+<div id="heft" class="heft-wrap"></div>
+<div class="next-level"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABoCAYAAABmOHdtAAACBUlEQVR42u2dsUrDUBSGj1JwclDUUYeC8QGqInSXUnBydvINBEGECkUQBN/AKe+g4p4iFF+gbroIVnBwEoS65kZICTnnemO+f7uk7SUf//k56T20IgghVF/N+N5waWFtYvn57x/PXu9pFg8BEIBVVsN3xkUHd7Z3FHcmPjMSBwIQgPXuA7OZZ55xJTWKO6qZiAMpYQDWKwOrlnnWmYgDKWEA8ixsmUna0s5sHAhAAJKBmpl309t11hutTeUdB86qGeNAShiAZGB11GsdOuv+47Xq63EgJQxAMjBkFc0w7czDgQAEIBmY1niUOOvlqB3UDTb3zsVyVgYHUsIApA8UxTOKbj97JnKv+vnaZy44EIAAFOYDU1rcPg2qL9SeB8SBlDAAmQ/My7ysQns2ZkaaEgYgKpKBVc88ZqQpYQAiMfw+MPTMu90f5F5nPpASBiAZ+Jd9VzJ8MN3vVbq515Phr+tO39ve2sntE3EgJQxAMlBTRyeXzvrq4tjr9ehsjAMpYQAK3weK0bmv7z6wrOgDKWEA0geK4TxgNmNC07QzEhxICQOQ2Zg6zcLgQEoYgGRger2yuh7UDb29PHn9bX0cCEAA8ixcJqOmKbSMxYEABCAZKH7/AynovhMHAhCA9X4W/vr+LPT+ucZ8oQz0vR8OpIQBSB9YJmOs5Xs/HAhAACKEEPqn+gHenpv1O2ZVGQAAAABJRU5ErkJggg==" alt=""><h3>Level 1.3 fast geschafft!</h3>
+<p>Auf der Lernlandkarte wartet das Spiel <b>„Hack the Grid: Die Datenfluss-Krake“</b>. Danach der Test – und dein Badge.</p></div>
+
+  <div class="done-row"><label class="done"><input type="checkbox" data-done="8"> Station erledigt</label></div>
+</div>
+</section>
+</main>
+<footer class="wrap footer">Lernpfad Level 1.3 · Informatik 9 (NTG) · Abschnitt 1 Tabellenkalkulation. Deine Häkchen und Eingaben merkt sich nur dieser Browser auf diesem Gerät.</footer>
+<script>window.LP = {"key": "l1-3", "dfd": {"d1": {"title": "Aufgabe 1 · Term", "prompt": "Baue das Datenflussdiagramm zu <code>=B2*C2</code>.", "term": "=B2*C2", "inputs": [{"label": "B2", "ref": "B2"}, {"label": "C2", "ref": "C2"}], "output": "D2", "funcs": ["*", "+", "-", "/"]}, "d2": {"title": "Aufgabe 2 · Term mit Konstante", "prompt": "Baue das Datenflussdiagramm zu <code>=B2*1,19</code>. Die Konstante 1,19 schreibst du als reine Zahl.", "term": "=B2*1,19", "inputs": [{"label": "B2", "ref": "B2"}], "output": "C2", "funcs": ["*", "+", "-", "/"]}, "d3": {"title": "Aufgabe 3 · Beschreibung", "prompt": "<b>Endpreis:</b> Vom Preis wird der Rabatt abgezogen. Den Rabatt berechnet man als Preis mal Rabattsatz.", "term": "=B1-B1*B2", "inputs": [{"label": "Preis", "ref": "B1"}, {"label": "Rabattsatz", "ref": "B2"}], "output": "Endpreis", "funcs": ["*", "+", "-", "/"]}, "d4": {"title": "Aufgabe 4 · Verkettung", "prompt": "Baue das Datenflussdiagramm zu <code>=RUNDEN(MITTELWERT(B2:D2);1)</code>.", "term": "=RUNDEN(MITTELWERT(B2:D2);1)", "inputs": [{"label": "B2:D2", "ref": "B2:D2"}], "output": "F2"}, "d5": {"title": "Aufgabe 5 · Beschreibung", "prompt": "<b>Spannweite:</b> Wie weit liegen das beste und das schlechteste Ergebnis der Punkte in B2:B9 auseinander?", "term": "=MAX(B2:B9)-MIN(B2:B9)", "inputs": [{"label": "B2:B9", "ref": "B2:B9"}], "output": "Spannweite"}, "d6": {"title": "Aufgabe 6 · Term", "prompt": "Baue das Datenflussdiagramm zu <code>=SUMME(B2:B6)/ANZAHL(B2:B6)</code>.", "term": "=SUMME(B2:B6)/ANZAHL(B2:B6)", "inputs": [{"label": "B2:B6", "ref": "B2:B6"}], "output": "C7"}, "d9": {"title": "Aufgabe 7 · Verteiler", "prompt": "<b>Treuerabatt:</b> Ist die Summe der Einkäufe in B2:B6 mindestens 100 €, gibt es 10 % Rabatt (Summe mal 0,9), sonst bleibt es bei der Summe. <b>Berechne die Summe nur einmal</b> und verteile ihr Ergebnis.", "term": "=WENN(SUMME(B2:B6)>=100;SUMME(B2:B6)*0,9;SUMME(B2:B6))", "inputs": [{"label": "B2:B6", "ref": "B2:B6"}], "output": "Endbetrag", "tests": [{"B2": "20", "B3": "30", "B4": "10", "B5": "5", "B6": "15"}, {"B2": "40", "B3": "30", "B4": "20", "B5": "5", "B6": "5"}, {"B2": "50", "B3": "50", "B4": "30", "B5": "0", "B6": "12"}]}, "d7": {"title": "Alpha-Aufgabe · Text", "prompt": "<b>Kürzel:</b> Aus dem Namen in B2 sollen die ersten drei Buchstaben in Großbuchstaben werden (aus „Fatima“ wird „FAT“).", "term": "=GROSS(LINKS(B2;3))", "inputs": [{"label": "Name", "ref": "B2"}], "output": "Kürzel", "tests": [{"B2": "Fatima"}, {"B2": "Jonas"}, {"B2": "Li"}]}, "d8": {"title": "Alpha-Aufgabe · Datum", "prompt": "<b>Alter:</b> Wie alt wird eine Person in diesem Jahr? Rechne: aktuelles Jahr minus Geburtsjahr. Das Geburtsdatum steht in B2. Tipp: HEUTE() hat keinen Eingang.", "term": "=JAHR(HEUTE())-JAHR(B2)", "inputs": [{"label": "Geburtsdatum", "ref": "B2"}], "output": "Alter", "tests": [{"B2": "40000"}, {"B2": "39500"}, {"B2": "41234"}]}}, "calcs": {"funktionen": {"title": "Highscore-Liste", "rows": 7, "cols": 5, "widths": {"A": 110, "D": 150, "E": 110}, "cells": {"A1": "Spieler", "B1": "Punkte", "A2": "Lena", "B2": "1250", "A3": "Paul", "B3": "980", "A4": "Sina", "B4": "1430", "A5": "Mo", "B5": "760", "A6": "Ella", "B6": "1120", "A7": "Tim", "D1": "Auswertung", "D2": "Summe", "D3": "Mittelwert", "D4": "Höchster", "D5": "Niedrigster", "D6": "Anzahl Spieler"}, "edit": ["B2:B7", "E2:E7"], "styles": {"A1:B1": "head", "D1": "head", "B2:B7": "inp", "E2:E6": "out"}, "start": "E2", "hint": "Werte die Highscores mit vordefinierten Funktionen aus (E2 bis E6). Der Bereich ist <code>B2:B7</code>. Tim hat noch nicht gespielt.", "check": [{"cells": "E2:E6", "formula": true, "msg": "In E2 bis E6 gehören Formeln mit Funktionen."}, {"cell": "E2", "has": "SUMME(", "eq": 5540, "msg": "E2: Nutze SUMME mit dem Bereich B2:B7."}, {"cell": "E3", "has": "MITTELWERT(", "eq": 1108, "msg": "E3: Nutze MITTELWERT mit dem Bereich B2:B7."}, {"cell": "E4", "has": "MAX(", "eq": 1430, "msg": "E4: Der höchste Wert – welche Funktion?"}, {"cell": "E5", "has": "MIN(", "eq": 760, "msg": "E5: Der niedrigste Wert – welche Funktion?"}, {"cell": "E6", "has": "ANZAHL(", "eq": 5, "msg": "E6: ANZAHL zählt Zellen mit Zahlen."}, {"test": {"set": {"B7": "2000"}, "cell": "E6", "eq": 6}, "msg": "E6 soll auch Tim mitzählen, sobald er Punkte hat. Nimm den Bereich bis B7."}], "ok": "Alle Funktionen sitzen. Gib Tim jetzt 2000 Punkte und beobachte, wie sich alle fünf Ergebnisse ändern."}, "verkettet": {"title": "Weitsprung (Meter)", "rows": 4, "cols": 6, "widths": {"A": 90, "E": 110, "F": 150}, "cells": {"A1": "Name", "B1": "V1", "C1": "V2", "D1": "V3", "E1": "Bester", "F1": "Schnitt (2 St.)", "A2": "Ali", "B2": "4,12", "C2": "4,35", "D2": "4,28", "A3": "Ben", "B3": "3,85", "C3": "3,97", "A4": "Clara", "B4": "3,66", "C4": "3,91", "D4": "3,88"}, "edit": ["B2:D4", "E2:F4"], "styles": {"A1:F1": "head", "B2:D4": "inp", "E2:F4": "out"}, "fmt": {"B2:E4": "d2", "F2:F4": "d2"}, "start": "E2", "hint": "E2: bester Versuch. F2: Durchschnitt, auf 2 Stellen gerundet – RUNDEN und MITTELWERT verketten. Dann beide nach unten ausfüllen. Bens 3. Versuch war ungültig.", "check": [{"cells": "E2:E4", "has": "MAX(", "msg": "In E2 bis E4 brauchst du MAX."}, {"cells": "F2:F4", "has": "RUNDEN(MITTELWERT(", "msg": "F2 bis F4: Verkette =RUNDEN(MITTELWERT(…);2)."}, {"cell": "F4", "eq": 3.82, "msg": "F4 soll 3,82 ergeben. Stimmt der zweite Parameter von RUNDEN?"}, {"cell": "F3", "eq": 3.91, "msg": "F3 soll 3,91 ergeben (nur zwei gültige Versuche)."}, {"cell": "E2", "eq": 4.35, "msg": "E2 soll 4,35 ergeben."}], "ok": "Verkettung gemeistert! MITTELWERT liefert 3,8166…, RUNDEN macht daraus 3,82."}}, "quiz": {"funktion": [{"q": "Was gilt für jede Funktion?", "o": [["Sie hat genau einen Eingabewert.", false, "Funktionen können mehrere Eingaben haben, z. B. SUMME."], ["Sie liefert genau einen Ausgabewert.", true, "Richtig. Egal wie viele Eingaben – es kommt genau ein Ergebnis heraus."], ["Sie braucht immer einen Bereich.", false, "Nein, z. B. RUNDEN bekommt eine Zahl und eine Stellenzahl."]]}, {"q": "Wie heißen die Eingabewerte einer Funktion?", "o": [["Parameter", true, "Genau. Die Werte in den Klammern sind die Parameter."], ["Zellbezüge", false, "Ein Parameter kann ein Zellbezug sein, muss aber nicht."], ["Funktionswerte", false, "Der Funktionswert ist die Ausgabe."]]}, {"q": "Auch <code>*</code> kann man als Funktion sehen. Warum?", "o": [["Weil es mit = beginnt", false, "Nein."], ["Weil es zwei Eingabewerte zu genau einem Ergebnis verarbeitet", true, "Richtig. Im Datenflussdiagramm wird daraus ein Kasten „mal“."], ["Weil es eine vordefinierte Funktion ist", false, "Rechenzeichen sind keine vordefinierten Funktionen, sie verhalten sich aber wie Funktionen."]]}], "dfd": [{"q": "Welche Formel passt zum Diagramm „Endpreis“? Preis in B1, Rabatt in B2.", "o": [["<code>=B1*B2-B1</code>", false, "Bei „minus“ kommt der Preis (linker Eingang) zuerst."], ["<code>=B1-B1*B2</code>", true, "Richtig: Preis minus (Preis mal Rabatt)."], ["<code>=B1-B2</code>", false, "Dann würde man den Rabatt (z. B. 0,1) vom Preis abziehen."]]}, {"q": "Die Eingabe „Preis“ wird von zwei Funktionen gebraucht. Was zeichnest du?", "o": [["Einen Verteiler: ein Pfeil vom Preis hinein, zwei Pfeile heraus zu den Funktionen.", true, "Richtig. Aus jedem Rechteck, jeder Konstante und jeder Ellipse geht nur ein Pfeil."], ["Zwei Pfeile direkt vom Preis-Rechteck.", false, "Aus einem Rechteck geht nur ein Pfeil. Zum Verteilen brauchst du einen Verteiler."], ["Das Rechteck „Preis“ zweimal.", false, "Jede Eingabe zeichnet man nur einmal."]]}, {"q": "Wofür steht der schwarze Punkt in einem Datenflussdiagramm?", "o": [["Für das Ende der Berechnung", false, "Das Ergebnis steht im Ausgabe-Rechteck."], ["Für einen Verteiler: Er gibt ein Datum an mehrere Funktionen weiter", true, "Genau. Ein Pfeil kommt hinein, mehrere gehen hinaus."], ["Für eine Multiplikation", false, "Funktionen stehen in Rechtecken."]]}], "spanne": [{"q": "Welche Formel gehört zum Diagramm mit MAX und MIN?", "o": [["<code>=MAX(B2:B9)+MIN(B2:B9)</code>", false, "Der untere Kasten heißt „minus“."], ["<code>=MAX(B2:B9)-MIN(B2:B9)</code>", true, "Richtig: Der Abstand zwischen größtem und kleinstem Wert (die Spannweite)."], ["<code>=MIN(B2:B9)-MAX(B2:B9)</code>", false, "MAX kommt in den linken Eingang, also zuerst."], ["<code>=MAX(MIN(B2:B9))</code>", false, "Hier sind MAX und MIN nicht verkettet, sondern stehen nebeneinander."]]}, {"q": "Du willst prüfen, ob <code>=MITTELWERT(B2:D2)</code> richtig rechnet. Welche Testeingabe ist besonders geschickt?", "o": [["B2 = 3,71; C2 = 4,08; D2 = 3,95", false, "Das Ergebnis kannst du im Kopf schlecht prüfen."], ["B2 = 2; C2 = 4; D2 = 6", true, "Richtig: Das Ergebnis 4 kennst du sofort. Danach testest du noch eine leere Zelle als Grenzfall."], ["Gar keine, die Formel sieht richtig aus.", false, "Testen gehört zu jeder guten Tabelle."]]}, {"q": "In D2 fehlt ein Wert (leere Zelle). Was macht <code>=MITTELWERT(B2:D2)</code> mit B2 = 4 und C2 = 6?", "o": [["Es kommt 3,33 heraus.", false, "Leere Zellen werden nicht als 0 mitgezählt."], ["Es kommt 5 heraus.", true, "Richtig: MITTELWERT ignoriert leere Zellen und teilt nur durch 2."], ["Es kommt #DIV/0! heraus.", false, "Das passiert nur, wenn alle Zellen leer sind."]]}]}, "heft": {"title": "Funktionen und Datenflussdiagramme", "sub": "INFORMATIK 9 · LEVEL 1.3", "html": "\n<p>Eine {{Funktion}} verarbeitet einen oder mehrere Eingabewerte und liefert genau {{einen}} Ausgabewert. Die Eingabewerte heißen {{Parameter}}.\nSchreibweise: <code>NAME(Parameter1; Parameter2)</code>. Die Parameter werden durch ein {{Semikolon|Strichpunkt}} getrennt. <code>B2:B6</code> ist ein {{Bereich}} (von B2 bis B6).</p>\n<p>Vordefinierte Funktionen: <code>SUMME</code>, {{MITTELWERT}}, <code>MIN</code>, <code>MAX</code>, <code>ANZAHL</code>, <code>RUNDEN(Zahl; Stellen)</code></p>\n<p>In einem {{Datenflussdiagramm}} stehen Eingaben und Ausgaben in {{Rechtecken}}, Funktionen in {{Ellipsen}} und Konstanten als reine Zahlen ohne Rahmen. Pfeile zeigen den {{Datenfluss}}.\nAus jedem Rechteck, jeder Konstante und jeder Ellipse geht nur ein Pfeil. Wird ein Datum mehrfach gebraucht, gibt ein {{Verteiler}} (kleiner ausgefüllter Kreis) es an mehrere Funktionen weiter.</p>\n<p>Bei der {{Verkettung}} ist die Ausgabe einer Funktion die Eingabe der nächsten. Man liest von innen nach außen:</p>\n<div style=\"max-width:360px\"><figure class=\"svgbox\"><svg viewBox=\"0 0 360 300\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" font-family=\"JetBrains Mono, Menlo, monospace\"><defs><marker id=\"ah\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\" fill=\"#33415a\"/></marker></defs><path d=\"M60,49.0 L60,68.0 L110.0,68.0 L110.0,87.0\" fill=\"none\" stroke=\"#33415a\" stroke-width=\"2.2\" marker-end=\"url(#ah)\"/><path d=\"M150,49.0 L150.0,87.0\" fill=\"none\" stroke=\"#33415a\" stroke-width=\"2.2\" marker-end=\"url(#ah)\"/><path d=\"M240,49.0 L240,68.0 L190.0,68.0 L190.0,87.0\" fill=\"none\" stroke=\"#33415a\" stroke-width=\"2.2\" marker-end=\"url(#ah)\"/><path d=\"M150,133.0 L150,152.5 L188.33333333333334,152.5 L188.33333333333334,172.0\" fill=\"none\" stroke=\"#33415a\" stroke-width=\"2.2\" marker-end=\"url(#ah)\"/><path d=\"M300,121.0 L300,146.5 L231.66666666666669,146.5 L231.66666666666669,172.0\" fill=\"none\" stroke=\"#33415a\" stroke-width=\"2.2\" marker-end=\"url(#ah)\"/><path d=\"M210,218.0 L210.0,251.0\" fill=\"none\" stroke=\"#33415a\" stroke-width=\"2.2\" marker-end=\"url(#ah)\"/><rect x=\"30.0\" y=\"11.0\" width=\"60\" height=\"38\" fill=\"#e6efff\" stroke=\"#2a6fd6\" stroke-width=\"2.2\"/><text x=\"60\" y=\"35.0\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"700\" fill=\"#14315a\">B2</text><rect x=\"120.0\" y=\"11.0\" width=\"60\" height=\"38\" fill=\"#e6efff\" stroke=\"#2a6fd6\" stroke-width=\"2.2\"/><text x=\"150\" y=\"35.0\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"700\" fill=\"#14315a\">C2</text><rect x=\"210.0\" y=\"11.0\" width=\"60\" height=\"38\" fill=\"#e6efff\" stroke=\"#2a6fd6\" stroke-width=\"2.2\"/><text x=\"240\" y=\"35.0\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"700\" fill=\"#14315a\">D2</text><ellipse cx=\"150\" cy=\"110\" rx=\"86.0\" ry=\"23.0\" fill=\"#fff3c4\" stroke=\"#a87400\" stroke-width=\"2.5\"/><text x=\"150\" y=\"115.0\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"700\" fill=\"#5a3e00\">MITTELWERT</text><text x=\"300\" y=\"115.0\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"700\" fill=\"#1c2533\">1</text><ellipse cx=\"210\" cy=\"195\" rx=\"71.0\" ry=\"23.0\" fill=\"#fff3c4\" stroke=\"#a87400\" stroke-width=\"2.5\"/><text x=\"210\" y=\"200.0\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"700\" fill=\"#5a3e00\">RUNDEN</text><rect x=\"180.0\" y=\"251.0\" width=\"60\" height=\"38\" fill=\"#e3f6ea\" stroke=\"#1f8f55\" stroke-width=\"2.2\"/><text x=\"210\" y=\"275.0\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"700\" fill=\"#145a32\">F2</text></svg></figure></div>\n<p><code>=RUNDEN(MITTELWERT(B2:D2);1)</code></p>", "extra": ["Komma", "zwei", "Kreisen", "Verzweigung", "MITTE", "Zellbezug", "Dreiecken"]}, "files": {"L1-3_Sportfest_Auswertung.xlsx": "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"}};</script>
+<script>
+/* MiniCalc-Engine: kleine Tabellenkalkulation mit deutschen Funktionsnamen.
+   Formeln: =, ; als Trennzeichen, Dezimalkomma, $-Bezüge, Bereiche A1:B3. */
+const CalcEngine = (() => {
+  const ERR = e => ({ err: e });
+  const isErr = v => v && typeof v === 'object' && 'err' in v;
+  const colName = c => String.fromCharCode(65 + c);
+  const addr = (r, c) => colName(c) + (r + 1);
+  function parseAddr(a) { const m = /^\$?([A-Z])\$?(\d+)$/.exec(a.toUpperCase()); return m ? { r: +m[2] - 1, c: m[1].charCodeAt(0) - 65 } : null; }
+  function rangeCells(a) {
+    const [p, q] = a.split(':'); const A = parseAddr(p), B = parseAddr(q || p); const out = [];
+    for (let r = Math.min(A.r, B.r); r <= Math.max(A.r, B.r); r++) for (let c = Math.min(A.c, B.c); c <= Math.max(A.c, B.c); c++) out.push(addr(r, c));
+    return out;
+  }
+
+  // ---------- Tokenizer ----------
+  function tokenize(src) {
+    const t = []; let i = 0;
+    while (i < src.length) {
+      const ch = src[i];
+      if (ch === ' ' || ch === ' ') { i++; continue; }
+      const rest = src.slice(i); let m;
+      if (ch === '"' || ch === '“' || ch === '„' || ch === '”') {
+        let j = i + 1, s = '';
+        while (j < src.length && !'"“”„'.includes(src[j])) { s += src[j]; j++; }
+        if (j >= src.length) throw ERR('#NAME?');
+        t.push({ k: 'str', v: s }); i = j + 1; continue;
+      }
+      if ((m = /^(\$?)([A-Za-z])(\$?)(\d+)/.exec(rest))) {
+        const after = rest.slice(m[0].length);
+        if (!/^[A-Za-zÄÖÜäöüß0-9_(]/.test(after)) {
+          t.push({ k: 'ref', ac: !!m[1], c: m[2].toUpperCase().charCodeAt(0) - 65, ar: !!m[3], r: +m[4] - 1, pos: i, len: m[0].length });
+          i += m[0].length; continue;
+        }
+      }
+      if ((m = /^\d+(,\d+)?|^,\d+/.exec(rest))) { t.push({ k: 'num', v: parseFloat(m[0].replace(',', '.')) }); i += m[0].length; continue; }
+      if ((m = /^[A-Za-zÄÖÜäöüß][A-Za-zÄÖÜäöüß0-9_.]*/.exec(rest))) { t.push({ k: 'name', v: m[0].toUpperCase() }); i += m[0].length; continue; }
+      if ((m = /^(<=|>=|<>|[-+*\/^&=<>();:%])/.exec(rest))) { t.push({ k: 'op', v: m[0] }); i += m[0].length; continue; }
+      throw ERR('#NAME?');
+    }
+    return t;
+  }
+
+  // ---------- Parser ----------
+  function parse(src) {
+    const t = tokenize(src); let p = 0;
+    const peek = () => t[p], next = () => t[p++];
+    const isOp = (v) => t[p] && t[p].k === 'op' && t[p].v === v;
+    function expect(v) { if (!isOp(v)) throw ERR('#NAME?'); p++; }
+    function comparison() {
+      let a = concat();
+      while (t[p] && t[p].k === 'op' && ['=', '<>', '<', '>', '<=', '>='].includes(t[p].v)) { const o = next().v; a = { k: 'bin', o, a, b: concat() }; }
+      return a;
+    }
+    function concat() { let a = additive(); while (isOp('&')) { next(); a = { k: 'bin', o: '&', a, b: additive() }; } return a; }
+    function additive() { let a = term(); while (isOp('+') || isOp('-')) { const o = next().v; a = { k: 'bin', o, a, b: term() }; } return a; }
+    function term() { let a = power(); while (isOp('*') || isOp('/')) { const o = next().v; a = { k: 'bin', o, a, b: power() }; } return a; }
+    function power() { let a = unary(); while (isOp('^')) { next(); a = { k: 'bin', o: '^', a, b: unary() }; } return a; }
+    function unary() { if (isOp('-')) { next(); return { k: 'neg', a: unary() }; } if (isOp('+')) { next(); return unary(); } return postfix(); }
+    function postfix() { let a = primary(); while (isOp('%')) { next(); a = { k: 'bin', o: '/', a, b: { k: 'num', v: 100 } }; } return a; }
+    function primary() {
+      const tk = next();
+      if (!tk) throw ERR('#NAME?');
+      if (tk.k === 'num') return { k: 'num', v: tk.v };
+      if (tk.k === 'str') return { k: 'str', v: tk.v };
+      if (tk.k === 'ref') {
+        if (isOp(':')) { next(); const b = next(); if (!b || b.k !== 'ref') throw ERR('#NAME?'); return { k: 'range', a: tk, b }; }
+        return { k: 'ref', r: tk.r, c: tk.c };
+      }
+      if (tk.k === 'name') {
+        if (isOp('(')) {
+          next(); const args = [];
+          if (!isOp(')')) { args.push(comparison()); while (isOp(';')) { next(); args.push(comparison()); } }
+          expect(')');
+          return { k: 'fn', n: tk.v, args };
+        }
+        if (tk.v === 'WAHR') return { k: 'bool', v: true };
+        if (tk.v === 'FALSCH') return { k: 'bool', v: false };
+        throw ERR('#NAME?');
+      }
+      if (tk.k === 'op' && tk.v === '(') { const e = comparison(); expect(')'); return e; }
+      throw ERR('#NAME?');
+    }
+    const ast = comparison();
+    if (p < t.length) throw ERR('#NAME?');
+    return ast;
+  }
+
+  // ---------- Werte ----------
+  function rawToValue(raw) {
+    if (raw === undefined || raw === null || raw === '') return null;
+    const s = String(raw).trim();
+    if (/^-?\d+(,\d+)?$/.test(s)) return parseFloat(s.replace(',', '.'));
+    if (/^-?\d+\.\d+$/.test(s)) return parseFloat(s);
+    if (/^-?\d+(,\d+)?\s*%$/.test(s)) return parseFloat(s.replace(',', '.')) / 100;
+    if (/^-?\d+(,\d+)?\s*€$/.test(s)) return parseFloat(s.replace(',', '.'));
+    if (s.toUpperCase() === 'WAHR') return true;
+    if (s.toUpperCase() === 'FALSCH') return false;
+    return String(raw);
+  }
+  function toNum(v) {
+    if (isErr(v)) return v;
+    if (v === null) return 0;
+    if (typeof v === 'number') return v;
+    if (typeof v === 'boolean') return v ? 1 : 0;
+    const x = rawToValue(v);
+    if (typeof x === 'number') return x;
+    return ERR('#WERT!');
+  }
+  function toStr(v) {
+    if (v === null) return '';
+    if (typeof v === 'number') return fmtNum(v);
+    if (typeof v === 'boolean') return v ? 'WAHR' : 'FALSCH';
+    return String(v);
+  }
+  function toBool(v) {
+    if (isErr(v)) return v;
+    if (typeof v === 'boolean') return v;
+    if (v === null) return false;
+    if (typeof v === 'number') return v !== 0;
+    const u = String(v).toUpperCase();
+    if (u === 'WAHR') return true; if (u === 'FALSCH') return false;
+    return ERR('#WERT!');
+  }
+  function fmtNum(x, dec) {
+    if (!isFinite(x)) return '#ZAHL!';
+    let s;
+    if (dec !== undefined) s = x.toFixed(dec);
+    else { s = String(parseFloat(x.toPrecision(12))); if (/e/.test(s)) s = x.toPrecision(6); }
+    return s.replace('.', ',');
+  }
+  function cmp(a, b) {
+    if (typeof a === 'number' && typeof b === 'number') return a - b;
+    if (a === null) a = typeof b === 'string' ? '' : 0;
+    if (b === null) b = typeof a === 'string' ? '' : 0;
+    if (typeof a === 'boolean') a = a ? 1 : 0;
+    if (typeof b === 'boolean') b = b ? 1 : 0;
+    if (typeof a === 'number' && typeof b === 'number') return a - b;
+    if (typeof a === 'number') return -1;
+    if (typeof b === 'number') return 1;
+    return String(a).toLowerCase().localeCompare(String(b).toLowerCase());
+  }
+  function crit(c) {
+    // Kriterium für ZÄHLENWENN/SUMMEWENN
+    if (typeof c === 'number') return v => typeof v === 'number' && v === c;
+    const m = /^(<=|>=|<>|<|>|=)?(.*)$/.exec(String(c));
+    const op = m[1] || '=', rv = rawToValue(m[2]);
+    return v => {
+      if (v === null) return op === '<>' ? true : false;
+      const d = cmp(v, rv);
+      if (typeof rv === 'number' && typeof v !== 'number') return op === '<>';
+      return { '=': d === 0, '<>': d !== 0, '<': d < 0, '>': d > 0, '<=': d <= 0, '>=': d >= 0 }[op];
+    };
+  }
+  const EPOCH = Date.UTC(1899, 11, 30);
+  const toSerial = ms => (ms - EPOCH) / 864e5;
+  const fromSerial = n => new Date(EPOCH + n * 864e5);
+  function round(x, n) { const f = Math.pow(10, n); const y = Math.abs(x) * f; const r = Math.floor(y + 0.5 + 1e-9); return Math.sign(x) * r / f; }
+
+  // ---------- Blatt ----------
+  class Sheet {
+    constructor(rows, cols, raw) { this.rows = rows; this.cols = cols; this.raw = Object.assign({}, raw || {}); this.cache = {}; }
+    set(a, v) { if (v === '' || v === null || v === undefined) delete this.raw[a]; else this.raw[a] = v; this.cache = {}; }
+    get(a) { return this.raw[a]; }
+    isFormula(a) { const r = this.raw[a]; return typeof r === 'string' && r.trim().startsWith('='); }
+    value(a, stack) {
+      if (a in this.cache) return this.cache[a];
+      stack = stack || new Set();
+      if (stack.has(a)) return ERR('#ZIRKEL!');
+      const raw = this.raw[a];
+      let v;
+      if (typeof raw === 'string' && raw.trim().startsWith('=')) {
+        stack.add(a);
+        if (raw.toUpperCase().includes('#BEZUG!')) { stack.delete(a); this.cache[a] = ERR('#BEZUG!'); return this.cache[a]; }
+        try {
+          const ast = parse(raw.trim().slice(1));
+          v = this.ev(ast, stack);
+          if (v && v.range) v = ERR('#WERT!');
+          if (v === null) v = 0;
+        } catch (e) { v = isErr(e) ? e : ERR('#NAME?'); }
+        stack.delete(a);
+      } else v = rawToValue(raw);
+      this.cache[a] = v;
+      return v;
+    }
+    refVal(r, c, stack) {
+      if (r < 0 || c < 0 || r >= this.rows || c >= this.cols) return ERR('#BEZUG!');
+      return this.value(addr(r, c), stack);
+    }
+    rangeVals(n, stack) {
+      const r0 = Math.min(n.a.r, n.b.r), r1 = Math.max(n.a.r, n.b.r), c0 = Math.min(n.a.c, n.b.c), c1 = Math.max(n.a.c, n.b.c);
+      if (r0 < 0 || c0 < 0 || r1 >= this.rows || c1 >= this.cols) return ERR('#BEZUG!');
+      const out = [];
+      for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) out.push(this.value(addr(r, c), stack));
+      return { range: out };
+    }
+    ev(n, st) {
+      switch (n.k) {
+        case 'num': return n.v;
+        case 'str': return n.v;
+        case 'bool': return n.v;
+        case 'ref': return this.refVal(n.r, n.c, st);
+        case 'range': return this.rangeVals(n, st);
+        case 'neg': { const a = toNum(this.ev(n.a, st)); return isErr(a) ? a : -a; }
+        case 'bin': {
+          let a = this.ev(n.a, st), b = this.ev(n.b, st);
+          if (a && a.range) a = ERR('#WERT!'); if (b && b.range) b = ERR('#WERT!');
+          if (isErr(a)) return a; if (isErr(b)) return b;
+          if (n.o === '&') return toStr(a) + toStr(b);
+          if (['=', '<>', '<', '>', '<=', '>='].includes(n.o)) {
+            const d = cmp(a, b);
+            return { '=': d === 0, '<>': d !== 0, '<': d < 0, '>': d > 0, '<=': d <= 0, '>=': d >= 0 }[n.o];
+          }
+          const x = toNum(a), y = toNum(b);
+          if (isErr(x)) return x; if (isErr(y)) return y;
+          if (n.o === '+') return x + y; if (n.o === '-') return x - y; if (n.o === '*') return x * y;
+          if (n.o === '/') return y === 0 ? ERR('#DIV/0!') : x / y;
+          if (n.o === '^') return Math.pow(x, y);
+        }
+        case 'fn': return this.fn(n, st);
+      }
+      return ERR('#NAME?');
+    }
+    nums(args, st, countText) {
+      // sammelt Zahlen: aus Bereichen nur echte Zahlen, direkte Argumente werden umgewandelt
+      const out = [];
+      for (const a of args) {
+        const v = this.ev(a, st);
+        if (isErr(v)) return v;
+        if (v && v.range) { for (const x of v.range) { if (isErr(x)) return x; if (typeof x === 'number') out.push(x); } }
+        else { const x = toNum(v); if (isErr(x)) return x; out.push(x); }
+      }
+      return out;
+    }
+    fn(n, st) {
+      const A = n.args, name = n.n.replace('ZAEHLENWENN', 'ZÄHLENWENN');
+      const need = (k) => { if (A.length < k) throw ERR('#WERT!'); };
+      switch (name) {
+        case 'SUMME': { const v = this.nums(A, st); return isErr(v) ? v : v.reduce((s, x) => s + x, 0); }
+        case 'MITTELWERT': { const v = this.nums(A, st); if (isErr(v)) return v; return v.length ? v.reduce((s, x) => s + x, 0) / v.length : ERR('#DIV/0!'); }
+        case 'MIN': { const v = this.nums(A, st); if (isErr(v)) return v; return v.length ? Math.min(...v) : 0; }
+        case 'MAX': { const v = this.nums(A, st); if (isErr(v)) return v; return v.length ? Math.max(...v) : 0; }
+        case 'ANZAHL': { let k = 0; for (const a of A) { const v = this.ev(a, st); if (v && v.range) k += v.range.filter(x => typeof x === 'number').length; else if (typeof v === 'number') k++; } return k; }
+        case 'ANZAHL2': { let k = 0; for (const a of A) { const v = this.ev(a, st); if (v && v.range) k += v.range.filter(x => x !== null && x !== '').length; else if (v !== null) k++; } return k; }
+        case 'RUNDEN': { need(2); const x = toNum(this.ev(A[0], st)), d = toNum(this.ev(A[1], st)); if (isErr(x)) return x; if (isErr(d)) return d; return round(x, Math.trunc(d)); }
+        case 'ABS': { need(1); const x = toNum(this.ev(A[0], st)); return isErr(x) ? x : Math.abs(x); }
+        case 'WURZEL': { need(1); const x = toNum(this.ev(A[0], st)); if (isErr(x)) return x; return x < 0 ? ERR('#ZAHL!') : Math.sqrt(x); }
+        case 'POTENZ': { need(2); const x = toNum(this.ev(A[0], st)), y = toNum(this.ev(A[1], st)); if (isErr(x)) return x; if (isErr(y)) return y; return Math.pow(x, y); }
+        case 'WENN': {
+          need(1);
+          const b = toBool(this.ev(A[0], st)); if (isErr(b)) return b;
+          if (b) return A.length > 1 ? this.ev(A[1], st) : true;
+          return A.length > 2 ? this.ev(A[2], st) : false;
+        }
+        case 'UND': case 'ODER': {
+          const vals = [];
+          for (const a of A) { const v = this.ev(a, st); if (v && v.range) vals.push(...v.range.filter(x => x !== null)); else vals.push(v); }
+          let res = name === 'UND';
+          for (const v of vals) { const b = toBool(v); if (isErr(b)) return b; res = name === 'UND' ? res && b : res || b; }
+          return res;
+        }
+        case 'NICHT': { need(1); const b = toBool(this.ev(A[0], st)); return isErr(b) ? b : !b; }
+        case 'ZÄHLENWENN': {
+          need(2); const r = this.ev(A[0], st); const c = this.ev(A[1], st); if (isErr(c)) return c;
+          const list = r && r.range ? r.range : [r]; const f = crit(c); return list.filter(v => !isErr(v) && f(v)).length;
+        }
+        case 'SUMMEWENN': {
+          need(2); const r = this.ev(A[0], st); const c = this.ev(A[1], st); const s = A[2] ? this.ev(A[2], st) : r;
+          const list = r && r.range ? r.range : [r], sl = s && s.range ? s.range : [s], f = crit(c);
+          let sum = 0; list.forEach((v, i) => { if (!isErr(v) && f(v) && typeof sl[i] === 'number') sum += sl[i]; }); return sum;
+        }
+        case 'ABRUNDEN': case 'AUFRUNDEN': {
+          need(1); const x = toNum(this.ev(A[0], st)), d = A[1] ? toNum(this.ev(A[1], st)) : 0; if (isErr(x)) return x; if (isErr(d)) return d;
+          const f = Math.pow(10, Math.trunc(d)), y = Math.abs(x) * f, r = name === 'ABRUNDEN' ? Math.floor(y + 1e-9) : Math.ceil(y - 1e-9);
+          return Math.sign(x) * r / f;
+        }
+        case 'GANZZAHL': { need(1); const x = toNum(this.ev(A[0], st)); return isErr(x) ? x : Math.floor(x); }
+        case 'OBERGRENZE': {
+          need(2); const x = toNum(this.ev(A[0], st)), s_ = toNum(this.ev(A[1], st)); if (isErr(x)) return x; if (isErr(s_)) return s_;
+          if (s_ === 0) return 0; if (x > 0 && s_ < 0) return ERR('#ZAHL!'); return Math.ceil(x / s_ - 1e-9) * s_;
+        }
+        case 'PRODUKT': { const v = this.nums(A, st); return isErr(v) ? v : v.reduce((p, x) => p * x, 1); }
+        case 'QUOTIENT': { need(2); const a = toNum(this.ev(A[0], st)), b = toNum(this.ev(A[1], st)); if (isErr(a)) return a; if (isErr(b)) return b; return b === 0 ? ERR('#DIV/0!') : Math.trunc(a / b); }
+        case 'REST': { need(2); const a = toNum(this.ev(A[0], st)), b = toNum(this.ev(A[1], st)); if (isErr(a)) return a; if (isErr(b)) return b; return b === 0 ? ERR('#DIV/0!') : a - b * Math.floor(a / b); }
+        case 'VORZEICHEN': { need(1); const x = toNum(this.ev(A[0], st)); return isErr(x) ? x : Math.sign(x); }
+        case 'ZUFALLSZAHL': return Math.random();
+        case 'ZUFALLSBEREICH': { need(2); const a = toNum(this.ev(A[0], st)), b = toNum(this.ev(A[1], st)); if (isErr(a)) return a; if (isErr(b)) return b; return Math.ceil(a) + Math.floor(Math.random() * (Math.floor(b) - Math.ceil(a) + 1)); }
+        case 'CODE': { need(1); const t = this.ev(A[0], st); if (isErr(t)) return t; const s2 = toStr(t); return s2.length ? s2.charCodeAt(0) : ERR('#WERT!'); }
+        case 'ZEICHEN': { need(1); const x = toNum(this.ev(A[0], st)); if (isErr(x)) return x; return x < 1 || x > 255 ? ERR('#WERT!') : String.fromCharCode(Math.trunc(x)); }
+        case 'GROSS': case 'KLEIN': case 'LÄNGE': {
+          need(1); const t = this.ev(A[0], st); if (isErr(t)) return t; const s2 = toStr(t);
+          return name === 'GROSS' ? s2.toUpperCase() : name === 'KLEIN' ? s2.toLowerCase() : s2.length;
+        }
+        case 'LINKS': case 'RECHTS': {
+          need(1); const t = this.ev(A[0], st); if (isErr(t)) return t; const n = A[1] ? toNum(this.ev(A[1], st)) : 1; if (isErr(n)) return n;
+          if (n < 0) return ERR('#WERT!'); const s2 = toStr(t); return name === 'LINKS' ? s2.slice(0, n) : (n === 0 ? '' : s2.slice(-n));
+        }
+        case 'TEIL': {
+          need(3); const t = this.ev(A[0], st), a = toNum(this.ev(A[1], st)), n = toNum(this.ev(A[2], st)); if (isErr(t)) return t; if (isErr(a)) return a; if (isErr(n)) return n;
+          if (a < 1 || n < 0) return ERR('#WERT!'); return toStr(t).substr(a - 1, n);
+        }
+        case 'FINDEN': {
+          need(2); const q = this.ev(A[0], st), t = this.ev(A[1], st), a = A[2] ? toNum(this.ev(A[2], st)) : 1; if (isErr(q)) return q; if (isErr(t)) return t; if (isErr(a)) return a;
+          const i = toStr(t).indexOf(toStr(q), a - 1); return i < 0 || a < 1 ? ERR('#WERT!') : i + 1;
+        }
+        case 'IDENTISCH': { need(2); const a = this.ev(A[0], st), b = this.ev(A[1], st); if (isErr(a)) return a; if (isErr(b)) return b; return toStr(a) === toStr(b); }
+        case 'WECHSELN': {
+          need(3); const t = toStr(this.ev(A[0], st)), alt = toStr(this.ev(A[1], st)), neu = toStr(this.ev(A[2], st));
+          if (!alt) return t;
+          if (A[3]) { const n = toNum(this.ev(A[3], st)); if (isErr(n)) return n; let i = -1; for (let k = 0; k < n; k++) { i = t.indexOf(alt, i + 1); if (i < 0) return t; } return t.slice(0, i) + neu + t.slice(i + alt.length); }
+          return t.split(alt).join(neu);
+        }
+        case 'TEXTKETTE': { let s2 = ''; for (const a of A) { const v = this.ev(a, st); if (isErr(v)) return v; if (v && v.range) s2 += v.range.map(toStr).join(''); else s2 += toStr(v); } return s2; }
+        case 'DATUM': {
+          need(3); const y = toNum(this.ev(A[0], st)), m = toNum(this.ev(A[1], st)), d = toNum(this.ev(A[2], st)); if (isErr(y)) return y; if (isErr(m)) return m; if (isErr(d)) return d;
+          return toSerial(Date.UTC(y < 1900 ? y + 1900 : y, m - 1, d));
+        }
+        case 'HEUTE': { const n = new Date(); return toSerial(Date.UTC(n.getFullYear(), n.getMonth(), n.getDate())); }
+        case 'JETZT': { const n = new Date(); return toSerial(Date.UTC(n.getFullYear(), n.getMonth(), n.getDate(), n.getHours(), n.getMinutes(), n.getSeconds())); }
+        case 'JAHR': case 'MONAT': case 'TAG': case 'WOCHENTAG': {
+          need(1); const x = toNum(this.ev(A[0], st)); if (isErr(x)) return x; if (x < 0) return ERR('#ZAHL!');
+          const dt = fromSerial(Math.floor(x));
+          if (name === 'JAHR') return dt.getUTCFullYear(); if (name === 'MONAT') return dt.getUTCMonth() + 1; if (name === 'TAG') return dt.getUTCDate();
+          const typ = A[1] ? toNum(this.ev(A[1], st)) : 1, wd = dt.getUTCDay();
+          return typ === 2 ? (wd + 6) % 7 + 1 : typ === 3 ? (wd + 6) % 7 : wd + 1;
+        }
+        case 'STUNDE': case 'MINUTE': case 'SEKUNDE': {
+          need(1); const x = toNum(this.ev(A[0], st)); if (isErr(x)) return x; if (x < 0) return ERR('#ZAHL!');
+          const sec = Math.round((x - Math.floor(x)) * 86400) % 86400;
+          return name === 'STUNDE' ? Math.floor(sec / 3600) : name === 'MINUTE' ? Math.floor(sec / 60) % 60 : sec % 60;
+        }
+        case 'ZEIT': {
+          need(3); const h = toNum(this.ev(A[0], st)), m = toNum(this.ev(A[1], st)), s3 = toNum(this.ev(A[2], st)); if (isErr(h)) return h; if (isErr(m)) return m; if (isErr(s3)) return s3;
+          const t = ((h * 3600 + m * 60 + s3) % 86400 + 86400) % 86400; return t / 86400;
+        }
+        case 'VERKETTEN': { let s = ''; for (const a of A) { const v = this.ev(a, st); if (isErr(v)) return v; s += toStr(v); } return s; }
+      }
+      return ERR('#NAME?');
+    }
+  }
+
+  // Formel beim Kopieren verschieben (relative Teile ändern sich)
+  function shiftFormula(src, dr, dc) {
+    if (typeof src !== 'string' || !src.trim().startsWith('=')) return src;
+    let out = '', i = 0, inStr = false;
+    while (i < src.length) {
+      const ch = src[i];
+      if (ch === '"') { inStr = !inStr; out += ch; i++; continue; }
+      if (!inStr) {
+        const m = /^(\$?)([A-Za-z])(\$?)(\d+)/.exec(src.slice(i));
+        const prev = i > 0 ? src[i - 1] : '';
+        if (m && !/[A-Za-zÄÖÜäöüß0-9_]/.test(prev) && !/^[A-Za-zÄÖÜäöüß0-9_(]/.test(src.slice(i + m[0].length))) {
+          let c = m[2].toUpperCase().charCodeAt(0) - 65, r = +m[4] - 1;
+          if (!m[1]) c += dc; if (!m[3]) r += dr;
+          if (c < 0 || r < 0 || c > 25) out += '#BEZUG!';
+          else out += m[1] + String.fromCharCode(65 + c) + m[3] + (r + 1);
+          i += m[0].length; continue;
+        }
+      }
+      out += ch; i++;
+    }
+    return out;
+  }
+  // Bezüge in einer Formel finden (für farbige Markierung)
+  function refsIn(src) {
+    if (typeof src !== 'string' || !src.trim().startsWith('=')) return [];
+    let toks; try { toks = tokenize(src.trim().slice(1)); } catch (e) { return []; }
+    const off = src.indexOf('=') + 1, out = [];
+    for (let i = 0; i < toks.length; i++) {
+      const t = toks[i];
+      if (t.k !== 'ref') continue;
+      if (toks[i + 1] && toks[i + 1].k === 'op' && toks[i + 1].v === ':' && toks[i + 2] && toks[i + 2].k === 'ref') {
+        const b = toks[i + 2];
+        out.push({ start: off + t.pos, end: off + b.pos + b.len, cells: rangeCells(addr(t.r, t.c) + ':' + addr(b.r, b.c)) });
+        i += 2;
+      } else out.push({ start: off + t.pos, end: off + t.pos + t.len, cells: [addr(t.r, t.c)] });
+    }
+    return out;
+  }
+  function display(v, fmt) {
+    if (v === null || v === undefined) return '';
+    if (isErr(v)) return v.err;
+    if (typeof v === 'boolean') return v ? 'WAHR' : 'FALSCH';
+    if (typeof v === 'number') {
+      if (fmt === 'eur') return fmtNum(v, 2).replace(/\B(?=(\d{3})+(?!\d))/, '.') + ' €';
+      if (fmt === 'pct') return fmtNum(round(v * 100, 2)) + ' %';
+      if (fmt === 'd1') return fmtNum(v, 1);
+      if (fmt === 'd2') return fmtNum(v, 2);
+      if (fmt === 'int') return fmtNum(Math.round(v));
+      return fmtNum(v);
+    }
+    return String(v);
+  }
+  return { Sheet, parse, shiftFormula, refsIn, display, isErr, addr, parseAddr, rangeCells, colName, fmtNum };
+})();
+if (typeof module !== 'undefined') module.exports = CalcEngine;
+
+/* DFD-Baukasten: Datenflussdiagramme per Touch bauen, als Formel lesen und prüfen.
+   Schulnotation: Eingabe/Ausgabe = Rechteck, Funktion = Ellipse, Konstante = Zahl ohne Rahmen, Verteiler = gefüllter Punkt. */
+const DFD = (() => {
+  const E = CalcEngine;
+  const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  // ---------------- Funktionskatalog (deutsche Excel-Namen und Parameter) ----------------
+  const OPS = {
+    '+': ['Summand1', 'Summand2'], '-': ['Minuend', 'Subtrahend'], '*': ['Faktor1', 'Faktor2'], '/': ['Dividend', 'Divisor'], '^': ['Basis', 'Exponent'], '&': ['Text1', 'Text2'],
+    '=': ['Wert1', 'Wert2'], '<>': ['Wert1', 'Wert2'], '<': ['Wert1', 'Wert2'], '>': ['Wert1', 'Wert2'], '<=': ['Wert1', 'Wert2'], '>=': ['Wert1', 'Wert2'],
+  };
+  const OPNAME = { '+': 'plus', '-': 'minus', '*': 'mal', '/': 'geteilt durch', '^': 'hoch', '&': 'Text verketten', '=': 'gleich', '<>': 'ungleich', '<': 'kleiner als', '>': 'größer als', '<=': 'kleiner gleich', '>=': 'größer gleich' };
+  const PREC = { '=': 1, '<>': 1, '<': 1, '>': 1, '<=': 1, '>=': 1, '&': 2, '+': 3, '-': 3, '*': 4, '/': 4, '^': 5 };
+  // p: Parameterliste; opt: Anzahl optionaler Parameter am Ende; v: beliebig viele (ab Parameter 1 wiederholt)
+  const F = {
+    // Mathematik
+    ABS: { g: 'Mathematik', p: ['Zahl'], d: 'Betrag einer Zahl' },
+    ABRUNDEN: { g: 'Mathematik', p: ['Zahl', 'Anzahl_Stellen'], d: 'rundet in Richtung 0' },
+    AUFRUNDEN: { g: 'Mathematik', p: ['Zahl', 'Anzahl_Stellen'], d: 'rundet von 0 weg' },
+    GANZZAHL: { g: 'Mathematik', p: ['Zahl'], d: 'rundet auf die nächste ganze Zahl ab' },
+    OBERGRENZE: { g: 'Mathematik', p: ['Zahl', 'Schritt'], d: 'rundet auf ein Vielfaches von Schritt auf' },
+    POTENZ: { g: 'Mathematik', p: ['Zahl', 'Potenz'], d: 'Zahl hoch Potenz' },
+    PRODUKT: { g: 'Mathematik', p: ['Zahl'], v: true, d: 'multipliziert alle Zahlen' },
+    QUOTIENT: { g: 'Mathematik', p: ['Zähler', 'Nenner'], d: 'ganzzahliger Anteil einer Division' },
+    REST: { g: 'Mathematik', p: ['Zahl', 'Divisor'], d: 'Rest einer Division' },
+    RUNDEN: { g: 'Mathematik', p: ['Zahl', 'Anzahl_Stellen'], d: 'rundet kaufmännisch' },
+    SUMME: { g: 'Mathematik', p: ['Zahl'], v: true, d: 'addiert alle Zahlen' },
+    VORZEICHEN: { g: 'Mathematik', p: ['Zahl'], d: '1, 0 oder −1' },
+    WURZEL: { g: 'Mathematik', p: ['Zahl'], d: 'Quadratwurzel' },
+    ZUFALLSZAHL: { g: 'Mathematik', p: [], d: 'Zufallszahl zwischen 0 und 1' },
+    // Statistik
+    ANZAHL: { g: 'Statistik', p: ['Wert'], v: true, d: 'zählt Zellen mit Zahlen' },
+    MAX: { g: 'Statistik', p: ['Zahl'], v: true, d: 'größter Wert' },
+    MIN: { g: 'Statistik', p: ['Zahl'], v: true, d: 'kleinster Wert' },
+    MITTELWERT: { g: 'Statistik', p: ['Zahl'], v: true, d: 'Durchschnitt' },
+    // Logik
+    WENN: { g: 'Logik', p: ['Prüfung', 'Dann_Wert', 'Sonst_Wert'], d: 'wählt je nach Prüfung einen Wert' },
+    UND: { g: 'Logik', p: ['Wahrheitswert'], v: true, d: 'WAHR, wenn alle WAHR sind' },
+    ODER: { g: 'Logik', p: ['Wahrheitswert'], v: true, d: 'WAHR, wenn mindestens einer WAHR ist' },
+    NICHT: { g: 'Logik', p: ['Wahrheitswert'], d: 'kehrt WAHR/FALSCH um' },
+    // Text
+    CODE: { g: 'Text', p: ['Text'], d: 'Code des ersten Zeichens' },
+    FINDEN: { g: 'Text', p: ['Suchtext', 'Text', 'Erstes_Zeichen'], opt: 1, d: 'Position eines Textes' },
+    GROSS: { g: 'Text', p: ['Text'], d: 'GROSSBUCHSTABEN' },
+    IDENTISCH: { g: 'Text', p: ['Text1', 'Text2'], d: 'prüft, ob zwei Texte gleich sind' },
+    KLEIN: { g: 'Text', p: ['Text'], d: 'kleinbuchstaben' },
+    LÄNGE: { g: 'Text', p: ['Text'], d: 'Anzahl der Zeichen' },
+    LINKS: { g: 'Text', p: ['Text', 'Anzahl_Zeichen'], opt: 1, d: 'Zeichen von links' },
+    RECHTS: { g: 'Text', p: ['Text', 'Anzahl_Zeichen'], opt: 1, d: 'Zeichen von rechts' },
+    TEIL: { g: 'Text', p: ['Text', 'Erstes_Zeichen', 'Anzahl_Zeichen'], d: 'Zeichen aus der Mitte' },
+    VERKETTEN: { g: 'Text', p: ['Text'], v: true, d: 'hängt Texte aneinander' },
+    WECHSELN: { g: 'Text', p: ['Text', 'Alter_Text', 'Neuer_Text', 'ntes_Auftreten'], opt: 1, d: 'ersetzt Text' },
+    ZEICHEN: { g: 'Text', p: ['Zahl'], d: 'Zeichen zu einem Code' },
+    // Datum und Uhrzeit
+    DATUM: { g: 'Datum & Zeit', p: ['Jahr', 'Monat', 'Tag'], d: 'Datum aus Jahr, Monat, Tag' },
+    HEUTE: { g: 'Datum & Zeit', p: [], d: 'heutiges Datum' },
+    JAHR: { g: 'Datum & Zeit', p: ['Zahl'], d: 'Jahr eines Datums' },
+    JETZT: { g: 'Datum & Zeit', p: [], d: 'Datum und Uhrzeit jetzt' },
+    MINUTE: { g: 'Datum & Zeit', p: ['Zahl'], d: 'Minute einer Uhrzeit' },
+    MONAT: { g: 'Datum & Zeit', p: ['Zahl'], d: 'Monat eines Datums' },
+    SEKUNDE: { g: 'Datum & Zeit', p: ['Zahl'], d: 'Sekunde einer Uhrzeit' },
+    STUNDE: { g: 'Datum & Zeit', p: ['Zahl'], d: 'Stunde einer Uhrzeit' },
+    TAG: { g: 'Datum & Zeit', p: ['Zahl'], d: 'Tag eines Datums' },
+    WOCHENTAG: { g: 'Datum & Zeit', p: ['Zahl', 'Typ'], opt: 1, d: 'Wochentag als Zahl' },
+    ZEIT: { g: 'Datum & Zeit', p: ['Stunde', 'Minute', 'Sekunde'], d: 'Uhrzeit aus Stunde, Minute, Sekunde' },
+  };
+  const isOp = f => f in OPS;
+  const sig = f => isOp(f) ? `${f}  (${OPNAME[f]})` : F[f].v ? `${f}(${F[f].p[0]}1; [${F[f].p[0]}2]; …)` : `${f}(${F[f].p.map((p, i) => (F[f].opt && i >= F[f].p.length - F[f].opt) ? '[' + p + ']' : p).join('; ')}${F[f].v ? '' : ''})`;
+  function slotCount(node, edges) {
+    if (isOp(node.fn)) return 2;
+    const d = F[node.fn];
+    if (!d.v) return d.p.length;
+    const used = edges.filter(e => e.to === node.id).reduce((m, e) => Math.max(m, e.slot + 1), 0);
+    return Math.min(8, Math.max(2, used + 1));
+  }
+  const slotName = (node, i) => isOp(node.fn) ? OPS[node.fn][i] : (F[node.fn].v ? F[node.fn].p[0] + (i + 1) : F[node.fn].p[i]);
+  const slotRequired = (node, i) => isOp(node.fn) ? true : F[node.fn].v ? i === 0 : !(F[node.fn].opt && i >= F[node.fn].p.length - F[node.fn].opt);
+
+  // ---------------- Geometrie ----------------
+  const W = 880, H = 560;
+  const textW = t => Math.max(1, [...String(t)].length) * 10.4;
+  function size(n) {
+    if (n.kind === 'split') return { w: 14, h: 14 };
+    if (n.kind === 'const') return { w: Math.max(26, textW(n.label) + 8), h: 36 };
+    if (n.kind === 'fn') { const lab = isOp(n.fn) ? n.fn : n.fn; return { w: Math.max(84, textW(lab) + 46), h: 48 }; }
+    return { w: Math.max(70, textW(n.label) + 24), h: 40 };
+  }
+  function slotPos(n, i, cnt) {
+    const s = size(n);
+    if (n.kind !== 'fn') return { x: n.x, y: n.y - s.h / 2 };
+    const t = (i + 1) / (cnt + 1), dx = (t - .5) * s.w * .9;
+    const a = s.w / 2, b = s.h / 2, yy = -b * Math.sqrt(Math.max(0, 1 - (dx * dx) / (a * a)));
+    return { x: n.x + dx, y: n.y + yy };
+  }
+  const outPos = n => n.kind === 'split' ? { x: n.x, y: n.y } : { x: n.x, y: n.y + size(n).h / 2 };
+  const canOut = n => n.kind !== 'out';
+  const maxOut = n => n.kind === 'split' ? 99 : 1;
+  const inCount = (n, edges) => n.kind === 'fn' ? slotCount(n, edges) : (n.kind === 'split' || n.kind === 'out') ? 1 : 0;
+
+  // ---------------- Formel aus dem Diagramm ----------------
+  function formula(model) {
+    const outs = model.nodes.filter(n => n.kind === 'out');
+    if (!outs.length) return { err: 'Es fehlt noch eine Ausgabe (Rechteck unten).' };
+    if (outs.length > 1) return { err: 'Nimm genau eine Ausgabe.' };
+    const byId = Object.fromEntries(model.nodes.map(n => [n.id, n]));
+    const into = (id, slot) => model.edges.find(e => e.to === id && e.slot === slot);
+    const used = new Set(); let missing = 0, cyc = false; const sub = {};
+    function ex(id, stack) {
+      const n = byId[id]; used.add(id);
+      if (stack.has(id)) { cyc = true; return { t: '?', p: 9 }; }
+      stack = new Set(stack); stack.add(id);
+      if (n.kind === 'in') return { t: n.ref || n.label, p: 9 };
+      if (n.kind === 'const') return { t: /^-?\d+(,\d+)?$/.test(n.label) ? n.label : /^(WAHR|FALSCH)$/i.test(n.label) ? n.label.toUpperCase() : '"' + n.label.replace(/^"|"$/g, '') + '"', p: 9 };
+      if (n.kind === 'split' || n.kind === 'out') { const e = into(id, 0); if (!e) { missing++; return { t: '□', p: 9 }; } return ex(e.from, stack); }
+      const cnt = slotCount(n, model.edges), args = [];
+      for (let i = 0; i < cnt; i++) {
+        const e = into(id, i);
+        if (e) args.push(ex(e.from, stack));
+        else if (slotRequired(n, i)) { missing++; args.push({ t: '□', p: 9 }); }
+        else args.push(null);
+      }
+      if (isOp(n.fn)) {
+        const pr = PREC[n.fn], [a, b] = args;
+        const wa = a.p < pr ? '(' + a.t + ')' : a.t, wb = (b.p < pr || (b.p === pr && n.fn !== '+' && n.fn !== '*' && n.fn !== '&')) ? '(' + b.t + ')' : b.t;
+        sub[id] = wa + n.fn + wb;
+        return { t: wa + n.fn + wb, p: pr };
+      }
+      while (args.length && args[args.length - 1] === null) args.pop();
+      sub[id] = n.fn + '(' + args.map(a => a ? a.t : '').join(';') + ')';
+      return { t: sub[id], p: 9 };
+    }
+    const r = ex(outs[0].id, new Set());
+    const unused = model.nodes.filter(n => !used.has(n.id));
+    return { text: '=' + r.t, missing, cyc, unused, out: outs[0], sub };
+  }
+
+  // ---------------- Bewerten ----------------
+  function cellsOf(refs) { const s = new Set(); refs.forEach(r => { try { E.rangeCells(r.replace(/\$/g, '')).forEach(a => s.add(a)); } catch (e) { } }); return [...s]; }
+  function refsInFormula(f) { return E.refsIn(f).map(r => f.slice(r.start, r.end)); }
+  function evalWith(f, vals) { const sh = new E.Sheet(60, 26, Object.assign({}, vals, { Z60: f })); return sh.value('Z60'); }
+  const same = (a, b) => (typeof a === 'number' && typeof b === 'number') ? Math.abs(a - b) < 1e-7 * Math.max(1, Math.abs(b)) : E.display(a) === E.display(b);
+  function testSets(task, cells) {
+    if (task.tests) return task.tests;
+    const sets = [];
+    for (let k = 0; k < 6; k++) { const s = {}; cells.forEach((c, i) => s[c] = String(((k * 7 + i * 13) % 17) + 2 + (k % 2 ? ',5' : ''))); sets.push(s); }
+    return sets;
+  }
+
+  // ---------------- Musterlösung aus einem Term ----------------
+  function fromTerm(term, task) {
+    const ast = E.parse(term.trim().replace(/^=/, ''));
+    const nodes = [], edges = []; let k = 0;
+    const lab = {}; (task && task.inputs || []).forEach(i => lab[i.ref] = i.label);
+    const refKey = n => n.k === 'ref' ? E.addr(n.r, n.c) : E.addr(n.a.r, n.a.c) + ':' + E.addr(n.b.r, n.b.c);
+    const count = {};
+    (function cnt(n) { if (!n) return; if (n.k === 'ref' || n.k === 'range') count[refKey(n)] = (count[refKey(n)] || 0) + 1; (n.args || []).forEach(cnt); if (n.a && n.k !== 'range') cnt(n.a); if (n.b && n.k !== 'range') cnt(n.b); })(ast);
+    const ser = n => n.k === 'num' ? 'n' + n.v : n.k === 'str' ? 's' + n.v : n.k === 'bool' ? 'b' + n.v : (n.k === 'ref' || n.k === 'range') ? 'r' + refKey(n)
+      : n.k === 'neg' ? '-(' + ser(n.a) + ')' : n.k === 'bin' ? '(' + ser(n.a) + n.o + ser(n.b) + ')' : n.n + '(' + n.args.map(ser).join(';') + ')';
+    const fcount = {};
+    (function cf(n) { if (!n) return; if (n.k === 'bin' || n.k === 'fn') { const k2 = ser(n); fcount[k2] = (fcount[k2] || 0) + 1; } (n.args || []).forEach(cf); if (n.k === 'bin' || n.k === 'neg') { cf(n.a); if (n.b) cf(n.b); } })(ast);
+    const inputNode = {}, fnNode = {}, splitNode = {};
+    const add = o => { o.id = 'n' + (++k); nodes.push(o); return o.id; };
+    function build(n) {
+      if (n.k === 'num') return add({ kind: 'const', label: E.fmtNum(n.v) });
+      if (n.k === 'str') return add({ kind: 'const', label: '"' + n.v + '"' });
+      if (n.k === 'bool') return add({ kind: 'const', label: n.v ? 'WAHR' : 'FALSCH' });
+      if (n.k === 'neg') { const id = add({ kind: 'fn', fn: '*' }); edges.push({ from: build(n.a), to: id, slot: 0 }); edges.push({ from: add({ kind: 'const', label: '-1' }), to: id, slot: 1 }); return id; }
+      if (n.k === 'ref' || n.k === 'range') {
+        const key = refKey(n);
+        if (!inputNode[key]) inputNode[key] = add({ kind: 'in', label: lab[key] || key, ref: key });
+        if (count[key] > 1) { if (!splitNode['r' + key]) { splitNode['r' + key] = add({ kind: 'split' }); edges.push({ from: inputNode[key], to: splitNode['r' + key], slot: 0 }); } return splitNode['r' + key]; }
+        return inputNode[key];
+      }
+      const key = ser(n), shared = fcount[key] > 1 && !/ZUFALLSZAHL/.test(key);
+      if (shared && splitNode[key]) return splitNode[key];
+      let id;
+      if (n.k === 'bin') { id = add({ kind: 'fn', fn: n.o }); edges.push({ from: build(n.a), to: id, slot: 0 }); edges.push({ from: build(n.b), to: id, slot: 1 }); }
+      else if (n.k === 'fn') { id = add({ kind: 'fn', fn: n.n }); n.args.forEach((a, i) => edges.push({ from: build(a), to: id, slot: i })); }
+      else throw new Error('?');
+      if (shared) { splitNode[key] = add({ kind: 'split' }); edges.push({ from: id, to: splitNode[key], slot: 0 }); return splitNode[key]; }
+      return id;
+    }
+    const root = build(ast);
+    const out = add({ kind: 'out', label: (task && task.output) || 'Ergebnis' });
+    edges.push({ from: root, to: out, slot: 0 });
+    // Verteiler mit nur einem Ausgang wieder entfernen
+    nodes.filter(n => n.kind === 'split').forEach(sp => {
+      const outsE = edges.filter(e => e.from === sp.id);
+      if (outsE.length === 1) {
+        const inE = edges.find(e => e.to === sp.id); outsE[0].from = inE.from;
+        edges.splice(edges.indexOf(inE), 1); nodes.splice(nodes.indexOf(sp), 1);
+      }
+    });
+    layout(nodes, edges);
+    return { nodes, edges };
+  }
+  function layout(nodes, edges) {
+    const byId = Object.fromEntries(nodes.map(n => [n.id, n]));
+    const kids = id => edges.filter(e => e.to === id).sort((a, b) => a.slot - b.slot).map(e => e.from);
+    const depth = {};
+    (function d(id, l) { if ((depth[id] || -1) >= l) return; depth[id] = l; kids(id).forEach(c => d(c, l + 1)); })(nodes.find(n => n.kind === 'out').id, 0);
+    // Eingaben ganz oben, Verteiler direkt darunter, Konstanten direkt über ihrer Funktion
+    const maxD = Math.max(...Object.values(depth));
+    nodes.forEach(n => { if (n.kind === 'in') depth[n.id] = maxD; });
+    nodes.forEach(n => { if (n.kind === 'const') { const p = edges.find(e => e.from === n.id); depth[n.id] = depth[p.to] + 0.75; } });
+    const top = Math.max(...Object.values(depth));
+    const order = []; const seen = new Set();
+    (function walk(id) { if (seen.has(id)) return; seen.add(id); const ks = kids(id); if (!ks.length) order.push(id); ks.forEach(walk); if (byId[id].kind === 'split') order.push(id); })(nodes.find(n => n.kind === 'out').id);
+    const xs = {}; const leaves = order.filter(id => !kids(id).length || byId[id].kind === 'split');
+    const leafIds = order.filter(id => !kids(id).length);
+    const ws = leafIds.map(id => size(byId[id]).w + 34), tot = ws.reduce((a, b) => a + b, 0);
+    const f = tot > W - 20 ? (W - 20) / tot : 1; let acc = (W - tot * f) / 2;
+    leafIds.forEach((id, i) => { xs[id] = acc + ws[i] * f / 2; acc += ws[i] * f; });
+    (function px(id) { const ks = kids(id); if (!ks.length) return xs[id]; const v = ks.map(px); xs[id] = v.reduce((a, b) => a + b, 0) / v.length; return xs[id]; })(nodes.find(n => n.kind === 'out').id);
+    // Überlappungen je Zeile auflösen
+    const rows = {};
+    nodes.forEach(n => { const r = Math.round(depth[n.id] * 4); (rows[r] = rows[r] || []).push(n); });
+    Object.values(rows).forEach(list => {
+      list.sort((a, b) => xs[a.id] - xs[b.id]);
+      for (let i = 1; i < list.length; i++) {
+        const a = list[i - 1], b = list[i], gap = (size(a).w + size(b).w) / 2 + 34;
+        if (xs[b.id] - xs[a.id] < gap) xs[b.id] = xs[a.id] + gap;
+      }
+      const lo = xs[list[0].id] - size(list[0]).w / 2, hi = xs[list[list.length - 1].id] + size(list[list.length - 1]).w / 2;
+      const shift = lo < 10 ? 10 - lo : hi > W - 10 ? (W - 10) - hi : 0;
+      list.forEach(n => xs[n.id] += shift);
+    });
+    const rowH = Math.min(110, (H - 90) / Math.max(1, top));
+    nodes.forEach(n => { n.x = Math.round(xs[n.id] ?? W / 2); n.y = Math.round(45 + (top - depth[n.id]) * rowH); });
+  }
+
+  // ================= Komponente =================
+  function Tool(root, task, key) {
+    task = task || {};
+    const KEY = key ? 'inf9-dfd-' + key : null;
+    let model = { nodes: [], edges: [] };
+    try { const s = KEY && localStorage.getItem(KEY); if (s) model = JSON.parse(s); } catch (e) { }
+    let seq = model.nodes.reduce((m, n) => Math.max(m, +n.id.slice(1) || 0), 0);
+    let sel = null, connectFrom = null, drag = null, tries = 0, edgeSel = null;
+    const save = () => { try { KEY && localStorage.setItem(KEY, JSON.stringify(model)); } catch (e) { } };
+    const inputs = task.inputs || [];
+    root.classList.add('dfd');
+    root.innerHTML = `
+      ${task.title ? `<div class="dfd-title">${esc(task.title)}</div>` : ''}
+      ${task.prompt ? `<div class="dfd-prompt">${task.prompt}</div>` : ''}
+      <div class="dfd-palette">
+        ${inputs.map((i, k) => `<button type="button" class="dfd-pal pin" data-add="in" data-k="${k}"><span class="sym-rect"></span>${esc(i.label)}</button>`).join('')}
+        ${task.inputs ? '' : '<button type="button" class="dfd-pal" data-add="in"><span class="sym-rect"></span>Eingabe</button>'}
+        <button type="button" class="dfd-pal" data-add="const"><span class="sym-const">2</span>Konstante</button>
+        <button type="button" class="dfd-pal" data-add="fn"><span class="sym-ell"></span>Funktion</button>
+        <button type="button" class="dfd-pal" data-add="split"><span class="sym-dot"></span>Verteiler</button>
+        <button type="button" class="dfd-pal" data-add="out"><span class="sym-rect out"></span>${esc(task.output || 'Ausgabe')}</button>
+      </div>
+      <div class="dfd-edit" hidden></div>
+      <div class="dfd-canvas"><svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="application" aria-label="Zeichenfläche für das Datenflussdiagramm">
+        <defs><marker id="dfdArrow-${key}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#33415a"/></marker></defs>
+        <g class="edges"></g><g class="nodes"></g><path class="rubber" fill="none" stroke="#e07a12" stroke-width="3" stroke-dasharray="6 5"/></svg></div>
+      <div class="dfd-formula"><span>Deine Formel:</span> <code></code></div>
+      <div class="dfd-foot">
+        ${task.term || task.target ? '<button type="button" class="fbtn primary" data-act="check">Prüfen</button>' : ''}
+        <button type="button" class="fbtn" data-act="del" disabled>✕ Löschen</button>
+        <button type="button" class="fbtn" data-act="clear">↺ Neu</button>
+        ${task.term ? `<button type="button" class="fbtn" data-act="solve"${task.showSolve ? '' : ' hidden'}>Lösung zeigen</button>` : ''}
+        <div class="dfd-msg" aria-live="polite">${task.hint || 'Bausteine oben in der Leiste antippen, um sie einzufügen. Verbinden: Baustein antippen, dann am <b>orangen Pfeil</b> darunter ziehen (oder den Pfeil antippen und danach das Ziel).'}</div>
+      </div>`;
+    const svg = root.querySelector('svg'), gE = root.querySelector('.edges'), gN = root.querySelector('.nodes'), rubber = root.querySelector('.rubber');
+    const msg = root.querySelector('.dfd-msg'), fcode = root.querySelector('.dfd-formula code'), edit = root.querySelector('.dfd-edit');
+    const say = (t, cls) => { msg.className = 'dfd-msg' + (cls ? ' ' + cls : ''); msg.innerHTML = t; };
+    const byId = id => model.nodes.find(n => n.id === id);
+    function freeSpot(kind) {
+      const rows = { in: [50, 140], const: [50, 140, 250], split: [130, 250], fn: [250, 360, 140], out: [490, 400] }[kind] || [250];
+      for (const y of rows) for (let c = 0; c < 7; c++) {
+        const x = 80 + c * 120;
+        if (!model.nodes.some(n => Math.abs(n.x - x) < 95 && Math.abs(n.y - y) < 55)) return { x, y };
+      }
+      return { x: W / 2, y: H / 2 };
+    }
+    function addNode(o) { const p = freeSpot(o.kind); const n = Object.assign({ id: 'n' + (++seq), x: p.x, y: p.y }, o); model.nodes.push(n); sel = n.id; edgeSel = null; save(); render(); return n; }
+    function pt(ev) { const m = svg.getScreenCTM().inverse(); const p = svg.createSVGPoint(); p.x = ev.clientX; p.y = ev.clientY; const q = p.matrixTransform(m); return { x: q.x, y: q.y }; }
+
+    // ---------- Zeichnen ----------
+    function render() {
+      // Eingabe-Chips: schon gesetzte ausgrauen
+      root.querySelectorAll('.dfd-pal.pin').forEach(b => b.disabled = model.nodes.some(n => n.kind === 'in' && n.k === +b.dataset.k));
+      root.querySelector('[data-add=out]').disabled = model.nodes.some(n => n.kind === 'out');
+      let es = '';
+      model.edges.forEach((e, i) => {
+        const a = byId(e.from), b = byId(e.to); if (!a || !b) return;
+        const p = outPos(a), q = slotPos(b, e.slot, inCount(b, model.edges));
+        const ty = q.y - (b.kind === 'fn' ? 2 : b.kind === 'split' ? 7 : 1), my = (p.y + ty) / 2, d = `M${p.x},${p.y} C${p.x},${my} ${q.x},${my} ${q.x},${ty}`;
+        es += `<path class="hit" data-edge="${i}" d="${d}"/><path class="edge${edgeSel === i ? ' is-sel' : ''}" d="${d}" marker-end="url(#dfdArrow-${key})"/>`;
+      });
+      gE.innerHTML = es;
+      let ns = '';
+      model.nodes.forEach(n => {
+        const s = size(n), cls = 'node k-' + n.kind + (sel === n.id ? ' is-sel' : '') + (connectFrom === n.id ? ' is-src' : '');
+        ns += `<g class="${cls}" data-id="${n.id}" transform="translate(${n.x},${n.y})">`;
+        if (n.kind === 'split') ns += `<circle r="12" class="pad"/><circle r="6.5" class="dot"/>`;
+        else if (n.kind === 'const') ns += `<rect x="${-s.w / 2}" y="${-s.h / 2}" width="${s.w}" height="${s.h}" class="pad"/><text y="3" class="lab">${esc(n.label)}</text>`;
+        else if (n.kind === 'fn') ns += `<ellipse rx="${s.w / 2}" ry="${s.h / 2}" class="shape"/><text y="6" class="lab">${esc(n.fn)}</text>`;
+        else ns += `<rect x="${-s.w / 2}" y="${-s.h / 2}" width="${s.w}" height="${s.h}" class="shape"/><text y="6" class="lab">${esc(n.label)}</text>`;
+        // Eingangsplätze
+        const cnt = inCount(n, model.edges);
+        if (n.kind === 'fn') for (let i = 0; i < cnt; i++) {
+          const q = slotPos(n, i, cnt), full = model.edges.some(e => e.to === n.id && e.slot === i);
+          const wiring = !!(connectFrom || (drag && drag.mode === 'wire'));
+          ns += `<g class="slot${full ? ' full' : ''}${slotRequired(n, i) ? '' : ' opt'}${wiring && !full ? ' target' : ''}" data-slot="${i}" transform="translate(${q.x - n.x},${q.y - n.y})"><circle r="16" class="slot-hit"/>${wiring && !full ? '<circle r="11" class="ring"/>' : ''}<text x="${full ? -11 : 0}" y="${full ? -4 : 5}">${i + 1}</text></g>`;
+        }
+        if (canOut(n) && (sel === n.id || connectFrom === n.id)) {
+          const p = outPos(n), hy = p.y - n.y + (n.kind === 'split' ? 12 : 4);
+          ns += `<g class="grip" data-handle="1" transform="translate(0,${hy})"><rect x="-22" y="0" width="44" height="30" rx="8"/><path d="M0 7 L0 21 M-6 15 L0 22 L6 15"/><rect class="handle-hit" x="-30" y="-6" width="60" height="44"/></g>`;
+        }
+        ns += '</g>';
+      });
+      gN.innerHTML = ns;
+      const f = formula(model);
+      fcode.textContent = f.err ? '–' : f.text;
+      root.querySelector('[data-act=del]').disabled = !(sel || edgeSel !== null);
+      renderEdit();
+    }
+    function renderEdit() {
+      const n = sel && byId(sel);
+      if (!n || n.kind === 'split' || (n.kind === 'out' && task.output)) { edit.hidden = true; return; }
+      edit.hidden = false;
+      if (n.kind === 'fn') {
+        const cnt = slotCount(n, model.edges);
+        const parts = [...Array(cnt)].map((_, i) => `<span class="${model.edges.some(e => e.to === n.id && e.slot === i) ? 'on' : ''}">${i + 1}: ${esc(slotName(n, i))}${slotRequired(n, i) ? '' : ' (optional)'}</span>`).join('');
+        edit.innerHTML = `<div class="sig"><b>${esc(isOp(n.fn) ? n.fn + ' · ' + OPNAME[n.fn] : n.fn)}</b> ${parts}</div><button type="button" class="fbtn" data-act="pick">Funktion ändern</button>`;
+        edit.querySelector('[data-act=pick]').onclick = () => picker(fn => { n.fn = fn; model.edges = model.edges.filter(e => !(e.to === n.id && e.slot >= slotCount(n, model.edges) && !F[fn]?.v)); save(); render(); });
+      } else if (n.kind === 'in' && n.k !== undefined) {
+        edit.innerHTML = `<div class="sig">Eingabe <b>${esc(n.label)}</b>${n.ref && n.ref !== n.label ? ` · steht in <code>${esc(n.ref)}</code>` : ''}</div>`;
+      } else {
+        const what = n.kind === 'const' ? 'Wert der Konstante' : n.kind === 'out' ? 'Name der Ausgabe' : 'Eingabe (Zelle wie B2 oder Name)';
+        edit.innerHTML = `<label class="sig">${what}: <input type="text" value="${esc(n.label)}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" ${n.kind === 'const' ? 'inputmode="decimal"' : ''}></label><button type="button" class="fbtn" data-act="ok">✓</button>`;
+        const inp = edit.querySelector('input');
+        const apply = () => { n.label = inp.value.trim() || n.label; if (n.kind === 'in') n.ref = /^\$?[A-Za-z]\$?\d+(:\$?[A-Za-z]\$?\d+)?$/.test(n.label) ? n.label.toUpperCase() : undefined; save(); render(); };
+        edit.querySelector('[data-act=ok]').onclick = apply;
+        inp.addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); apply(); } });
+        if (n.fresh) { delete n.fresh; setTimeout(() => { try { inp.focus(); inp.select(); } catch (e) { } }, 30); }
+      }
+    }
+    // ---------- Funktionsauswahl ----------
+    function picker(done) {
+      const ov = document.createElement('div'); ov.className = 'dfd-picker';
+      const allowed = task.funcs ? new Set(task.funcs) : null;
+      const groups = {};
+      Object.keys(OPS).forEach(o => { const g = PREC[o] === 1 ? 'Vergleich' : 'Rechenzeichen'; (groups[g] = groups[g] || []).push(o); });
+      Object.entries(F).forEach(([k, v]) => (groups[v.g] = groups[v.g] || []).push(k));
+      const btn = f => `<button type="button" data-fn="${esc(f)}"><b>${esc(isOp(f) ? f : f)}</b><span>${esc(isOp(f) ? OPNAME[f] : sig(f))}</span>${isOp(f) ? '' : `<i>${esc(F[f].d)}</i>`}</button>`;
+      ov.innerHTML = `<div class="dfd-picker-in"><div class="dfd-picker-head"><b>Funktion wählen</b><input type="search" placeholder="suchen …" autocomplete="off" autocapitalize="characters"><button type="button" class="fbtn" data-x>✕</button></div>
+        <div class="dfd-picker-list">${Object.entries(groups).map(([g, fs]) => { const l = fs.filter(f => !allowed || allowed.has(f)); return l.length ? `<h4>${g}</h4><div class="grid">${l.map(btn).join('')}</div>` : ''; }).join('')}</div></div>`;
+      document.body.appendChild(ov);
+      document.documentElement.classList.add('dfd-lock');
+      const close = () => { ov.remove(); document.documentElement.classList.remove('dfd-lock'); };
+      ov.querySelector('[data-x]').onclick = close;
+      ov.addEventListener('click', e => { if (e.target === ov) close(); const b = e.target.closest('[data-fn]'); if (b) { close(); done(b.dataset.fn); } });
+      const s = ov.querySelector('input[type=search]');
+      s.addEventListener('input', () => { const q = s.value.trim().toUpperCase(); ov.querySelectorAll('[data-fn]').forEach(b => b.hidden = q && !b.dataset.fn.includes(q) && !b.textContent.toUpperCase().includes(q)); });
+    }
+    // ---------- Verbinden ----------
+    function connect(fromId, toId, slot) {
+      const a = byId(fromId), b = byId(toId);
+      if (!a || !b || a === b) return;
+      if (b.kind === 'in' || b.kind === 'const') { say('In Eingaben und Konstanten führt kein Pfeil hinein.', 'bad'); return; }
+      const outs = model.edges.filter(e => e.from === fromId).length;
+      if (outs >= maxOut(a)) {
+        say(a.kind === 'out' ? 'Aus der Ausgabe führt kein Pfeil heraus.'
+          : 'Aus diesem Baustein führt schon ein Pfeil. Soll das Datum an mehrere Funktionen gehen, führe den Pfeil in einen <b>Verteiler</b> – aus dem Verteiler dürfen mehrere Pfeile herausgehen.', 'bad'); return;
+      }
+      const cnt = inCount(b, model.edges);
+      if (slot === undefined || slot === null) { slot = [...Array(cnt).keys()].find(i => !model.edges.some(e => e.to === toId && e.slot === i)); }
+      if (slot === undefined) { say('Alle Eingänge dieses Bausteins sind schon belegt. Tippe einen Pfeil an und lösche ihn, wenn du umstecken willst.', 'bad'); return; }
+      model.edges = model.edges.filter(e => !(e.to === toId && e.slot === slot));
+      // Kreis verhindern
+      const reach = new Set([toId]); let ch = true;
+      while (ch) { ch = false; model.edges.forEach(e => { if (reach.has(e.from) && !reach.has(e.to)) { reach.add(e.to); ch = true; } }); }
+      if (reach.has(fromId)) { say('So entstünde ein Kreis. Daten fließen nur in eine Richtung.', 'bad'); return; }
+      model.edges.push({ from: fromId, to: toId, slot });
+      save(); say(b.kind === 'fn' ? `Verbunden mit Eingang ${slot + 1} (${esc(slotName(b, slot))}) von <b>${esc(b.fn)}</b>.` : 'Verbunden.');
+    }
+    function hitTarget(ev) {
+      const el = document.elementFromPoint(ev.clientX, ev.clientY); if (!el) return null;
+      const g = el.closest && el.closest('.node'); if (!g) return null;
+      const s = el.closest('.slot');
+      return { id: g.dataset.id, slot: s ? +s.dataset.slot : null };
+    }
+    svg.addEventListener('pointerdown', ev => {
+      const handle = ev.target.closest('[data-handle]'), g = ev.target.closest('.node'), edgeEl = ev.target.closest('[data-edge]');
+      const p = pt(ev);
+      if (connectFrom && g && g.dataset.id !== connectFrom) { // Ziel antippen (auch auf dessen Anschlusspunkt)
+        ev.preventDefault();
+        const t = hitTarget(ev); connect(connectFrom, t.id, t.slot); connectFrom = null; render(); return;
+      }
+      if (handle && g) { ev.preventDefault(); drag = { mode: 'wire', id: g.dataset.id, x0: p.x, y0: p.y, moved: false, pid: ev.pointerId }; try { svg.setPointerCapture(ev.pointerId); } catch (e) { } return; }
+      if (g) {
+        ev.preventDefault(); const n = byId(g.dataset.id);
+        drag = { mode: 'move', id: n.id, dx: p.x - n.x, dy: p.y - n.y, x0: p.x, y0: p.y, moved: false, pid: ev.pointerId };
+        try { svg.setPointerCapture(ev.pointerId); } catch (e) { } return;
+      }
+      if (edgeEl) { edgeSel = +edgeEl.dataset.edge; sel = null; connectFrom = null; render(); say('Pfeil ausgewählt. Mit <b>✕ Löschen</b> entfernen.'); return; }
+      sel = null; edgeSel = null; connectFrom = null; render();
+    });
+    svg.addEventListener('pointermove', ev => {
+      if (!drag || ev.pointerId !== drag.pid) return;
+      const p = pt(ev);
+      if (Math.hypot(p.x - drag.x0, p.y - drag.y0) > 6) drag.moved = true;
+      if (drag.mode === 'move' && drag.moved) {
+        const n = byId(drag.id); n.x = Math.max(30, Math.min(W - 30, Math.round(p.x - drag.dx))); n.y = Math.max(24, Math.min(H - 24, Math.round(p.y - drag.dy))); render();
+      } else if (drag.mode === 'wire' && drag.moved) {
+        if (!drag.shown) { drag.shown = true; render(); }
+        const s = outPos(byId(drag.id)); rubber.setAttribute('d', `M${s.x},${s.y} L${p.x},${p.y}`);
+      }
+    });
+    function endDrag(ev) {
+      if (!drag || ev.pointerId !== drag.pid) return;
+      const d = drag; drag = null; rubber.setAttribute('d', '');
+      if (d.mode === 'wire') {
+        if (d.moved) { const t = hitTarget(ev); if (t && t.id !== d.id) connect(d.id, t.id, t.slot); }
+        else { connectFrom = d.id; sel = null; say('Jetzt das Ziel antippen. Bei Funktionen zeigen orange Ringe die freien Eingänge.'); }
+      } else if (!d.moved) { sel = d.id; edgeSel = null; }
+      save(); render();
+    }
+    svg.addEventListener('pointerup', endDrag);
+    svg.addEventListener('pointercancel', endDrag);
+    // ---------- Knöpfe ----------
+    root.querySelectorAll('[data-add]').forEach(b => b.addEventListener('click', () => {
+      const t = b.dataset.add;
+      if (t === 'in') { if (b.dataset.k !== undefined) { const i = inputs[+b.dataset.k]; addNode({ kind: 'in', label: i.label, ref: i.ref, k: +b.dataset.k }); } else addNode({ kind: 'in', label: 'B2', ref: 'B2', fresh: true }); }
+      if (t === 'const') addNode({ kind: 'const', label: '2', fresh: true });
+      if (t === 'split') addNode({ kind: 'split' });
+      if (t === 'out') addNode({ kind: 'out', label: task.output || 'Ergebnis', fresh: !task.output });
+      if (t === 'fn') picker(fn => addNode({ kind: 'fn', fn }));
+    }));
+    root.querySelector('[data-act=del]').addEventListener('click', () => {
+      if (edgeSel !== null) { model.edges.splice(edgeSel, 1); edgeSel = null; }
+      else if (sel) { model.nodes = model.nodes.filter(n => n.id !== sel); model.edges = model.edges.filter(e => e.from !== sel && e.to !== sel); sel = null; }
+      save(); render();
+    });
+    root.querySelector('[data-act=clear]').addEventListener('click', () => { model = { nodes: [], edges: [] }; sel = null; edgeSel = null; connectFrom = null; root.classList.remove('solved'); save(); render(); say(task.hint || 'Leere Fläche. Los geht’s!'); });
+    const solveBtn = root.querySelector('[data-act=solve]');
+    if (solveBtn) solveBtn.addEventListener('click', () => { model = fromTerm(task.term, task); seq = model.nodes.length + 1; sel = null; save(); render(); say('So sieht eine mögliche Lösung aus. Vergleiche mit deinem Diagramm – baue es danach selbst noch einmal nach.'); });
+    const chk = root.querySelector('[data-act=check]');
+    if (chk) chk.addEventListener('click', () => {
+      const f = formula(model);
+      if (f.err) return say('✗ ' + f.err, 'bad');
+      if (f.cyc) return say('✗ Dein Diagramm enthält einen Kreis.', 'bad');
+      if (f.missing) return say(`✗ Es ${f.missing === 1 ? 'fehlt noch ein Pfeil' : 'fehlen noch ' + f.missing + ' Pfeile'} (leere Eingänge □ in deiner Formel).`, 'bad');
+      if (f.unused.length) return say(`✗ ${f.unused.length === 1 ? 'Ein Baustein hängt' : f.unused.length + ' Bausteine hängen'} nirgends dran. Verbinde ${f.unused.length === 1 ? 'ihn' : 'sie'} oder lösche ${f.unused.length === 1 ? 'ihn' : 'sie'}.`, 'bad');
+      const lonely = model.nodes.filter(n => n.kind === 'split' && model.edges.filter(e => e.from === n.id).length < 2);
+      if (lonely.length) return say('✗ Ein Verteiler hat nur <b>einen</b> Ausgang. Einen Verteiler brauchst du nur, wenn ein Datum an <b>mehrere</b> Stellen weitergeleitet wird – sonst geht der Pfeil direkt in die nächste Ellipse oder in die Ausgabe. Lösche den Verteiler.', 'bad');
+      const ins = model.nodes.filter(n => n.kind === 'in'), lbl = ins.map(n => n.label);
+      if (new Set(lbl).size < lbl.length) return say('✗ Eine Eingabe kommt doppelt vor. Zeichne jede Eingabe nur einmal und verteile sie mit einem <b>Verteiler</b>, wenn sie mehrfach gebraucht wird.', 'bad');
+      const seen = {};
+      for (const [id, t] of Object.entries(f.sub)) {
+        if (/ZUFALL|HEUTE|JETZT/.test(t) && !/\(/.test(t.replace(/^(ZUFALLSZAHL|HEUTE|JETZT)\(\)$/, ''))) continue;
+        if (seen[t]) return say(`✗ Die Funktion <code>${esc(t)}</code> wird zweimal berechnet. Berechne sie nur <b>einmal</b> und führe ihre Ausgabe in einen <b>Verteiler</b>, der den Wert an die anderen Funktionen weitergibt.`, 'bad');
+        seen[t] = id;
+      }
+      const target = task.term;
+      const cells = cellsOf(refsInFormula(target).concat(refsInFormula(f.text)));
+      const sets = testSets(task, cells);
+      tries++;
+      for (const s of sets) {
+        const a = evalWith(f.text, s), b = evalWith(target, s);
+        if (!same(a, b)) {
+          if (solveBtn && tries >= 2) solveBtn.hidden = false;
+          // Tipp: vertauschte Eingänge?
+          let tip = '';
+          for (const n of model.nodes.filter(n => n.kind === 'fn' && slotCount(n, model.edges) === 2)) {
+            const sw = JSON.parse(JSON.stringify(model)); sw.edges.forEach(e => { if (e.to === n.id) e.slot = 1 - e.slot; });
+            const g = formula(sw); if (!g.err && sets.every(t => same(evalWith(g.text, t), evalWith(target, t)))) { tip = ` Tipp: Prüfe die <b>Reihenfolge der Eingänge</b> bei <b>${esc(n.fn)}</b>.`; break; }
+          }
+          const show = Object.entries(s).filter(([c]) => cells.includes(c)).map(([c, v]) => `${c} = ${esc(v)}`).join(', ');
+          return say(`✗ Noch nicht. Test mit ${show}: Dein Diagramm liefert <b>${esc(E.display(a))}</b>, richtig wäre <b>${esc(E.display(b))}</b>.${tip}`, 'bad');
+        }
+      }
+      root.classList.add('solved');
+      say(`✓ Richtig! Dein Diagramm rechnet genau wie <code>${esc(target)}</code>.`, 'good');
+    });
+    render();
+    return { setTask: null };
+  }
+  return { Tool, fromTerm, formula, F, OPS, sig };
+})();
+if (typeof module !== 'undefined') module.exports = DFD;
+
+(() => {
+  const LP = window.LP || {};
+  const E = CalcEngine;
+  const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { } }
+  };
+  const KEY = 'inf9-' + (LP.key || 'lp');
+  const expand = list => { const out = new Set(); (list || []).forEach(r => E.rangeCells(r).forEach(a => out.add(a))); return out; };
+  const expandMap = obj => { const out = {}; Object.entries(obj || {}).forEach(([r, v]) => E.rangeCells(r).forEach(a => out[a] = v)); return out; };
+
+  // ================= Mini-Tabellenkalkulation =================
+  function Calc(root, cfg, id) {
+    const R = cfg.rows, C = cfg.cols, skey = KEY + '-calc-' + id;
+    const init = Object.assign({}, cfg.cells || {});
+    const saved = store.get(skey, null);
+    const sheet = new E.Sheet(R, C, saved || init);
+    const editable = cfg.edit ? expand(cfg.edit) : null;
+    const canEdit = a => !editable || editable.has(a);
+    const style = expandMap(cfg.styles), fmt = expandMap(cfg.fmt);
+    const tools = cfg.tools || ['copy', 'paste', 'filldown', 'formulas'];
+    let justPointed = false;
+    let sel = cfg.start || (editable ? [...editable][0] : 'A1'), showF = !!cfg.showFormulas, clip = null, editing = false;
+
+    root.innerHTML = `
+      <div class="calc-title">${esc(cfg.title || 'Tabellenblatt')}</div>
+      <div class="calc-fx"><span class="calc-name" aria-label="Zelladresse"></span><span class="calc-fxlabel">fx</span>
+        <input class="calc-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" aria-label="Inhalt der Zelle">
+        <button class="calc-ok" type="button" aria-label="Eingabe übernehmen">✓</button></div>
+      ${cfg.keys === false ? '' : `<div class="calc-keys">${['=', '$', ';', ':', '(', ')', '*', '/', '"'].map(k => `<button type="button" data-ins="${esc(k)}">${esc(k)}</button>`).join('')}
+        <span class="sep"></span>
+        ${tools.includes('copy') ? '<button type="button" class="tool" data-act="copy">Kopieren</button>' : ''}
+        ${tools.includes('paste') ? '<button type="button" class="tool" data-act="paste" disabled>Einfügen</button>' : ''}
+        ${tools.includes('filldown') ? '<button type="button" class="tool" data-act="filldown">↓ Ausfüllen</button>' : ''}
+        ${tools.includes('fillright') ? '<button type="button" class="tool" data-act="fillright">→ Ausfüllen</button>' : ''}
+        ${tools.includes('fillblock') ? '<button type="button" class="tool" data-act="fillblock">↘ Block ausfüllen</button>' : ''}
+        ${tools.includes('formulas') ? '<button type="button" class="tool" data-act="formulas" aria-pressed="false">Formeln zeigen</button>' : ''}
+      </div>`}
+      <div class="calc-preview" aria-live="polite"></div>
+      <div class="calc-scroll"><table><thead><tr><th></th>${Array.from({ length: C }, (_, c) => `<th data-col="${c}">${E.colName(c)}</th>`).join('')}</tr></thead>
+      <tbody>${Array.from({ length: R }, (_, r) => `<tr><th data-row="${r}">${r + 1}</th>${Array.from({ length: C }, (_, c) => {
+        const a = E.addr(r, c), w = cfg.widths && cfg.widths[E.colName(c)];
+        return `<td data-a="${a}"${w ? ` style="min-width:${w}px"` : ''}></td>`;
+      }).join('')}</tr>`).join('')}</tbody></table></div>
+      <div class="calc-foot">
+        ${cfg.check ? '<button type="button" class="fbtn primary" data-act="check">Prüfen</button>' : ''}
+        <button type="button" class="fbtn" data-act="reset">↺ Zurücksetzen</button>
+        <div class="calc-msg" aria-live="polite">${cfg.hint ? cfg.hint : ''}</div>
+      </div>`;
+    const input = root.querySelector('.calc-input'), nameBox = root.querySelector('.calc-name'), prev = root.querySelector('.calc-preview'), msg = root.querySelector('.calc-msg');
+    const tds = {}; root.querySelectorAll('td').forEach(td => tds[td.dataset.a] = td);
+
+    function colored(src) {
+      const refs = E.refsIn(src); if (!refs.length) return esc(src);
+      let out = '', p = 0;
+      refs.forEach((rf, i) => { out += esc(src.slice(p, rf.start)) + `<span class="rf c${i % 6}">${esc(src.slice(rf.start, rf.end))}</span>`; p = rf.end; });
+      return out + esc(src.slice(p));
+    }
+    function render() {
+      for (const a in tds) {
+        const td = tds[a], raw = sheet.get(a), v = sheet.value(a), isF = sheet.isFormula(a);
+        td.className = '';
+        if (style[a]) td.classList.add(style[a]);
+        if (!canEdit(a)) td.classList.add('lock');
+        if (showF && isF) { td.textContent = raw; td.classList.add('fx'); }
+        else {
+          td.textContent = E.display(v, fmt[a]);
+          if (typeof v === 'number') td.classList.add('num');
+          if (E.isErr(v)) td.classList.add('err');
+        }
+      }
+      if (clip) tds[clip.a] && tds[clip.a].classList.add('copysrc');
+      const td = tds[sel]; if (td) td.classList.add('sel');
+      root.querySelectorAll('th').forEach(th => th.classList.remove('hl'));
+      const p = E.parseAddr(sel);
+      if (p) { const h = root.querySelector(`th[data-col="${p.c}"]`), v = root.querySelector(`th[data-row="${p.r}"]`); h && h.classList.add('hl'); v && v.classList.add('hl'); }
+      showRefs(editing ? input.value : sheet.get(sel));
+      const pb = root.querySelector('[data-act=paste]'); if (pb) pb.disabled = !clip;
+    }
+    function showRefs(src) {
+      Object.values(tds).forEach(td => td.classList.remove('rf0', 'rf1', 'rf2', 'rf3', 'rf4', 'rf5'));
+      if (typeof src === 'string' && src.trim().startsWith('=')) {
+        E.refsIn(src).forEach((rf, i) => rf.cells.forEach(a => tds[a] && tds[a].classList.add('rf' + (i % 6))));
+        const v = editing ? null : sheet.value(sel);
+        prev.innerHTML = `<b>${sel}</b>: ${colored(src)}${v !== null && v !== undefined ? ` <span>→ <b>${esc(E.display(v, fmt[sel]))}</b></span>` : ''}`;
+      } else prev.innerHTML = sheet.get(sel) !== undefined ? `<b>${sel}</b>: ${esc(sheet.get(sel))}` : `<b>${sel}</b>: <i>leer</i>`;
+    }
+    function select(a) {
+      sel = a; editing = false;
+      nameBox.textContent = a;
+      const raw = sheet.get(a);
+      input.value = raw === undefined ? '' : String(raw);
+      input.disabled = !canEdit(a);
+      input.placeholder = canEdit(a) ? 'Inhalt oder =Formel eingeben' : 'Diese Zelle ist gesperrt';
+      render();
+    }
+    function save() { store.set(skey, sheet.raw); }
+    function commit(move) {
+      if (!canEdit(sel)) return;
+      let v = input.value;
+      if (v.trim() === '') v = '';
+      // Formel ohne Gleichheitszeichen bleibt Text (wie in echt) – Hinweis geben
+      sheet.set(sel, v);
+      save(); editing = false;
+      if (move) { const p = E.parseAddr(sel); if (p.r + 1 < R) { select(E.addr(p.r + 1, p.c)); return; } }
+      select(sel);
+      if (/^\s+=/.test(v)) say('Achtung: Vor dem = steht ein Leerzeichen. Dann ist es keine Formel, sondern Text.', 'bad');
+    }
+    function pointable() {
+      if (document.activeElement !== input) return false;
+      const v = input.value, pos = input.selectionStart ?? v.length;
+      return v.trim().startsWith('=') && /[=+\-*\/^(;:<>&]\s*$/.test(v.slice(0, pos));
+    }
+    function insertAt(txt) {
+      const v = input.value, s = input.selectionStart ?? v.length, e = input.selectionEnd ?? v.length;
+      input.value = v.slice(0, s) + txt + v.slice(e);
+      const np = s + txt.length;
+      try { input.setSelectionRange(np, np); } catch (err) { }
+      editing = true; showRefs(input.value);
+    }
+    function say(t, cls) { msg.className = 'calc-msg' + (cls ? ' ' + cls : ''); msg.innerHTML = t; }
+
+    root.querySelector('tbody').addEventListener('pointerdown', ev => {
+      const td = ev.target.closest('td'); if (!td) return;
+      if (pointable()) { ev.preventDefault(); insertAt(td.dataset.a); justPointed = true; try { input.focus({ preventScroll: true }); } catch (e) { } return; }
+    });
+    root.querySelector('tbody').addEventListener('mousedown', ev => { if (pointable()) ev.preventDefault(); });
+    root.querySelector('tbody').addEventListener('click', ev => {
+      const td = ev.target.closest('td'); if (!td) return;
+      if (justPointed) { justPointed = false; try { input.focus({ preventScroll: true }); } catch (e) { } return; }
+      if (editing) commit(false);
+      select(td.dataset.a);
+    });
+    input.addEventListener('input', () => { editing = true; showRefs(input.value); });
+    input.addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); commit(true); } if (ev.key === 'Escape') select(sel); });
+    root.querySelector('.calc-ok').addEventListener('click', () => commit(false));
+    root.querySelectorAll('[data-ins]').forEach(b => {
+      b.addEventListener('pointerdown', ev => ev.preventDefault());
+      b.addEventListener('mousedown', ev => ev.preventDefault());
+      b.addEventListener('click', () => { if (input.disabled) return; if (document.activeElement !== input) input.focus(); insertAt(b.dataset.ins); });
+    });
+    root.querySelectorAll('[data-act]').forEach(b => b.addEventListener('click', () => {
+      const act = b.dataset.act;
+      if (editing && act !== 'formulas') commit(false);
+      if (act === 'copy') { clip = { a: sel, raw: sheet.get(sel) }; say(`<b>${sel}</b> kopiert. Wähle die Zielzelle und tippe auf <b>Einfügen</b>.`); render(); }
+      if (act === 'paste' && clip) {
+        if (!canEdit(sel)) { say('In diese Zelle kannst du nichts einfügen.', 'bad'); return; }
+        const p = E.parseAddr(sel), q = E.parseAddr(clip.a);
+        const nr = E.shiftFormula(clip.raw, p.r - q.r, p.c - q.c);
+        sheet.set(sel, nr === undefined ? '' : nr); save(); select(sel);
+        say(sheet.isFormula(sel) ? `Eingefügt in <b>${sel}</b>: <code>${esc(nr)}</code>` : `Eingefügt in <b>${sel}</b>.`);
+      }
+      if (act === 'filldown' || act === 'fillright') {
+        const p = E.parseAddr(sel), src = sheet.get(sel);
+        if (src === undefined) { say('Wähle zuerst eine Zelle mit Inhalt (meist eine Formel).', 'bad'); return; }
+        let n = 0;
+        for (let k = 1; ; k++) {
+          const r = act === 'filldown' ? p.r + k : p.r, c = act === 'fillright' ? p.c + k : p.c;
+          if (r >= R || c >= C) break;
+          const a = E.addr(r, c); if (!canEdit(a)) break;
+          sheet.set(a, E.shiftFormula(src, r - p.r, c - p.c)); n++;
+        }
+        save(); select(sel);
+        say(n ? `Formel aus <b>${sel}</b> in ${n} Zelle${n > 1 ? 'n' : ''} ${act === 'filldown' ? 'darunter' : 'rechts daneben'} kopiert. Tippe die Zellen an und vergleiche die Bezüge!` : 'Hier ist kein Platz zum Ausfüllen.', n ? '' : 'bad');
+      }
+      if (act === 'fillblock') {
+        const p = E.parseAddr(sel), src = sheet.get(sel);
+        if (src === undefined) { say('Wähle zuerst die Zelle mit der Formel.', 'bad'); return; }
+        let mc = p.c, mr = p.r;
+        while (mc + 1 < C && canEdit(E.addr(p.r, mc + 1))) mc++;
+        while (mr + 1 < R && canEdit(E.addr(mr + 1, p.c))) mr++;
+        let n = 0;
+        for (let r = p.r; r <= mr; r++) for (let c = p.c; c <= mc; c++) {
+          if (r === p.r && c === p.c) continue; const a = E.addr(r, c); if (!canEdit(a)) continue;
+          sheet.set(a, E.shiftFormula(src, r - p.r, c - p.c)); n++;
+        }
+        save(); select(sel);
+        say(n ? `Formel aus <b>${sel}</b> in den ganzen Block (${n} Zellen) kopiert. Tippe einzelne Zellen an und vergleiche!` : 'Hier ist kein Platz zum Ausfüllen.', n ? '' : 'bad');
+      }
+      if (act === 'formulas') { showF = !showF; b.setAttribute('aria-pressed', String(showF)); b.textContent = showF ? 'Werte zeigen' : 'Formeln zeigen'; render(); }
+      if (act === 'reset') { sheet.raw = Object.assign({}, init); sheet.cache = {}; clip = null; save(); root.classList.remove('solved'); say(cfg.hint || ''); select(cfg.start || sel); }
+      if (act === 'check') check();
+    }));
+    function evalRule(rule) {
+      const norm = s => String(s || '').replace(/\s+/g, '').toUpperCase();
+      if (rule.test) {
+        const s2 = new E.Sheet(R, C, Object.assign({}, sheet.raw, rule.test.set));
+        const v = s2.value(rule.test.cell);
+        if (rule.test.text !== undefined) return E.display(v).toLowerCase() === String(rule.test.text).toLowerCase();
+        return typeof v === 'number' && Math.abs(v - rule.test.eq) < 1e-6;
+      }
+      const cells = rule.cells ? E.rangeCells(rule.cells) : [rule.cell];
+      return cells.every(a => {
+        const raw = sheet.get(a), v = sheet.value(a);
+        if (rule.formula && !sheet.isFormula(a)) return false;
+        if (rule.has && !norm(raw).includes(norm(rule.has))) return false;
+        if (rule.not && norm(raw).includes(norm(rule.not))) return false;
+        if (rule.eq !== undefined && !(typeof v === 'number' && Math.abs(v - rule.eq) < 1e-6)) return false;
+        if (rule.text !== undefined && E.display(v).toLowerCase() !== String(rule.text).toLowerCase()) return false;
+        if (rule.noerr && E.isErr(v)) return false;
+        return true;
+      });
+    }
+    function check() {
+      for (const rule of cfg.check) {
+        if (!evalRule(rule)) { say('✗ ' + (rule.msg || 'Noch nicht ganz. Prüfe deine Formeln.'), 'bad'); root.classList.remove('solved'); return; }
+      }
+      say('✓ ' + (cfg.ok || 'Stark! Alles richtig.'), 'good'); root.classList.add('solved');
+    }
+    select(sel);
+  }
+  document.querySelectorAll('.calc[data-calc]').forEach(el => { const cfg = (LP.calcs || {})[el.dataset.calc]; if (cfg) Calc(el, cfg, el.dataset.calc); });
+
+  // ================= DFD-Baukasten =================
+  if (typeof DFD !== 'undefined') document.querySelectorAll('[data-dfd]').forEach(el => { const t = (LP.dfd || {})[el.dataset.dfd]; if (t) DFD.Tool(el, t, (LP.key || 'lp') + '-' + el.dataset.dfd); });
+
+  // ================= Quiz =================
+  document.querySelectorAll('[data-quiz]').forEach(box => {
+    (LP.quiz[box.dataset.quiz] || []).forEach(item => {
+      const q = document.createElement('div'); q.className = 'q';
+      q.innerHTML = `<div class="q-text">${item.q}</div><div class="q-opts">${item.o.map((o, i) => `<button class="q-opt" type="button" data-i="${i}">${o[0]}</button>`).join('')}</div><div class="q-fb" aria-live="polite"></div>`;
+      const fb = q.querySelector('.q-fb');
+      q.querySelector('.q-opts').addEventListener('click', e => {
+        const b = e.target.closest('.q-opt'); if (!b) return;
+        const o = item.o[+b.dataset.i];
+        q.querySelectorAll('.q-opt').forEach(x => x.classList.remove('is-right', 'is-wrong'));
+        b.classList.add(o[1] ? 'is-right' : 'is-wrong');
+        fb.className = 'q-fb ' + (o[1] ? 'good' : 'bad');
+        fb.innerHTML = (o[1] ? '✓ ' : '✗ ') + o[2];
+      });
+      box.appendChild(q);
+    });
+  });
+
+  // ================= Downloads + ByCS Drive =================
+  const fileIcon = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 2h13l7 7v21H7z" fill="#1f8f55"/><path d="M20 2v7h7" fill="#8fd6ad"/><path d="M11 14h12v12H11z" fill="#fff"/><path d="M11 18h12M11 22h12M15 14v12M19 14v12" stroke="#1f8f55" stroke-width="1.4"/></svg>';
+  const dlIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"/></svg>';
+  document.querySelectorAll('.dl[data-file]').forEach(box => {
+    const name = box.dataset.file;
+    box.innerHTML = `<div class="dl-head"><div class="dl-file">${fileIcon}<span>${esc(name)}</span></div><button type="button" class="dl-btn">${dlIcon}<span>Vorlage herunterladen</span></button></div>
+      <div class="dl-body"><ol class="steps">
+        <li><span>Tippe auf <span class="ui">Vorlage herunterladen</span>. Das iPad legt die Datei in <span class="ui">Dateien → Downloads</span> ab.</span></li>
+        <li><span>Öffne <a href="https://1107.drive.bycs.de/" target="_blank" rel="noopener">ByCS Drive</a> und gehe in deinen Ordner <span class="ui">Informatik/Tabellenkalkulation</span>. Gibt es ihn noch nicht, lege ihn an (<span class="ui">+ → Neuer Ordner</span>).</span></li>
+        <li><span>Tippe auf <span class="ui">+ → Datei hochladen</span> und wähle <code>${esc(name)}</code> aus deinen Downloads.</span></li>
+        <li><span>Tippe die Datei in ByCS Drive an. Sie öffnet sich im Browser, und du kannst direkt darin arbeiten. Alles wird automatisch gespeichert.</span></li>
+      </ol>${box.innerHTML}</div>`;
+    box.querySelector('.dl-btn').addEventListener('click', () => {
+      const b64 = (LP.files || {})[name]; if (!b64) return;
+      const bin = atob(b64), arr = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+      const blob = new Blob([arr], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = URL.createObjectURL(blob), a = document.createElement('a');
+      a.href = url; a.download = name; document.body.appendChild(a); a.click();
+      setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 4000);
+    });
+  });
+
+  // ================= Hefteintrag mit Lücken =================
+  const H = LP.heft;
+  const hw = document.getElementById('heft');
+  if (H && hw) {
+    let seed = 7; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+    const words = [];
+    const body = H.html.replace(/\{\{([^}]+)\}\}/g, (_, w) => { const alts = w.split('|'); words.push(alts[0]); return `<span class="gap" role="button" tabindex="0" data-ans="${esc(alts.join('|'))}" aria-label="Lücke"></span>`; });
+    const bank = words.concat(H.extra || []).map((w, i) => ({ w, i, r: rnd() })).sort((a, b) => a.r - b.r);
+    const scis = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12"/></svg>';
+    hw.innerHTML = `
+      <div class="heft"><span class="scissors">${scis}</span>
+        <div class="heft-title">${H.title}</div><div class="heft-sub">${H.sub || ''}</div>${body}</div>
+      <div class="bank"><span class="bank-label">Begriffe · Ziehe sie in die Lücken oder tippe erst den Begriff, dann die Lücke an</span>${bank.map(b => `<button type="button" class="chip" data-w="${esc(b.w)}">${esc(b.w)}</button>`).join('')}</div>
+      <div class="heft-bar"><button type="button" class="fbtn primary" data-h="check">Prüfen</button><button type="button" class="fbtn" data-h="reset">↺ Alles zurück</button><div class="heft-msg" aria-live="polite"></div></div>
+      <div class="note rule shot-help"><span class="note-title">✂ Jetzt ab ins digitale Heft</span>
+        <ol class="steps">
+          <li><span>Scrolle so, dass der <b>gestrichelte Kasten</b> ganz zu sehen ist (mit <span class="ui">A−</span> oben rechts kannst du die Schrift verkleinern).</span></li>
+          <li><span>Mach einen Screenshot: <b>Seitentaste + Lauter-Taste</b> gleichzeitig drücken (iPad mit Home-Taste: <b>Seitentaste + Home-Taste</b>). Mit dem Apple Pencil geht es auch: vom unteren Bildschirmrand schräg nach innen wischen.</span></li>
+          <li><span>Tippe auf das kleine Vorschaubild und ziehe die Ecken genau auf die <b>gestrichelte Linie</b> (wie mit der Schere ausschneiden).</span></li>
+          <li><span>Tippe auf <span class="ui">Fertig</span> bzw. das Teilen-Symbol und füge das Bild in dein digitales Heft auf die nächste freie Seite ein. Überschrift und Datum nicht vergessen!</span></li>
+        </ol></div>`;
+    const heft = hw.querySelector('.heft'), bankEl = hw.querySelector('.bank'), hmsg = hw.querySelector('.heft-msg');
+    let picked = null;
+    const chipFor = w => [...bankEl.querySelectorAll('.chip.used')].find(c => c.dataset.w === w);
+    function place(gap, chip) {
+      if (gap.dataset.val) { const old = chipFor(gap.dataset.val); if (old) old.classList.remove('used'); }
+      gap.dataset.val = chip.dataset.w; gap.textContent = chip.dataset.w; gap.classList.add('filled'); gap.classList.remove('ok', 'bad');
+      chip.classList.add('used'); chip.classList.remove('picked'); picked = null; hmsg.textContent = '';
+    }
+    function clear(gap) {
+      if (!gap.dataset.val) return;
+      const c = chipFor(gap.dataset.val); if (c) c.classList.remove('used');
+      delete gap.dataset.val; gap.textContent = ''; gap.classList.remove('filled', 'ok', 'bad');
+    }
+    heft.addEventListener('click', e => {
+      const g = e.target.closest('.gap'); if (!g || hw.classList.contains('is-solved')) return;
+      if (picked) place(g, picked); else clear(g);
+    });
+    heft.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('gap')) { e.preventDefault(); e.target.click(); } });
+    // Ziehen mit Finger/Maus (Pointer Events), Antippen als Alternative
+    let drag = null;
+    bankEl.addEventListener('pointerdown', e => {
+      const chip = e.target.closest('.chip'); if (!chip) return;
+      drag = { chip, x: e.clientX, y: e.clientY, moved: false, ghost: null, id: e.pointerId };
+      try { chip.setPointerCapture(e.pointerId); } catch (err) { }
+    });
+    bankEl.addEventListener('pointermove', e => {
+      if (!drag || e.pointerId !== drag.id) return;
+      if (!drag.moved && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) > 8) {
+        drag.moved = true;
+        const g = drag.chip.cloneNode(true); g.classList.add('ghost'); document.body.appendChild(g); drag.ghost = g;
+      }
+      if (drag.moved) {
+        e.preventDefault();
+        drag.ghost.style.left = (e.clientX - drag.ghost.offsetWidth / 2) + 'px'; drag.ghost.style.top = (e.clientY - drag.ghost.offsetHeight / 2) + 'px';
+        heft.querySelectorAll('.gap').forEach(g => g.classList.remove('drop-hover'));
+        const t = document.elementFromPoint(e.clientX, e.clientY); const g = t && t.closest && t.closest('.gap'); if (g) g.classList.add('drop-hover');
+      }
+    });
+    function endDrag(e) {
+      if (!drag || e.pointerId !== drag.id) return;
+      const d = drag; drag = null;
+      heft.querySelectorAll('.gap').forEach(g => g.classList.remove('drop-hover'));
+      if (d.moved) {
+        d.ghost.remove();
+        const t = document.elementFromPoint(e.clientX, e.clientY); const g = t && t.closest && t.closest('.gap');
+        if (g && !hw.classList.contains('is-solved')) place(g, d.chip);
+      } else {
+        bankEl.querySelectorAll('.chip').forEach(c => c !== d.chip && c.classList.remove('picked'));
+        d.chip.classList.toggle('picked'); picked = d.chip.classList.contains('picked') ? d.chip : null;
+        if (picked) hmsg.innerHTML = `<b>${esc(picked.dataset.w)}</b> ausgewählt. Tippe jetzt auf eine Lücke.`;
+      }
+    }
+    bankEl.addEventListener('pointerup', endDrag);
+    bankEl.addEventListener('pointercancel', e => { if (drag && drag.ghost) drag.ghost.remove(); drag = null; });
+    hw.querySelector('[data-h=check]').addEventListener('click', () => {
+      const gaps = [...heft.querySelectorAll('.gap')]; let ok = 0, empty = 0;
+      gaps.forEach(g => {
+        const v = g.dataset.val; if (!v) { empty++; return; }
+        const good = g.dataset.ans.split('|').some(a => a.toLowerCase() === v.toLowerCase());
+        g.classList.toggle('ok', good); g.classList.toggle('bad', !good); if (good) ok++;
+      });
+      if (ok === gaps.length) {
+        hw.classList.add('is-solved'); heft.classList.add('solved');
+        hmsg.className = 'heft-msg good'; hmsg.textContent = '✓ Alle Lücken richtig! Dein Hefteintrag ist fertig.';
+        store.set(KEY + '-heft', true);
+      } else {
+        hmsg.className = 'heft-msg bad';
+        hmsg.textContent = `${ok} von ${gaps.length} richtig.` + (empty ? ` ${empty} Lücke${empty > 1 ? 'n sind' : ' ist'} noch leer.` : ' Rote Lücken antippen, dann neu belegen.');
+      }
+    });
+    hw.querySelector('[data-h=reset]').addEventListener('click', () => {
+      hw.classList.remove('is-solved'); heft.classList.remove('solved');
+      heft.querySelectorAll('.gap').forEach(clear); bankEl.querySelectorAll('.chip').forEach(c => c.classList.remove('used', 'picked'));
+      picked = null; hmsg.textContent = '';
+    });
+  }
+
+  // ================= Fortschritt =================
+  let done = store.get(KEY + '-done', {}) || {};
+  const stations = [...document.querySelectorAll('.station')];
+  const stops = document.getElementById('trailStops');
+  stops.innerHTML = stations.map(s => `<a href="#${s.id}" data-stop="${s.dataset.station}"${s.classList.contains('heft-st') ? ' class="is-heft"' : ''} aria-label="Station ${s.dataset.station}: ${esc(s.querySelector('h2').textContent)}">${s.dataset.station}</a>`).join('');
+  function renderProgress() {
+    let n = 0;
+    stations.forEach(s => {
+      const id = s.dataset.station, d = !!done[id]; if (d) n++;
+      stops.querySelector(`[data-stop="${id}"]`).classList.toggle('is-done', d);
+      const cb = s.querySelector(`[data-done="${id}"]`); if (cb) cb.checked = d;
+    });
+    document.getElementById('trailCount').textContent = `${n} / ${stations.length}`;
+  }
+  document.querySelectorAll('[data-done]').forEach(cb => cb.addEventListener('change', () => { done[cb.dataset.done] = cb.checked; store.set(KEY + '-done', done); renderProgress(); }));
+  renderProgress();
+
+  // ================= Schriftgröße =================
+  const STEPS = [0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.25, 1.4];
+  let zi = STEPS.indexOf(store.get('inf9-fz', 0.9)); if (zi < 0) zi = 3;
+  const fsBtns = document.querySelectorAll('.fs-btn');
+  function applyZoom() { document.documentElement.style.setProperty('--fz', String(STEPS[zi])); fsBtns.forEach(b => b.disabled = (b.dataset.fs == '-1' && zi == 0) || (b.dataset.fs == '1' && zi == STEPS.length - 1)); }
+  fsBtns.forEach(b => b.addEventListener('click', () => {
+    const bar = document.querySelector('.trail').getBoundingClientRect().bottom;
+    const cur = stations.filter(st => st.getBoundingClientRect().top <= bar + 1).pop();
+    const r0 = cur ? cur.getBoundingClientRect() : null, frac = r0 && r0.height > 0 ? (bar - r0.top) / r0.height : 0;
+    zi = Math.max(0, Math.min(STEPS.length - 1, zi + Number(b.dataset.fs))); store.set('inf9-fz', STEPS[zi]); applyZoom();
+    if (cur) requestAnimationFrame(() => { const r1 = cur.getBoundingClientRect(); window.scrollBy({ top: r1.top + frac * r1.height - bar, behavior: 'instant' }); });
+  }));
+  applyZoom();
+
+  // ================= Terminal-Tippanimation im Kopf =================
+  const ty = document.querySelector('.typing');
+  if (ty && ty.dataset.lines) {
+    const lines = JSON.parse(ty.dataset.lines); let li = 0, ci = 0, txt = '';
+    const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) ty.textContent = lines.join('\n');
+    else (function step() {
+      if (li >= lines.length) return;
+      if (ci < lines[li].length) { txt += lines[li][ci++]; ty.textContent = txt; setTimeout(step, 45); }
+      else { txt += '\n'; li++; ci = 0; setTimeout(step, 500); }
+    })();
+  }
+})();
+
+</script>
+<!-- FlowPad-Adapter -->
+<script>
+/* FlowPad-Adapter für die Informatik-9-Lernpfade.
+ * Außerhalb von FlowPad (z. B. als Datei in Moodle) ändert sich nichts.
+ * In FlowPad werden die eingebauten Mini-Tabellen und DFD-Baukästen durch Karten ersetzt,
+ * die links in FlowPad die Tabelle laden bzw. die Diagramm-Aufgabe stellen und das Ergebnis zurückbekommen.
+ * Wird von tools/adapt-lernpfad.mjs in den Lernpfad eingesetzt. */
+(function () {
+  if (!(window.FlowPad && window.FlowPad.inside) || !window.LP || typeof CalcEngine === 'undefined') return;
+  var LP = window.LP, E = CalcEngine, FP = window.FlowPad;
+  var KEY = 'inf9-' + (LP.key || 'lp') + '-flowpad';
+  var esc = function (s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); };
+  var plain = function (h) { var d = document.createElement('div'); d.innerHTML = h; return d.textContent; };
+  var done = {}; try { done = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { }
+  var save = function () { try { localStorage.setItem(KEY, JSON.stringify(done)); } catch (e) { } };
+  var GORI = '<svg class="fpa-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="20" height="18" rx="4" fill="#ffe135"/><rect x="5" y="6" width="6" height="4" fill="#fff" stroke="#0f1a2b" stroke-width="1.4"/><rect x="13" y="6" width="6" height="4" fill="#fff" stroke="#0f1a2b" stroke-width="1.4"/><ellipse cx="12" cy="15" rx="4.5" ry="2.4" fill="#1f8f55" stroke="#0f1a2b" stroke-width="1.4"/></svg>';
+
+  var css = document.createElement('style');
+  css.textContent = '.fpa-ico{width:22px;height:22px;flex:none;vertical-align:-5px;margin-right:6px}'
+    + '.fpa-body{padding:12px 14px;display:grid;gap:8px}.fpa-body p{margin:0}'
+    + '.fpa-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}'
+    + '.fpa-note{font-size:.9em;color:var(--ink-2)}'
+    + '.fbtn.fpa-go{background:#ffe135;border-color:#e8b800;color:#2b2300}'
+    + '.calc.fpa, .dfd.fpa{margin:18px 0 22px}'
+    + '.fpa .fpa-state{margin-left:auto;font-weight:700;font-size:.9em}'
+    + '.fpa.solved .fpa-state::after{content:"✓ geschafft";color:var(--good)}'
+    + '.fpa-mini{font:13px/1.3 var(--font-code,monospace);border-collapse:collapse;margin-top:2px}'
+    + '.fpa-mini td,.fpa-mini th{border:1px solid var(--line);padding:2px 6px;white-space:nowrap}.fpa-mini th{background:var(--surface-2);color:var(--ink-2);font-weight:600}';
+  document.head.appendChild(css);
+
+  // ---------- Mini-Tabellen → Tabelle in FlowPad ----------
+  var expand = function (list) { var out = []; (list || []).forEach(function (r) { E.rangeCells(r).forEach(function (a) { out.push(a); }); }); return out; };
+  function evalRule(rule, raw, R, C) {
+    var norm = function (s) { return String(s || '').replace(/\s+/g, '').toUpperCase(); };
+    var sheet = new E.Sheet(R, C, raw);
+    if (rule.test) {
+      var s2 = new E.Sheet(R, C, Object.assign({}, raw, rule.test.set)), v0 = s2.value(rule.test.cell);
+      if (rule.test.text !== undefined) return E.display(v0).toLowerCase() === String(rule.test.text).toLowerCase();
+      return typeof v0 === 'number' && Math.abs(v0 - rule.test.eq) < 1e-6;
+    }
+    var cells = rule.cells ? E.rangeCells(rule.cells) : [rule.cell];
+    return cells.every(function (a) {
+      var r = sheet.get(a), v = sheet.value(a);
+      if (rule.formula && !sheet.isFormula(a)) return false;
+      if (rule.has && norm(r).indexOf(norm(rule.has)) < 0) return false;
+      if (rule.not && norm(r).indexOf(norm(rule.not)) >= 0) return false;
+      if (rule.eq !== undefined && !(typeof v === 'number' && Math.abs(v - rule.eq) < 1e-6)) return false;
+      if (rule.text !== undefined && E.display(v).toLowerCase() !== String(rule.text).toLowerCase()) return false;
+      if (rule.noerr && E.isErr(v)) return false;
+      return true;
+    });
+  }
+  function miniTable(cfg) {
+    var R = Math.min(cfg.rows, 4), C = Math.min(cfg.cols, 6), sh = new E.Sheet(cfg.rows, cfg.cols, cfg.cells || {});
+    var h = '<table class="fpa-mini"><tr><th></th>';
+    for (var c = 0; c < C; c++) h += '<th>' + E.colName(c) + '</th>';
+    h += '</tr>';
+    for (var r = 0; r < R; r++) { h += '<tr><th>' + (r + 1) + '</th>'; for (c = 0; c < C; c++) h += '<td>' + esc(E.display(sh.value(E.addr(r, c)))) + '</td>'; h += '</tr>'; }
+    return h + '</table>';
+  }
+  document.querySelectorAll('.calc[data-calc]').forEach(function (el) {
+    var id = el.dataset.calc, cfg = (LP.calcs || {})[id]; if (!cfg) return;
+    var sid = (LP.key || 'lp') + ':' + id, canCheck = !!(cfg.check && cfg.check.length);
+    el.classList.add('fpa');
+    el.innerHTML = '<div class="calc-title">' + esc(cfg.title || 'Tabellenblatt') + '</div>'
+      + '<div class="fpa-body">' + (cfg.hint ? '<p>' + cfg.hint + '</p>' : '')
+      + miniTable(cfg)
+      + '<div class="fpa-row"><button type="button" class="fbtn fpa-go" data-a="load">' + GORI + 'Tabelle links in FlowPad laden</button>'
+      + (canCheck ? '<button type="button" class="fbtn primary" data-a="check">Prüfen</button>' : '')
+      + '<span class="fpa-state"></span></div>'
+      + '<p class="fpa-note">Du arbeitest links in der Tabelle von FlowPad. ' + (canCheck ? 'Mit <b>Prüfen</b> schaut der Lernpfad nach, ob alles stimmt.' : 'Probiere dort alles aus.') + ' Tipp: Mit <b>Formel → DFD</b> siehst du zu jeder Formel das Datenflussdiagramm.</p></div>'
+      + '<div class="calc-foot"><div class="calc-msg" aria-live="polite"></div></div>';
+    var msg = el.querySelector('.calc-msg');
+    var say = function (t, cls) { msg.className = 'calc-msg' + (cls ? ' ' + cls : ''); msg.innerHTML = t; };
+    if (done[sid]) el.classList.add('solved');
+    el.querySelector('[data-a=load]').addEventListener('click', function () {
+      FP.sheet({ id: sid, title: cfg.title, cells: cfg.cells || {}, rows: cfg.rows, cols: cfg.cols, widths: cfg.widths, styles: cfg.styles, fmt: cfg.fmt, edit: cfg.edit, select: cfg.start, show: true });
+      say('Die Tabelle steht jetzt links in FlowPad.');
+    });
+    var chk = el.querySelector('[data-a=check]');
+    if (chk) chk.addEventListener('click', function () {
+      FP.getSheet().then(function (s) {
+        if (s.id !== sid) { say('Lade zuerst die Tabelle „' + esc(cfg.title) + '“ (gelber Knopf), dann arbeite links in FlowPad.', 'bad'); return; }
+        for (var i = 0; i < cfg.check.length; i++) {
+          var rule = cfg.check[i];
+          if (!evalRule(rule, s.cells, cfg.rows, cfg.cols)) {
+            var t = rule.msg || 'Noch nicht ganz. Prüfe deine Formeln.';
+            say('✗ ' + t, 'bad'); el.classList.remove('solved'); FP.say('✗ ' + plain(t), false); return;
+          }
+        }
+        done[sid] = 1; save(); el.classList.add('solved');
+        say('✓ ' + (cfg.ok || 'Stark! Alles richtig.'), 'good'); FP.say('✓ ' + plain(cfg.ok || 'Alles richtig.'), true);
+      }).catch(function () { say('FlowPad hat nicht geantwortet. Lade die Seite neu.', 'bad'); });
+    });
+  });
+
+  // ---------- DFD-Baukästen → Diagramm-Aufgabe in FlowPad ----------
+  var isCell = function (s) { return /^\$?[A-Za-z]\$?\d+$/.test(String(s || '')); };
+  function sheetFor(t) {
+    // Eingabezellen mit Beispielwerten (aus den Tests) und Beschriftungen, dazu die Zelle für die Ausgabe
+    var cells = {}, used = {}, first = null, maxR = 0, maxC = 0, sample = (t.tests && t.tests[0]) || {}, n = 0;
+    var vals = ['12', '8', '15', '9', '20', '5', '11', '7'];
+    (t.inputs || []).forEach(function (inp) {
+      E.rangeCells(inp.ref.replace(/\$/g, '')).forEach(function (a) {
+        cells[a] = sample[a] !== undefined ? String(sample[a]) : vals[n++ % vals.length]; used[a] = 1;
+        var p = E.parseAddr(a); maxR = Math.max(maxR, p.r); maxC = Math.max(maxC, p.c); if (!first) first = p;
+      });
+    });
+    var label = function (a, text) {
+      var p = E.parseAddr(a); if (!text || text === a) return;
+      var up = p.r > 0 ? E.addr(p.r - 1, p.c) : null, left = p.c > 0 ? E.addr(p.r, p.c - 1) : null;
+      if (up && !used[up] && !cells[up]) { cells[up] = text; used[up] = 1; }
+      else if (left && !used[left] && !cells[left]) { cells[left] = text; used[left] = 1; }
+    };
+    (t.inputs || []).forEach(function (inp) { if (inp.label !== inp.ref) label(inp.ref.split(':')[0].replace(/\$/g, ''), inp.label); });
+    var out;
+    if (isCell(t.output)) out = t.output.replace(/\$/g, '').toUpperCase();
+    else {
+      first = first || { r: 1, c: 1 };
+      out = E.addr(maxR + 1, first.c);
+      if (cells[out]) out = E.addr(first.r, maxC + 1);
+      label(out, t.output);
+    }
+    return { cells: cells, out: out };
+  }
+  document.querySelectorAll('[data-dfd]').forEach(function (el) {
+    var id = el.dataset.dfd, t = (LP.dfd || {})[id]; if (!t || !t.term) return;
+    var sid = (LP.key || 'lp') + ':dfd:' + id, s = sheetFor(t), tries = 0;
+    el.classList.add('fpa');
+    el.innerHTML = (t.title ? '<div class="dfd-title">' + esc(t.title) + '</div>' : '')
+      + (t.prompt ? '<div class="dfd-prompt">' + t.prompt + '</div>' : '')
+      + '<div class="fpa-body"><div class="fpa-row"><button type="button" class="fbtn fpa-go" data-a="task">' + GORI + 'Diagramm links in FlowPad bauen</button>'
+      + '<button type="button" class="fbtn" data-a="solve" hidden>Lösung zeigen</button><span class="fpa-state"></span></div>'
+      + '<p class="fpa-note">FlowPad legt dafür eine kleine Tabelle an. Baue das Diagramm für <b>' + esc(s.out) + '</b>, dann <b>Prüfen</b> – das Ergebnis erscheint auch hier.</p></div>'
+      + '<div class="dfd-foot"><div class="dfd-msg" aria-live="polite"></div></div>';
+    var msg = el.querySelector('.dfd-msg'), solve = el.querySelector('[data-a=solve]');
+    var say = function (h, cls) { msg.className = 'dfd-msg' + (cls ? ' ' + cls : ''); msg.innerHTML = h; };
+    if (done[sid]) el.classList.add('solved');
+    el.querySelector('[data-a=task]').addEventListener('click', function () {
+      FP.task({ cell: s.out, id: sid, target: t.term, title: t.title, prompt: t.prompt, mode: 'diagramm', dfd: 'leer', tests: t.tests,
+        cells: s.cells, sheetTitle: t.title, rows: 12, cols: 8 });
+      say('Die Aufgabe steht links in FlowPad. Baue das Diagramm für <b>' + esc(s.out) + '</b>.');
+    });
+    solve.addEventListener('click', function () { FP.send('dfd', { cell: s.out, term: t.term }); say('Links siehst du eine mögliche Lösung. Vergleiche mit deinem Diagramm und baue es danach noch einmal selbst.'); });
+    FP.onResult(function (r) {
+      if (r.task !== sid) return;
+      if (r.ok) { done[sid] = 1; save(); el.classList.add('solved'); say('✓ Richtig! Dein Diagramm rechnet wie <code>' + esc(t.term) + '</code>.', 'good'); }
+      else { tries++; if (tries >= 2) solve.hidden = false; say('✗ Noch nicht – die Rückmeldung steht links unter dem Diagramm.', 'bad'); }
+    });
+  });
+
+  // ---------- Excel-Vorlagen: zusätzlich direkt in FlowPad öffnen ----------
+  document.querySelectorAll('.dl[data-file]').forEach(function (box) {
+    var name = box.dataset.file, b64 = (LP.files || {})[name], head = box.querySelector('.dl-head'); if (!b64 || !head) return;
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'fbtn fpa-go'; b.innerHTML = GORI + 'In FlowPad öffnen';
+    b.addEventListener('click', function () { FP.send('xlsx', { name: name, data: b64, id: (LP.key || 'lp') + ':file:' + name }); });
+    head.appendChild(b);
+  });
+})();
+</script>
+<!-- /FlowPad-Adapter -->
+</body>
+</html>

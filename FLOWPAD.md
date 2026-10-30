@@ -78,6 +78,9 @@ Ohne eigenes Skript: Knöpfe mit `data-flowpad` (JSON).
 | `task` | `cell`, `target` (Musterformel), `title`, `prompt` (HTML), `mode` (`diagramm`, `formel` oder leer = beides), `dfd: "leer"` (vorhandenes Diagramm entfernen), `tests` (eigene Testbelegungen, z. B. `[{"B2":"Fatima"}]`), optional `cells` usw. wie bei `sheet`. |
 | `dfd` | `cell`, `term` – zeigt das Diagramm zu einer Formel (zum Lesen). |
 | `select` | `cell` |
+| `xlsx` | `name`, `data` (Base64 einer .xlsx) – lädt eine Excel-Vorlage in die Tabelle (bei mehreren Blättern das mit den meisten Zahlen/Formeln). |
+| `say` | `text`, `ok` (true/false) – kurze Rückmeldung links in FlowPad. |
+| `getSheet` | nur per Skript: `FlowPad.getSheet().then(s => …)` liefert `{ id, cells, rows, cols }`, damit der Lernpfad selbst prüfen kann. |
 
 Mit Skript: `FlowPad.sheet({...})`, `FlowPad.task({...})`, `FlowPad.select("D2")`, `FlowPad.send(action, {...})` und
 `FlowPad.onResult(r => …)`. Ergebnis: `{ type: "flowpad-result", cell, ok, how: "diagramm" | "formel", formula }` –
@@ -106,3 +109,17 @@ Lehrkraft alle Codes mit Links, doppelte rot) oder die beim Bauen erzeugte `lear
 | `js/flowcode.js`, `learn/flowcode.php` | FlowCodes |
 | `js/zip.js` | ZIP lesen/schreiben, xlsx sichern und öffnen |
 | `tools/build.mjs`, `tools/test.mjs` | Bauen, Selbsttests |
+
+## Informatik-9-Lernpfade in FlowPad
+
+`learn/9/LP1-1_Zellen_und_Formeln.html` (FlowCode **4VBM7**), `LP1-3_Funktionen_und_Datenfluesse.html` (**F2K55**) und
+`LP1-4_Die_WENN-Funktion.html` (**D5BBB**) sind die Lernpfade aus dem Moodle-Kurs mit eingesetztem FlowPad-Adapter:
+
+* In FlowPad werden die eingebauten Mini-Tabellen zu Karten mit **Tabelle links in FlowPad laden** und **Prüfen**
+  (geprüft wird mit den Regeln des Lernpfads), die DFD-Baukästen zu **Diagramm links in FlowPad bauen**
+  (FlowPad legt dazu eine kleine Tabelle mit Beispielwerten an; nach zwei Fehlversuchen gibt es **Lösung zeigen**).
+  Excel-Vorlagen haben zusätzlich **In FlowPad öffnen**. Gelöste Aufgaben merkt sich der Lernpfad.
+* Außerhalb von FlowPad (als Datei in Moodle) verhalten sich die Seiten wie bisher. Nur die Schriften kommen in diesen Kopien
+  aus `fonts/` statt von Google Fonts, damit FlowPad keine fremden Server anfragt.
+* Neue oder geänderte Lernpfade: `node tools/adapt-lernpfad.mjs Lernpfad.html learn/9/Lernpfad.html` (der Adapter steht in
+  `tools/lernpfad-adapter.js`; mehrfaches Ausführen ersetzt ihn).

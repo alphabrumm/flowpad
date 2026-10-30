@@ -5,5 +5,26 @@
   "code": "B3JKZ",
   "title": "FlowPad",
   "kind": "html"
+ },
+ {
+  "path": "learn/9/LP1-1_Zellen_und_Formeln.html",
+  "folder": "9",
+  "code": "4VBM7",
+  "title": "Zellen &amp; Formeln",
+  "kind": "html"
+ },
+ {
+  "path": "learn/9/LP1-3_Funktionen_und_Datenfluesse.html",
+  "folder": "9",
+  "code": "F2K55",
+  "title": "Funktionen &amp; Datenflüsse",
+  "kind": "html"
+ },
+ {
+  "path": "learn/9/LP1-4_Die_WENN-Funktion.html",
+  "folder": "9",
+  "code": "D5BBB",
+  "title": "Die WENN-Funktion",
+  "kind": "html"
  }
 ]

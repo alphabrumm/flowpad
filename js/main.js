@@ -253,12 +253,13 @@ async function lernpfadAction(m) {
         if (has && !same && !await confirmBox('Tabelle aus dem Lernpfad laden?', `Der Lernpfad möchte die Tabelle${m.title ? ' „' + esc(m.title) + '“' : ''} laden. Deine jetzige Tabelle wird dabei ersetzt (Rückgängig geht mit ↶).`, 'Laden')) return;
         pushUndo();
         const maxR = Math.max(0, ...Object.keys(cells).map(a => (E.parseAddr(a) || { r: 0 }).r + 1)), maxC = Math.max(0, ...Object.keys(cells).map(a => (E.parseAddr(a) || { c: 0 }).c + 1));
-        project.sheet = { rows: Math.min(200, Math.max(+m.rows || 0, maxR + 3, 12)), cols: Math.min(26, Math.max(+m.cols || 0, maxC + 1, 6)), cells, widths: m.widths, fmt: m.fmt, styles: m.styles, edit: m.edit };
+        project.sheet = { rows: Math.min(200, Math.max(+m.rows || 0, maxR + 3, 12)), cols: Math.min(26, Math.max(+m.cols || 0, maxC + 1, 6)), cells, widths: m.widths, fmt: m.fmt, styles: m.styles, edit: m.edit && m.edit.length ? m.edit : (Array.isArray(m.edit) ? [] : undefined), id: m.id };
         project.dfds = {}; if (m.tasks !== false) project.tasks = {};
         grid.rebuild(); grid.setMarks(new Set());
         const start = (m.select || m.start || 'A1').toUpperCase();
         grid.select(validCell(start) ? start : 'A1');
         touch(); toast(m.title ? `Tabelle „${esc(m.title)}“ geladen` : 'Tabelle geladen');
+        if (m.show && layoutMode() !== 'wide') showView('tabelle');
         return;
     }
     if (m.action === 'task') {
@@ -271,6 +272,29 @@ async function lernpfadAction(m) {
         touch();
         grid.select(a);
         if (layoutMode() !== 'wide') showView(m.mode === 'formel' ? 'tabelle' : 'diagramm');
+        return;
+    }
+    if (m.action === 'getSheet') {
+        // Der Lernpfad prüft selbst (z. B. die Regeln seiner Mini-Tabellen) und bekommt dafür die Zellen
+        postToLernpfad({ type: 'flowpad-sheet', req: m.req, id: project.sheet.id || null, cells: Object.assign({}, project.sheet.cells), rows: project.sheet.rows, cols: project.sheet.cols });
+        return;
+    }
+    if (m.action === 'say') {
+        const html = esc(String(m.text || '')).replace(/&lt;(\/?)(b|code|i)&gt;/g, '<$1$2>');
+        grid.say(html, m.ok === true ? 'good' : m.ok === false ? 'bad' : '');
+        toast(html);
+        return;
+    }
+    if (m.action === 'xlsx') {
+        // Excel-Vorlage aus dem Lernpfad übernehmen
+        const bin = atob(String(m.data || '')), bytes = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        const s = await xlsxToSheet(bytes);
+        if (Object.keys(project.sheet.cells).length && !await confirmBox('Excel-Datei laden?', `Der Lernpfad möchte „${esc(m.name || 'Vorlage')}“ laden. Deine jetzige Tabelle wird dabei ersetzt (Rückgängig geht mit ↶).`, 'Laden')) return;
+        pushUndo(); project.sheet = { rows: Math.max(20, s.rows + 5), cols: Math.min(26, Math.max(8, s.cols + 1)), cells: s.cells, id: m.id }; project.dfds = {}; project.tasks = {};
+        grid.rebuild(); grid.setMarks(new Set()); grid.select('A1'); touch();
+        toast(`„${esc(m.name || 'Vorlage')}“ geladen${s.sheets && s.sheets.length > 1 ? ` (Blatt „${esc(s.title)}“)` : ''}`);
+        if (layoutMode() !== 'wide') showView('tabelle');
         return;
     }
     if (m.action === 'select') { const a = String(m.cell || '').toUpperCase(); if (validCell(a)) { grid.select(a); if (layoutMode() !== 'wide') showView('tabelle'); } return; }

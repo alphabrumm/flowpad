@@ -226,7 +226,7 @@ export function Grid(root, host) {
     }
 
     return {
-        rebuild() { build(); select(sel, true); },
+        rebuild() { build(); scroller.scrollTop = 0; scroller.scrollLeft = 0; select(sel, true); },
         /** nach Änderungen von außen (Diagramm → Zelle, Rückgängig …) neu rechnen und zeichnen */
         refresh() { const s = host.getSheet(); sheet = new E.Sheet(R, C, s.cells); if (s.rows !== R || s.cols !== C) { build(); } select(sel, true); },
         select: a => select(a),
