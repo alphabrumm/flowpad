@@ -66,11 +66,14 @@ code { font-family: var(--font-code); font-size: .9em; background: var(--surface
 :focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
 
 /* ---------- Kopfzeile ---------- */
-.topbar { display: flex; align-items: center; gap: 6px; padding: 6px max(10px, env(safe-area-inset-right)) 6px max(10px, env(safe-area-inset-left));
-  padding-top: max(6px, env(safe-area-inset-top)); background: var(--bar); color: var(--bar-ink); border-bottom: 3px solid var(--glow); min-height: 52px; }
-.brand-mark { width: 30px; height: 30px; fill: var(--glow); stroke: var(--bar-ink); stroke-width: 2; display: block; }
+.topbar { display: flex; align-items: center; gap: 4px; padding: 2px max(8px, env(safe-area-inset-right)) 2px max(8px, env(safe-area-inset-left));
+  padding-top: max(2px, env(safe-area-inset-top)); background: var(--bar); color: var(--bar-ink); border-bottom: 3px solid var(--glow); min-height: 40px; }
+.topbar .iconbtn { min-width: 38px; min-height: 36px; }
+.topbar .ic { width: 19px; height: 19px; }
+.topbar .btn { min-height: 32px; padding: 0 10px; font-size: .92em; }
+.brand-mark { width: 24px; height: 24px; fill: var(--glow); stroke: var(--bar-ink); stroke-width: 2; display: block; }
 .brand-mark path { fill: none; }
-.project-name { min-width: 0; flex: 0 1 auto; border: 0; background: transparent; font-family: var(--title-font); font-weight: 700; font-size: 1.15em; padding: 6px 8px; border-radius: 6px; cursor: pointer;
+.project-name { min-width: 0; flex: 0 1 auto; border: 0; background: transparent; font-family: var(--title-font); font-weight: 700; font-size: 1.02em; padding: 3px 6px; border-radius: 6px; cursor: pointer;
   max-width: 40vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .project-name:hover { background: var(--bar-2); }
 .saved { font-size: .78em; opacity: .65; }
@@ -331,7 +334,7 @@ button.taskbadge { cursor: pointer; font: inherit; font-size: .8em; font-weight:
 @media (max-width: 700px) {
   .hide-narrow { display: none; }
   .saved, .brand { display: none; }
-  .topbar .iconbtn { min-width: 40px; }
+  .topbar .iconbtn { min-width: 36px; }
   .dfd-actions .btn span { display: none; }
   .project-name { max-width: 34vw; }
 }
