@@ -44,6 +44,7 @@ function toast(text) { const t = $('#toast'); t.innerHTML = text; t.classList.ad
 // ================= Speichern =================
 let saveTimer = null;
 function touch(noUndoSnapshot) {
+    syncTab();
     project.modified = Date.now();
     clearTimeout(saveTimer);
     $('#saved').textContent = '…';
@@ -53,6 +54,50 @@ function touch(noUndoSnapshot) {
 function flushSave() { if (!saveTimer || !project) return; clearTimeout(saveTimer); saveTimer = null; Store.putProject(project).then(() => $('#saved').textContent = 'gespeichert').catch(() => { }); }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushSave(); });
 window.addEventListener('pagehide', flushSave);
+// ================= Reiter: mehrere Tabellen in einem Projekt =================
+// project.sheet/dfds/tasks sind die Daten des aktiven Reiters; vor dem Speichern und Wechseln zurück in project.tabs schreiben
+function syncTab() { if (!project || !project.tabs) return; const t = project.tabs[project.tab]; if (!t) return; t.sheet = project.sheet; t.dfds = project.dfds; t.tasks = project.tasks; t.sel = cell; }
+function loadTab(i) { project.tab = i; const t = project.tabs[i]; project.sheet = t.sheet; project.dfds = t.dfds || (t.dfds = {}); project.tasks = t.tasks || (t.tasks = {}); }
+function showTab(sel) {
+    undo = []; redo = []; updateHist();
+    grid.cancelPick(); grid.rebuild(); grid.setMarks(new Set(Object.keys(project.dfds)));
+    const t = project.tabs[project.tab], a = (sel || t.sel || 'A1').toUpperCase();
+    grid.select(validCell(a) ? a : 'A1');
+    renderTabs();
+}
+function switchTab(i, sel) { if (i === project.tab) { if (sel) grid.select(sel); return; } syncTab(); loadTab(i); showTab(sel); touch(); }
+function addTab(t, sel) { syncTab(); project.tabs.push(Object.assign({ dfds: {}, tasks: {} }, t)); loadTab(project.tabs.length - 1); showTab(sel); touch(); }
+/** Leerer, unberührter Reiter? Dann kann der Lernpfad ihn benutzen, statt einen neuen anzulegen */
+const tabIsEmpty = t => !Object.keys(t.sheet.cells).length && !Object.keys(t.dfds || {}).length && !t.sheet.id;
+function nextTabName() { let n = project.tabs.length + 1; while (project.tabs.some(t => t.name === 'Tabelle ' + n)) n++; return 'Tabelle ' + n; }
+function renderTabs() {
+    const box = $('#tabs'); if (!box || !project) return;
+    box.innerHTML = project.tabs.map((t, i) => `<button type="button" class="tab${i === project.tab ? ' active' : ''}" data-tab="${i}" role="tab" aria-selected="${i === project.tab}" title="${i === project.tab ? 'Reiter umbenennen, zurücksetzen oder löschen' : 'Zu dieser Tabelle wechseln'}">${esc(t.name)}${i === project.tab ? '<span class="tab-more" aria-hidden="true">▾</span>' : ''}</button>`).join('')
+        + '<button type="button" class="tab tab-add" data-tabadd title="Neue Tabelle" aria-label="Neue Tabelle">+</button>';
+    const act = box.querySelector('.tab.active'); if (act) act.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+}
+async function tabMenu() {
+    const t = project.tabs[project.tab];
+    const btns = [{ label: 'Abbrechen', value: null }, { label: 'Umbenennen', value: 'rename', primary: true }];
+    if (t.origin) btns.splice(1, 0, { label: 'Neu aus dem Lernpfad laden', value: 'reset' });
+    if (project.tabs.length > 1) btns.splice(1, 0, { label: 'Löschen', value: 'delete', danger: true });
+    const v = await dialog({ title: `Reiter „${t.name}“`, html: `${Object.keys(t.sheet.cells).length} Zellen mit Inhalt, ${Object.keys(t.dfds || {}).length} Diagramme.`, buttons: btns });
+    if (v === 'rename') { const n = await promptBox('Reiter umbenennen', t.name); if (n && n.trim()) { t.name = n.trim().slice(0, 40); renderTabs(); touch(); } }
+    if (v === 'delete' && await confirmBox('Reiter löschen?', `„${esc(t.name)}“ mit Tabelle und Diagrammen wird gelöscht. Das lässt sich nicht rückgängig machen.`, 'Löschen', true)) {
+        project.tabs.splice(project.tab, 1); loadTab(Math.max(0, project.tab - 1)); showTab(); touch();
+    }
+    if (v === 'reset' && await confirmBox('Neu laden?', `„${esc(t.name)}“ bekommt wieder den Anfangsstand aus dem Lernpfad. Deine Eingaben und Diagramme in diesem Reiter gehen verloren.`, 'Neu laden', true)) {
+        project.sheet = JSON.parse(JSON.stringify(t.origin)); project.dfds = {}; project.tasks = {}; syncTab(); showTab(); touch();
+    }
+}
+$('#tabs').addEventListener('click', e => {
+    const b = e.target.closest('[data-tab]'), add = e.target.closest('[data-tabadd]');
+    if (add) { addTab({ name: nextTabName(), sheet: Store.emptySheet() }); toast('Neue Tabelle'); return; }
+    if (!b) return;
+    const i = +b.dataset.tab;
+    if (i === project.tab) tabMenu(); else switchTab(i);
+});
+
 function snapshot() { return JSON.stringify({ sheet: project.sheet, dfds: project.dfds }); }
 function pushUndo() { undo.push(snapshot()); if (undo.length > 60) undo.shift(); redo = []; updateHist(); }
 function restore(s) { const o = JSON.parse(s); project.sheet = o.sheet; project.dfds = o.dfds; grid.rebuild(); showCell(cell, true); touch(); }
@@ -103,6 +148,18 @@ const editor = DFD.Editor($('#dfd'), {
     labelOf,
     startPick(done, text) { if (layoutMode() !== 'wide') showView('tabelle'); grid.startPick(ref => { done(ref); if (layoutMode() !== 'wide') showView('diagramm'); }, text); },
     cancelPick: () => grid.cancelPick(),
+    /** Ausgabe des Diagramms soll in eine andere Zelle: Diagramm dorthin umziehen */
+    async moveOutput(ref) {
+        ref = String(ref).toUpperCase();
+        if (!validCell(ref)) { editor.say(`<b>${esc(ref)}</b> gibt es in dieser Tabelle nicht.`, 'bad'); return; }
+        if (ref === cell) return;
+        if (project.dfds[ref] && project.dfds[ref].nodes.length && !await confirmBox('Diagramm ersetzen?', `In <b>${esc(ref)}</b> gibt es schon ein Diagramm. Soll es ersetzt werden?`, 'Ersetzen', true)) { showCell(cell); return; }
+        pushUndo();
+        const model = JSON.parse(JSON.stringify(editor.getModel()));
+        project.dfds[ref] = model; delete project.dfds[cell]; touch();
+        grid.select(ref);
+        editor.say(`Die Ausgabe ist jetzt <b>${esc(ref)}</b>. <b>DFD → Zelle</b> schreibt die Formel dorthin.`, 'good');
+    },
 });
 function showCell(a, keepMsg) {
     cell = a;
@@ -247,28 +304,33 @@ window.addEventListener('message', async ev => {
 const validCell = a => typeof a === 'string' && !!E.parseAddr(a.toUpperCase()) && E.parseAddr(a.toUpperCase()).c < project.sheet.cols && E.parseAddr(a.toUpperCase()).r < project.sheet.rows;
 async function lernpfadAction(m) {
     if (m.action === 'sheet') {
+        // Jede Tabelle aus dem Lernpfad bekommt einen eigenen Reiter. Gibt es ihn schon (gleiche id), wird nur gewechselt – der Stand bleibt.
         const cells = m.cells && typeof m.cells === 'object' ? Object.fromEntries(Object.entries(m.cells).map(([k, v]) => [k.toUpperCase(), String(v)])) : {};
-        const has = Object.keys(project.sheet.cells).length > 0;
-        const same = JSON.stringify(project.sheet.cells) === JSON.stringify(cells);
-        if (has && !same && !await confirmBox('Tabelle aus dem Lernpfad laden?', `Der Lernpfad möchte die Tabelle${m.title ? ' „' + esc(m.title) + '“' : ''} laden. Deine jetzige Tabelle wird dabei ersetzt (Rückgängig geht mit ↶).`, 'Laden')) return;
-        pushUndo();
+        const id = m.id || (m.title ? 'titel:' + m.title : null);
+        const start = String(m.select || m.start || 'A1').toUpperCase();
+        const ex = id ? project.tabs.findIndex(t => t.sheet && t.sheet.id === id) : -1;
+        if (ex >= 0) {
+            switchTab(ex, start);
+            toast(`„${esc(project.tabs[ex].name)}“ geöffnet – dein Stand ist noch da`);
+            if (m.show && layoutMode() !== 'wide') showView('tabelle');
+            return 'existing';
+        }
         const maxR = Math.max(0, ...Object.keys(cells).map(a => (E.parseAddr(a) || { r: 0 }).r + 1)), maxC = Math.max(0, ...Object.keys(cells).map(a => (E.parseAddr(a) || { c: 0 }).c + 1));
-        project.sheet = { rows: Math.min(200, Math.max(+m.rows || 0, maxR + 3, 12)), cols: Math.min(26, Math.max(+m.cols || 0, maxC + 1, 6)), cells, widths: m.widths, fmt: m.fmt, styles: m.styles, edit: m.edit && m.edit.length ? m.edit : (Array.isArray(m.edit) ? [] : undefined), id: m.id };
-        project.dfds = {}; if (m.tasks !== false) project.tasks = {};
-        grid.rebuild(); grid.setMarks(new Set());
-        const start = (m.select || m.start || 'A1').toUpperCase();
-        grid.select(validCell(start) ? start : 'A1');
-        touch(); toast(m.title ? `Tabelle „${esc(m.title)}“ geladen` : 'Tabelle geladen');
+        const sheet = { rows: Math.min(200, Math.max(+m.rows || 0, maxR + 3, 12)), cols: Math.min(26, Math.max(+m.cols || 0, maxC + 1, 6)), cells, widths: m.widths, fmt: m.fmt, styles: m.styles, edit: m.edit && m.edit.length ? m.edit : (Array.isArray(m.edit) ? [] : undefined), id };
+        const tab = { name: String(m.title || nextTabName()).slice(0, 40), sheet, dfds: {}, tasks: {}, origin: JSON.parse(JSON.stringify(sheet)) };
+        if (tabIsEmpty(project.tabs[project.tab]) ) { Object.assign(project.tabs[project.tab], tab); loadTab(project.tab); showTab(start); touch(); }
+        else addTab(tab, start);
+        toast(`Neuer Reiter „${esc(tab.name)}“`);
         if (m.show && layoutMode() !== 'wide') showView('tabelle');
-        return;
+        return 'new';
     }
     if (m.action === 'task') {
         const a = String(m.cell || '').toUpperCase();
         if (!validCell(a)) throw new Error(`„${m.cell}“ ist keine Zelle dieser Tabelle.`);
-        if (m.cells) await lernpfadAction({ action: 'sheet', cells: m.cells, rows: m.rows, cols: m.cols, widths: m.widths, fmt: m.fmt, styles: m.styles, edit: m.edit, title: m.sheetTitle, select: a, tasks: false });
+        const made = m.cells ? await lernpfadAction({ action: 'sheet', id: m.id, cells: m.cells, rows: m.rows, cols: m.cols, widths: m.widths, fmt: m.fmt, styles: m.styles, edit: m.edit, title: m.sheetTitle, select: a }) : null;
         project.tasks = project.tasks || {};
         project.tasks[a] = { id: m.id, target: m.target, title: m.title, prompt: m.prompt, mode: m.mode, tests: Array.isArray(m.tests) ? m.tests : undefined };
-        if (m.dfd === 'leer' && project.dfds[a]) { pushUndo(); delete project.dfds[a]; grid.setMarks(new Set(Object.keys(project.dfds))); }
+        if (m.dfd === 'leer' && made !== 'existing' && project.dfds[a]) { pushUndo(); delete project.dfds[a]; grid.setMarks(new Set(Object.keys(project.dfds))); }
         touch();
         grid.select(a);
         if (layoutMode() !== 'wide') showView(m.mode === 'formel' ? 'tabelle' : 'diagramm');
@@ -276,7 +338,9 @@ async function lernpfadAction(m) {
     }
     if (m.action === 'getSheet') {
         // Der Lernpfad prüft selbst (z. B. die Regeln seiner Mini-Tabellen) und bekommt dafür die Zellen
-        postToLernpfad({ type: 'flowpad-sheet', req: m.req, id: project.sheet.id || null, cells: Object.assign({}, project.sheet.cells), rows: project.sheet.rows, cols: project.sheet.cols });
+        syncTab();
+        const t = m.id ? project.tabs.find(x => x.sheet.id === m.id) : project.tabs[project.tab];
+        postToLernpfad({ type: 'flowpad-sheet', req: m.req, id: t ? t.sheet.id || null : null, cells: t ? Object.assign({}, t.sheet.cells) : {}, rows: t ? t.sheet.rows : 0, cols: t ? t.sheet.cols : 0 });
         return;
     }
     if (m.action === 'say') {
@@ -289,11 +353,15 @@ async function lernpfadAction(m) {
         // Excel-Vorlage aus dem Lernpfad übernehmen
         const bin = atob(String(m.data || '')), bytes = new Uint8Array(bin.length);
         for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-        const s = await xlsxToSheet(bytes);
-        if (Object.keys(project.sheet.cells).length && !await confirmBox('Excel-Datei laden?', `Der Lernpfad möchte „${esc(m.name || 'Vorlage')}“ laden. Deine jetzige Tabelle wird dabei ersetzt (Rückgängig geht mit ↶).`, 'Laden')) return;
-        pushUndo(); project.sheet = { rows: Math.max(20, s.rows + 5), cols: Math.min(26, Math.max(8, s.cols + 1)), cells: s.cells, id: m.id }; project.dfds = {}; project.tasks = {};
-        grid.rebuild(); grid.setMarks(new Set()); grid.select('A1'); touch();
-        toast(`„${esc(m.name || 'Vorlage')}“ geladen${s.sheets && s.sheets.length > 1 ? ` (Blatt „${esc(s.title)}“)` : ''}`);
+        const ex = m.id ? project.tabs.findIndex(t => t.sheet.id === m.id) : -1;
+        if (ex >= 0) { switchTab(ex); toast(`„${esc(project.tabs[ex].name)}“ geöffnet – dein Stand ist noch da`); }
+        else {
+            const s = await xlsxToSheet(bytes);
+            const sheet = { rows: Math.max(20, s.rows + 5), cols: Math.min(26, Math.max(8, s.cols + 1)), cells: s.cells, id: m.id };
+            const tab = { name: String(m.name || 'Vorlage').replace(/\.xlsx$/i, '').slice(0, 40), sheet, dfds: {}, tasks: {}, origin: JSON.parse(JSON.stringify(sheet)) };
+            if (tabIsEmpty(project.tabs[project.tab])) { Object.assign(project.tabs[project.tab], tab); loadTab(project.tab); showTab(); touch(); } else addTab(tab);
+            toast(`„${esc(m.name || 'Vorlage')}“ geladen${s.sheets && s.sheets.length > 1 ? ` (Blatt „${esc(s.title)}“)` : ''}`);
+        }
         if (layoutMode() !== 'wide') showView('tabelle');
         return;
     }
@@ -351,14 +419,10 @@ $('#lpPane').addEventListener('click', () => { if (document.body.classList.conta
 async function openProject(p, opts) {
     project = Store.normalizeProject(p);
     if (!project.id) project.id = Store.newProject().id;
-    undo = []; redo = []; updateHist();
     pref.set('last', project.id);
     $('#projectName').textContent = project.name;
     document.title = project.name + ' · FlowPad';
-    grid.rebuild();
-    grid.setMarks(new Set(Object.keys(project.dfds)));
-    const first = project.select && validCell(project.select) ? project.select : 'A1';
-    grid.select(first);
+    showTab(project.tabs[project.tab].sel);
     view = project.lernpfadHtml && layoutMode() !== 'wide' ? 'lernpfad' : 'tabelle';
     showLernpfad();
     if (!opts || !opts.noSave) await Store.putProject(project).catch(() => { });
@@ -378,7 +442,7 @@ async function shareFile(blob, name) {
     if (navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file], title: name }); return; } catch (e) { if (e.name === 'AbortError') return; } }
     deliver(blob, name);
 }
-const projectBlob = () => new Blob([Store.projectFile(project)], { type: 'application/json' });
+const projectBlob = () => { syncTab(); return new Blob([Store.projectFile(project)], { type: 'application/json' }); };
 function pickFile(accept) {
     return new Promise(res => { const i = document.createElement('input'); i.type = 'file'; i.accept = accept; i.onchange = () => res(i.files[0] || null); i.click(); });
 }
@@ -477,9 +541,9 @@ on('#drawerXlsxOut', async () => { await deliver(sheetToXlsx(project.sheet, proj
 on('#drawerXlsxIn', async () => {
     const f = await pickFile('.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'); if (!f) return;
     const s = await xlsxToSheet(new Uint8Array(await f.arrayBuffer()));
-    if (Object.keys(project.sheet.cells).length && !await confirmBox('Tabelle ersetzen?', `Die Tabelle dieses Projekts wird durch „${esc(f.name)}“ ersetzt (Rückgängig geht mit ↶).`, 'Ersetzen')) return;
-    pushUndo(); project.sheet = { rows: Math.max(20, s.rows + 5), cols: Math.min(26, Math.max(8, s.cols + 1)), cells: s.cells }; project.dfds = {};
-    grid.rebuild(); grid.setMarks(new Set()); grid.select('A1'); touch(); closeDrawer(); toast('Excel-Datei übernommen');
+    const tab = { name: f.name.replace(/\.xlsx$/i, '').slice(0, 40), sheet: { rows: Math.max(20, s.rows + 5), cols: Math.min(26, Math.max(8, s.cols + 1)), cells: s.cells } };
+    if (tabIsEmpty(project.tabs[project.tab])) { Object.assign(project.tabs[project.tab], tab, { dfds: {}, tasks: {} }); loadTab(project.tab); showTab(); touch(); } else addTab(tab);
+    closeDrawer(); toast(`Excel-Datei als Reiter „${esc(tab.name)}“ übernommen`);
 });
 on('#drawerAddRow', async () => { pushUndo(); project.sheet.rows = Math.min(200, project.sheet.rows + 5); grid.rebuild(); touch(); toast(`Jetzt ${project.sheet.rows} Zeilen`); });
 on('#drawerAddCol', async () => { if (project.sheet.cols >= 26) { toast('Mehr als 26 Spalten (A–Z) gehen nicht.'); return; } pushUndo(); project.sheet.cols++; grid.rebuild(); touch(); toast(`Jetzt bis Spalte ${E.colName(project.sheet.cols - 1)}`); });

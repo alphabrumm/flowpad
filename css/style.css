@@ -397,3 +397,22 @@ button.taskbadge { cursor: pointer; font: inherit; font-size: .8em; font-weight:
 .teach-code-big { font: 800 1.35em var(--font-code); letter-spacing: .12em; padding: 4px 10px; border-radius: 8px; background: var(--next); border: 2px solid var(--next-edge); }
 .teach-actions { display: flex; gap: 6px; }
 .teach-actions input { flex: 1; min-width: 0; font: .85em var(--font-code); padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface-2); color: var(--ink); }
+
+/* ---------- Reiter (mehrere Tabellen) in der Menüleiste ---------- */
+.tabs { flex: 1 1 auto; min-width: 0; display: flex; align-items: flex-end; gap: 3px; overflow-x: auto; scrollbar-width: none; align-self: stretch; padding: 4px 6px 0; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { flex: none; max-width: 200px; display: inline-flex; align-items: center; gap: 4px; padding: 4px 12px; min-height: 32px; border: 1px solid var(--line); border-bottom: 0;
+  border-radius: 10px 10px 0 0; background: var(--bar-2); color: var(--bar-ink); font-size: .88em; font-weight: 700; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: .75; }
+.tab.active { background: var(--glow); color: var(--acc-ink, #000); border-color: var(--next-edge, var(--line)); opacity: 1; }
+.tab-more { font-size: .8em; opacity: .7; }
+.tab-add { min-width: 34px; justify-content: center; font-size: 1.1em; opacity: .9; }
+/* Zelle leeren */
+.calc-clear { flex: none; min-width: 42px; border: 1px solid var(--line); border-bottom-width: 3px; border-radius: 4px; background: var(--surface); color: var(--bad); font-weight: 800; cursor: pointer; }
+/* Bearbeitungsleiste des Diagramms: kompakt in einer Zeile */
+.dfd-edit { gap: 6px 8px; padding: 5px 8px; }
+.dfd-edit .sig-l { font-weight: 700; white-space: nowrap; }
+.dfd-edit .fbtn { min-height: 36px; padding: 0 10px; }
+.dfd-edit .fbtn.icon { min-width: 38px; padding: 0; justify-content: center; }
+.dfd-edit input.f-cell { width: 5.2em; }
+.dfd-edit input.f-name { width: 8.5em; }
+.dfd-field { gap: 4px; }

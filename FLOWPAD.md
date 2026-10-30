@@ -11,6 +11,12 @@
 
 Trennlinie zwischen Tabelle und Diagramm lässt sich ziehen (wird gemerkt).
 
+**Reiter:** Ein Projekt kann mehrere Tabellen haben – jede mit ihren eigenen Diagrammen. Die Reiter stehen oben in der Menüleiste;
+„+“ legt eine neue Tabelle an, Antippen des aktiven Reiters öffnet Umbenennen, Löschen und (bei Tabellen aus dem Lernpfad) „Neu aus dem Lernpfad laden“.
+Lädt der Lernpfad eine Tabelle, bekommt sie einen eigenen Reiter; ein zweites Laden wechselt nur dorthin, der Stand bleibt erhalten.
+
+**Zelle leeren:** ✕ links neben ✓. **Doppeltippen** auf eine Zelle öffnet die Eingabe mit Schreibmarke.
+
 ### Schulnotation im Diagramm
 Eingaben und Ausgabe in Rechtecken, Funktionen **und Rechenzeichen** in Ellipsen, Konstanten als reine Zahl,
 Verteiler als gefüllter Punkt. Aus jedem Baustein geht nur ein Pfeil; mehrfach gebrauchte Daten gehen über einen Verteiler.
@@ -19,7 +25,7 @@ wenn es keinen gibt, aus der Beschriftung links in derselben Zeile. `$`-Bezüge 
 
 ### Knöpfe im Diagramm
 * **Formel → DFD** – zeichnet das Diagramm zur Formel der Zelle (gleiche Teilausdrücke werden nur einmal berechnet und verteilt).
-* **DFD → Zelle** – schreibt die Formel des Diagramms in die Zelle und rechnet. Stand vorher eine andere Formel in der Zelle,
+* **DFD → Zelle** – schreibt die Formel des Diagramms in die Ausgabezelle und rechnet. Die Ausgabezelle lässt sich am Ausgabe-Baustein ändern („Ausgabe in“: Zelle eintippen oder ▦ und antippen) – das Diagramm zieht dann in diese Zelle um. Stand vorher eine andere Formel in der Zelle,
   vergleicht FlowPad beide und meldet, ob sie gleich rechnen (Rückgängig mit ↶).
 * **Prüfen** – Regeln der Notation (fehlende Pfeile, Verteiler mit nur einem Ausgang, doppelte Eingaben, doppelt berechnete Funktionen),
   dann Vergleich mit der Aufgabe bzw. mit der Formel in der Zelle.

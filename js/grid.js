@@ -28,6 +28,7 @@ export function Grid(root, host) {
     root.innerHTML = `
       <div class="calc-fx"><span class="calc-name" aria-label="Zelladresse"></span><button type="button" class="calc-fxbtn" title="Handbuch der Funktionen" aria-label="Handbuch der Funktionen öffnen">fx</button>
         <input class="calc-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" aria-label="Inhalt der Zelle">
+        <button class="calc-clear" type="button" title="Inhalt der Zelle löschen" aria-label="Inhalt der Zelle löschen">✕</button>
         <button class="calc-ok" type="button" aria-label="Eingabe übernehmen">✓</button></div>
       <div class="calc-keys">${['=', '$', ';', ':', '(', ')', '+', '-', '*', '/', '"', '<', '>'].map(k => `<button type="button" data-ins="${esc(k)}">${esc(k)}</button>`).join('')}
         <span class="sep"></span>
@@ -184,6 +185,12 @@ export function Grid(root, host) {
     input.addEventListener('input', () => { editing = true; showRefs(input.value); });
     input.addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); commit(true); } if (ev.key === 'Escape') select(sel, true); });
     root.querySelector('.calc-ok').addEventListener('click', () => commit(false));
+    root.querySelector('.calc-clear').addEventListener('click', () => {
+        if (!canEdit(sel)) { say('Diese Zelle ist gesperrt.', 'bad'); return; }
+        editing = false; input.value = '';
+        if (sheet.get(sel) !== undefined) host.commit(sel, '');
+        select(sel, true);
+    });
     root.querySelectorAll('[data-ins]').forEach(b => {
         b.addEventListener('pointerdown', ev => ev.preventDefault());
         b.addEventListener('mousedown', ev => ev.preventDefault());

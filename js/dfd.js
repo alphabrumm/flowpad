@@ -440,9 +440,9 @@ export const DFD = (() => {
       renderEdit();
     }
     function field(label, value, attrs) {
-      return `<label class="dfd-field"><span>${label}</span><input type="text" value="${esc(value || '')}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" ${attrs || ''}></label>`;
+      return `<label class="dfd-field">${label ? `<span>${label}</span>` : ''}<input type="text" value="${esc(value || '')}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" ${attrs || ''}></label>`;
     }
-    const delBtn = '<button type="button" class="fbtn danger" data-act="del" title="Löschen">✕ Löschen</button>';
+    const delBtn = '<button type="button" class="fbtn danger" data-act="del" title="Löschen">✕<span class="hide-narrow"> Löschen</span></button>';
     function renderEdit() {
       const n = sel && byId(sel);
       if (!n && edgeSel === null) { edit.hidden = true; return; }
@@ -457,9 +457,9 @@ export const DFD = (() => {
         return;
       }
       if (n.kind === 'in') {
-        edit.innerHTML = field('Zelle', n.ref, 'data-f="ref" placeholder="B2 oder B2:B6" autocapitalize="characters"')
-          + field('Name', n.name, 'data-f="name" placeholder="z. B. Preis"')
-          + `<button type="button" class="fbtn" data-act="pickcell">▦ Zelle antippen</button><button type="button" class="fbtn" data-act="ok">✓</button>${delBtn}`; bindDel();
+        edit.innerHTML = `<span class="sig-l">Eingabe</span>` + field('', n.ref, 'data-f="ref" class="f-cell" placeholder="B2:B6" autocapitalize="characters"')
+          + field('Name', n.name, 'data-f="name" class="f-name" placeholder="z. B. Preis"')
+          + `<button type="button" class="fbtn icon" data-act="pickcell" title="Zelle in der Tabelle antippen" aria-label="Zelle antippen">▦</button><button type="button" class="fbtn icon" data-act="ok" aria-label="Übernehmen">✓</button>${delBtn}`; bindDel();
         const fr = edit.querySelector('[data-f=ref]'), fname = edit.querySelector('[data-f=name]');
         const apply = () => {
           const r = fr.value.trim().toUpperCase().replace(/\s+/g, '');
@@ -475,11 +475,23 @@ export const DFD = (() => {
         return;
       }
       if (n.kind === 'out') {
-        edit.innerHTML = `<div class="sig">Ausgabe${n.ref ? ` in <code>${esc(n.ref)}</code>` : ''}</div>` + field('Name', n.name, 'data-f="name" placeholder="z. B. Endpreis"') + `<button type="button" class="fbtn" data-act="ok">✓</button>${delBtn}`; bindDel();
-        const fname = edit.querySelector('[data-f=name]');
-        const apply = () => { n.name = fname.value.trim() || undefined; n.label = n.ref ? labelFor(n.name, n.ref) : (n.name || 'Ergebnis'); save(); render(); };
+        // Ausgabe in [Zelle] ▦ · Name · ✓ · ✕ – eine Zeile
+        edit.innerHTML = `<span class="sig-l">Ausgabe in</span>` + field('', n.ref, 'data-f="ref" class="f-cell" placeholder="D2" autocapitalize="characters"')
+          + `<button type="button" class="fbtn icon" data-act="pickcell" title="Zielzelle in der Tabelle antippen" aria-label="Zielzelle antippen">▦</button>`
+          + field('Name', n.name, 'data-f="name" class="f-name" placeholder="z. B. Endpreis"') + `<button type="button" class="fbtn icon" data-act="ok" aria-label="Übernehmen">✓</button>${delBtn}`; bindDel();
+        const fname = edit.querySelector('[data-f=name]'), fref = edit.querySelector('[data-f=ref]');
+        const apply = () => {
+          n.name = fname.value.trim() || undefined;
+          const r = fref.value.trim().toUpperCase().replace(/\$/g, '');
+          n.label = n.ref ? labelFor(n.name, n.ref) : (n.name || 'Ergebnis'); save(); render();
+          if (r && r !== n.ref) {
+            if (!/^[A-Z]\d+$/.test(r)) { say('Die Ausgabe ist genau eine Zelle, z. B. <code>D2</code>.', 'bad'); return; }
+            host.moveOutput && host.moveOutput(r);
+          }
+        };
         edit.querySelector('[data-act=ok]').onclick = apply;
-        fname.addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); apply(); } });
+        edit.querySelector('[data-act=pickcell]').onclick = () => host.startPick(ref => { const r = ref.split(':')[0]; fref.value = r; apply(); }, 'Tippe die Zelle an, in die das Ergebnis soll.');
+        [fname, fref].forEach(i => i.addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); apply(); } }));
         return;
       }
       // Konstante

@@ -73,12 +73,12 @@
     if (done[sid]) el.classList.add('solved');
     el.querySelector('[data-a=load]').addEventListener('click', function () {
       FP.sheet({ id: sid, title: cfg.title, cells: cfg.cells || {}, rows: cfg.rows, cols: cfg.cols, widths: cfg.widths, styles: cfg.styles, fmt: cfg.fmt, edit: cfg.edit, select: cfg.start, show: true });
-      say('Die Tabelle steht jetzt links in FlowPad.');
+      say('Die Tabelle steht jetzt links in FlowPad – oben als eigener Reiter.');
     });
     var chk = el.querySelector('[data-a=check]');
     if (chk) chk.addEventListener('click', function () {
-      FP.getSheet().then(function (s) {
-        if (s.id !== sid) { say('Lade zuerst die Tabelle „' + esc(cfg.title) + '“ (gelber Knopf), dann arbeite links in FlowPad.', 'bad'); return; }
+      FP.getSheet(sid).then(function (s) {
+        if (s.id !== sid) { say('Lade zuerst die Tabelle „' + esc(cfg.title) + '“ (gelber Knopf). Sie öffnet sich links als eigener Reiter.', 'bad'); return; }
         for (var i = 0; i < cfg.check.length; i++) {
           var rule = cfg.check[i];
           if (!evalRule(rule, s.cells, cfg.rows, cfg.cols)) {

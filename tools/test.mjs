@@ -4,6 +4,7 @@ import E from '../js/engine.js';
 import DFD from '../js/dfd.js';
 import { toExcelFormula, fromExcelFormula } from '../js/zip.js';
 import { flowcodeOf } from '../js/flowcode.js';
+import { normalizeProject } from '../js/store.js';
 
 let n = 0; const t = (name, fn) => { fn(); n++; };
 const ctx = (raw, cell = 'Z30') => ({ raw, rows: 30, cols: 26, cell });
@@ -41,4 +42,8 @@ t('Excel-Formeln übersetzen', () => {
 });
 t('FlowCodes wie JCodes', () => { assert.equal(flowcodeOf('10/JPad-Schafkonstruktor.json'), 'LPANT'); });
 t('Engine rechnet', () => { const s = new E.Sheet(10, 6, { B2: '0,9', C2: '14', D2: '=B2*C2' }); assert.ok(Math.abs(s.value('D2') - 12.6) < 1e-9); });
+t('Alte Projektdateien bekommen Reiter', () => {
+    const p = normalizeProject({ format: 'flowpad', name: 'Alt', sheet: { rows: 5, cols: 3, cells: { A1: '1' } }, dfds: { A1: { nodes: [], edges: [] } } });
+    assert.equal(p.tabs.length, 1); assert.equal(p.tabs[0].name, 'Tabelle 1'); assert.equal(p.sheet, p.tabs[0].sheet); assert.ok(p.dfds.A1);
+});
 console.log(`${n} Tests bestanden.`);
