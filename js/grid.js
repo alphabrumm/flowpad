@@ -25,7 +25,7 @@ export function Grid(root, host) {
 
     root.classList.add('grid');
     root.innerHTML = `
-      <div class="calc-fx"><span class="calc-name" aria-label="Zelladresse"></span><span class="calc-fxlabel">fx</span>
+      <div class="calc-fx"><span class="calc-name" aria-label="Zelladresse"></span><button type="button" class="calc-fxbtn" title="Handbuch der Funktionen" aria-label="Handbuch der Funktionen öffnen">fx</button>
         <input class="calc-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" aria-label="Inhalt der Zelle">
         <button class="calc-ok" type="button" aria-label="Eingabe übernehmen">✓</button></div>
       <div class="calc-keys">${['=', '$', ';', ':', '(', ')', '+', '-', '*', '/', '"', '<', '>'].map(k => `<button type="button" data-ins="${esc(k)}">${esc(k)}</button>`).join('')}
@@ -172,6 +172,7 @@ export function Grid(root, host) {
     });
     root.querySelector('[data-act=pickcancel]').addEventListener('click', () => { pick = null; root.classList.remove('picking'); pickBar.hidden = true; render(); });
 
+    root.querySelector('.calc-fxbtn').addEventListener('click', () => host.onFx && host.onFx());
     input.addEventListener('input', () => { editing = true; showRefs(input.value); });
     input.addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); commit(true); } if (ev.key === 'Escape') select(sel, true); });
     root.querySelector('.calc-ok').addEventListener('click', () => commit(false));
@@ -233,5 +234,11 @@ export function Grid(root, host) {
         cancelPick() { if (pick) { pick = null; root.classList.remove('picking'); pickBar.hidden = true; render(); } },
         say,
         value: a => sheet.value(a),
+        /** Text an der Schreibmarke einfügen (Handbuch); leere Zelle bekommt zuerst ein = */
+        insertText(txt) {
+            if (input.disabled) { say('Diese Zelle ist gesperrt – wähle eine andere Zelle.', 'bad'); return; }
+            if (!input.value.trim()) { input.value = '='; try { input.setSelectionRange(1, 1); } catch (e) { } }
+            input.focus(); insertAt(txt);
+        },
     };
 }

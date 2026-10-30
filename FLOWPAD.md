@@ -4,7 +4,7 @@
 
 | Bereich | Inhalt |
 |---|---|
-| oben links | Tabelle: Zelle antippen, in der Eingabezeile schreiben, ✓. Beim Schreiben einer Formel fügt das Antippen einer Zelle ihre Adresse ein. Tasten `= $ ; : ( ) + - * / " < >`, Kopieren/Einfügen (Bezüge verschieben sich), ↓/→ Ausfüllen, Formeln zeigen. |
+| oben links | Tabelle: Zelle antippen, in der Eingabezeile schreiben, ✓. Der gelbe Knopf **fx** öffnet das Handbuch aller Funktionen (kleines Beispiel in der Liste, angetippt ein größeres mit Tabelle; Ergebnisse rechnet FlowPad live aus, „einfügen“ schreibt den Funktionsnamen in die Formel). Beim Schreiben einer Formel fügt das Antippen einer Zelle ihre Adresse ein. Tasten `= $ ; : ( ) + - * / " < >`, Kopieren/Einfügen (Bezüge verschieben sich), ↓/→ Ausfüllen, Formeln zeigen. |
 | unten links | Datenflussdiagramm **der gewählten Zelle**. Jede Zelle hat ihr eigenes Diagramm (kleines Dreieck in der Zelle). |
 | rechts | Lernpfad (nur, wenn das Projekt einen hat). Breiter/schmaler und „nur Lernpfad“ über die Knöpfe im Kopf. |
 | unten (iPad hochkant, Handy) | Umschalten zwischen Lernpfad, Tabelle und Diagramm. |
@@ -95,9 +95,10 @@ Lehrkraft alle Codes mit Links, doppelte rot) oder die beim Bauen erzeugte `lear
 
 | Datei | Aufgabe |
 |---|---|
-| `index.html`, `css/style.css` | Oberfläche, Themes (Werkstatt, Standard, Hacker; hell/dunkel) |
+| `index.html`, `css/style.css` | Oberfläche, Themes (Werkstatt mit Bananengelb, Standard, Hacker; hell/dunkel) |
 | `js/engine.js` | MiniCalc: Tabellenkalkulation mit deutschen Funktionen (aus der DFD-Werkstatt) |
 | `js/dfd.js` | DFD: Katalog, Formel ↔ Diagramm, Layout, Regeln, Vergleich, Zeichenfläche |
+| `js/handbuch.js` | Handbuch der Funktionen (fx-Knopf) mit Beispielen |
 | `js/grid.js` | Tabellenblatt (Touch, Zeigen, Ausfüllen, Zellen für das Diagramm wählen) |
 | `js/main.js` | App: Projekte, Rückgängig, Aufgaben, Lernpfad-Schnittstelle, Menü, Layout |
 | `js/store.js` | Projekte in IndexedDB, Projektdatei |

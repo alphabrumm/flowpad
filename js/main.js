@@ -5,6 +5,7 @@
 import E from './engine.js';
 import DFD from './dfd.js';
 import { Grid } from './grid.js';
+import { openHandbuch } from './handbuch.js';
 import * as Store from './store.js';
 import { readLernpfadFile, loadLernpfadUrl, withBridge, titleOf, nameFromUrl } from './lernpfad.js';
 import { normalizeCode, codeFormatError, resolveCode, codeOfUrl } from './flowcode.js';
@@ -80,6 +81,7 @@ const grid = Grid($('#grid'), {
     commit(a, raw) { pushUndo(); setCell(a, raw); afterSheetChange(); checkFormulaTask(a); },
     setMany(map) { pushUndo(); Object.entries(map).forEach(([a, v]) => setCell(a, v)); afterSheetChange(); },
     onSelect(a) { showCell(a); },
+    onFx() { openHandbuch(txt => grid.insertText(txt)); },
 });
 function setCell(a, raw) { if (raw === '' || raw === undefined || raw === null) delete project.sheet.cells[a]; else project.sheet.cells[a] = raw; }
 function afterSheetChange() { grid.refresh(); updateCellInfo(); touch(); }
