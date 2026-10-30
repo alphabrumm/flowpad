@@ -332,7 +332,14 @@ export const DFD = (() => {
     root.querySelector('.dfd-body').prepend(root.querySelector('.dfd-palette'));
     const canvas = root.querySelector('.dfd-canvas'), svg = root.querySelector('svg'), gE = root.querySelector('.edges'), gN = root.querySelector('.nodes'), rubber = root.querySelector('.rubber');
     const msg = root.querySelector('.dfd-msg'), fcode = root.querySelector('.dfd-formula code'), edit = root.querySelector('.dfd-edit'), empty = root.querySelector('.dfd-empty');
-    const say = (t, cls) => { msg.className = 'dfd-msg' + (cls ? ' ' + cls : ''); msg.innerHTML = t || ''; };
+    // Statusleiste: eine Zeile; ist die Meldung länger, zeigt „▾“ das an und ein Tipp klappt sie auf
+    msg.innerHTML = '<div class="dfd-msg-in"></div>';
+    const msgIn = msg.firstChild;
+    const say = (t, cls) => {
+      msg.className = 'dfd-msg' + (cls ? ' ' + cls : ''); msgIn.innerHTML = t || '';
+      requestAnimationFrame(() => msg.classList.toggle('more', msgIn.scrollWidth > msgIn.clientWidth + 2));
+    };
+    msg.addEventListener('click', () => { if (msg.classList.contains('more') || msg.classList.contains('open')) msg.classList.toggle('open'); });
     const byId = id => model.nodes.find(n => n.id === id);
     const cw = () => model.w || W, ch = () => model.h || H;
     const save = () => host.onChange && host.onChange(model);
