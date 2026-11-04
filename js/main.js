@@ -276,6 +276,14 @@ $('#btnDfdClear').addEventListener('click', async () => {
 });
 $('#dfdTask').addEventListener('click', () => { const t = project.tasks?.[cell]; if (t) editor.say(`<b>${esc(t.title || 'Aufgabe')}</b>${t.prompt ? ': ' + t.prompt : ''}`); });
 $('#btnFlow').addEventListener('click', () => editor.runFlow());
+// Diagrammkopf: Passt er nicht in eine Zeile, zeigen „fx → DFD“ und „DFD → Zelle“ nur ihre Symbole
+(() => {
+    const head = document.querySelector('.dfd-head'); if (!head) return;
+    const wrapped = () => { const kids = [...head.querySelectorAll('.dfd-cellinfo, #btnToDfd, #btnToCell, #btnFlow, #btnCheck, .dfd-tools')].filter(e => e.offsetParent); return kids.some(e => e.offsetTop > kids[0].offsetTop + 6); };
+    const fitHead = () => { head.classList.remove('compact'); if (wrapped()) head.classList.add('compact'); };
+    new ResizeObserver(fitHead).observe(head);
+    window.addEventListener('resize', fitHead);
+})();
 $('#btnZoomIn').addEventListener('click', () => editor.zoomBy(1.2));
 $('#btnZoomOut').addEventListener('click', () => editor.zoomBy(1 / 1.2));
 $('#btnZoomFit').addEventListener('click', () => editor.fit());

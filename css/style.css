@@ -487,3 +487,5 @@ button, [role=button] { -webkit-touch-callout: none; -webkit-user-select: none; 
 .dfd-cellinfo { flex: 0 1 auto; }
 .dfd-actions { flex: 1 1 auto; }
 .dfd-tools { margin-left: auto; }
+.dfd-head.compact #btnToDfd > span, .dfd-head.compact #btnToCell > span { display: none; }
+.dfd-head.compact #btnToDfd, .dfd-head.compact #btnToCell { padding: 0 9px; }
