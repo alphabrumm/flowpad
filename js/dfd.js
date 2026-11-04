@@ -632,7 +632,7 @@ export const DFD = (() => {
       <button type="button" class="fbtn primary" data-fb="again" hidden>▶ Nochmal</button>
       <button type="button" class="fbtn" data-fb="close" hidden>✕ Fertig</button>`;
     root.querySelector('.dfd-stage').prepend(flowBar);
-    let flowing = false, flowToken = 0, speed = 1, stepMode = false, stepWait = null;
+    let flowing = false, flowToken = 0, speed = 0.5, stepMode = false, stepWait = null;
     const SVGNS = 'http://www.w3.org/2000/svg';
     const mk = (tag, attrs, parent) => { const el = document.createElementNS(SVGNS, tag); for (const k in attrs) el.setAttribute(k, attrs[k]); (parent || flowLayer).appendChild(el); return el; };
     const wait = ms => new Promise(res => setTimeout(res, ms / speed));
