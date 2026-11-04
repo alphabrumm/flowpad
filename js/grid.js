@@ -30,13 +30,15 @@ export function Grid(root, host) {
         <input class="calc-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" aria-label="Inhalt der Zelle">
         <button class="calc-clear" type="button" title="Inhalt der Zelle löschen" aria-label="Inhalt der Zelle löschen">✕</button>
         <button class="calc-ok" type="button" aria-label="Eingabe übernehmen">✓</button></div>
-      <div class="calc-keys">${['=', '$', ';', ':', '(', ')', '+', '-', '*', '/', '"', '<', '>'].map(k => `<button type="button" data-ins="${esc(k)}">${esc(k)}</button>`).join('')}
-        <span class="sep"></span>
-        <button type="button" class="tool" data-act="copy">Kopieren</button>
-        <button type="button" class="tool" data-act="paste" disabled>Einfügen</button>
-        <button type="button" class="tool" data-act="filldown">↓ Ausfüllen</button>
-        <button type="button" class="tool" data-act="fillright">→ Ausfüllen</button>
-        <button type="button" class="tool" data-act="formulas" aria-pressed="false">Formeln zeigen</button>
+      <div class="calc-keybar">
+        <div class="calc-keys">${['=', '$', ';', ':', '(', ')', '+', '-', '*', '/', '"', '<', '>'].map(k => `<button type="button" data-ins="${esc(k)}">${esc(k)}</button>`).join('')}</div>
+        <div class="calc-tools">
+          <button type="button" class="calc-tool" data-act="copy" title="Kopieren" aria-label="Kopieren"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg></button>
+          <button type="button" class="calc-tool" data-act="paste" disabled title="Einfügen" aria-label="Einfügen"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="14" height="16" rx="2"/><path d="M9 5V3h6v2"/><path d="M9 12h6M9 16h4"/></svg></button>
+          <button type="button" class="calc-tool" data-act="filldown" title="Nach unten ausfüllen" aria-label="Nach unten ausfüllen"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="3" width="12" height="6" rx="1.5"/><path d="M12 11v9"/><path d="M8 16l4 4 4-4"/></svg></button>
+          <button type="button" class="calc-tool" data-act="fillright" title="Nach rechts ausfüllen" aria-label="Nach rechts ausfüllen"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="6" height="12" rx="1.5"/><path d="M11 12h9"/><path d="M16 8l4 4-4 4"/></svg></button>
+          <button type="button" class="calc-tool" data-act="formulas" aria-pressed="false" title="Formeln zeigen" aria-label="Formeln zeigen"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6S2 12 2 12z"/><path d="M9.5 10.5h5M9.5 13.5h5"/></svg></button>
+        </div>
       </div>
       <div class="calc-pick" hidden><span></span><button type="button" class="fbtn" data-act="pickcancel">Abbrechen</button></div>
       <div class="calc-preview" aria-live="polite"></div>
@@ -196,7 +198,7 @@ export function Grid(root, host) {
         b.addEventListener('mousedown', ev => ev.preventDefault());
         b.addEventListener('click', () => { if (input.disabled) return; if (document.activeElement !== input) input.focus(); insertAt(b.dataset.ins); });
     });
-    root.querySelectorAll('.calc-keys [data-act]').forEach(b => b.addEventListener('click', () => {
+    root.querySelectorAll('.calc-tools [data-act]').forEach(b => b.addEventListener('click', () => {
         const act = b.dataset.act;
         if (editing && act !== 'formulas') commit(false);
         if (act === 'copy') { clip = { a: sel, raw: sheet.get(sel) }; say(`<b>${sel}</b> kopiert. Wähle die Zielzelle und tippe auf <b>Einfügen</b>.`); render(); }
@@ -222,7 +224,7 @@ export function Grid(root, host) {
             select(sel, true);
             say(n ? `Formel aus <b>${sel}</b> in ${n} Zelle${n > 1 ? 'n' : ''} ${act === 'filldown' ? 'darunter' : 'rechts daneben'} kopiert. Tippe die Zellen an und vergleiche die Bezüge!` : 'Hier ist kein Platz zum Ausfüllen.', n ? '' : 'bad');
         }
-        if (act === 'formulas') { showF = !showF; b.setAttribute('aria-pressed', String(showF)); b.textContent = showF ? 'Werte zeigen' : 'Formeln zeigen'; render(); }
+        if (act === 'formulas') { showF = !showF; b.setAttribute('aria-pressed', String(showF)); b.title = showF ? 'Werte zeigen' : 'Formeln zeigen'; b.setAttribute('aria-label', b.title); render(); }
     }));
     /** Wie weit ausfüllen? Bis zur letzten Zeile (Spalte), in der links (oben) daneben noch etwas steht – sonst bis zum Rand. */
     function lastFilled(p, dir) {
