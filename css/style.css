@@ -483,3 +483,7 @@ button, [role=button] { -webkit-touch-callout: none; -webkit-user-select: none; 
 .dfd-actions .calc-tool { min-height: 38px; }
 #btnFlow.active { background: var(--glow); }
 .fxlbl b i { font-family: var(--font-code); font-size: 1.05em; }
+/* Zellname direkt vor den Knöpfen, Zoom-Knöpfe rechts */
+.dfd-cellinfo { flex: 0 1 auto; }
+.dfd-actions { flex: 1 1 auto; }
+.dfd-tools { margin-left: auto; }
