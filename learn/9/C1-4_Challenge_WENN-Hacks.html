@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Challenge 1.4 · WENN-Hacks</title>
+<style>
+@font-face { font-family: "Pixelify Sans"; src: url(../../fonts/PixelifySans.ttf) format("truetype"); font-weight: 400 700; }
+@font-face { font-family: "Atkinson Hyperlegible"; src: url(../../fonts/AtkinsonHyperlegible-Regular.ttf) format("truetype"); font-weight: 400; }
+@font-face { font-family: "Atkinson Hyperlegible"; src: url(../../fonts/AtkinsonHyperlegible-Bold.ttf) format("truetype"); font-weight: 700; }
+@font-face { font-family: "JetBrains Mono"; src: url(../../fonts/JetBrainsMono.ttf) format("truetype"); font-weight: 100 800; }
+:root { --bg: #f5f3fb; --surface: #fff; --surface-2: #efebf8; --ink: #1d1a2e; --ink-2: #625c78; --line: #e2dcef;
+  --neon: #1f9d55; --gold: #f6cf45; --gold-d: #c99a06; --sky: #3b63c4; --rose: #c2477f; --violet: #7a4fd0; --good: #1f8f55; --bad: #c23b3b;
+  --c-edge: #33415a; --c-in-fill: #e6efff; --c-in-stroke: #2a6fd6; --c-in-ink: #14315a; --c-out-fill: #e3f6ea; --c-out-stroke: #1f8f55; --c-out-ink: #145a32;
+  --c-fn-fill: #fff3c4; --c-fn-stroke: #a87400; --c-fn-ink: #5a3e00; --c-ink: #1c2533; }
+@media (prefers-color-scheme: dark) { :root { --bg: #12101f; --surface: #1d1a30; --surface-2: #26223d; --ink: #f1eefa; --ink-2: #b5aed0; --line: #36304f;
+  --neon: #5fe08a; --sky: #9db6f5; --rose: #f29cc2; --violet: #c2a6ff; --good: #78d29d; --bad: #ff8a8a;
+  --c-edge: #a9bad2; --c-in-fill: #17305a; --c-in-stroke: #7fb0ff; --c-in-ink: #dbe8ff; --c-out-fill: #163a26; --c-out-stroke: #6fd08b; --c-out-ink: #d4f5df;
+  --c-fn-fill: #3d3112; --c-fn-stroke: #e3b341; --c-fn-ink: #ffe9a8; --c-ink: #e8f0fa; color-scheme: dark; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.55 "Atkinson Hyperlegible", -apple-system, "Segoe UI", system-ui, sans-serif; }
+code { font: .88em "JetBrains Mono", ui-monospace, Menlo, monospace; background: var(--surface-2); padding: 1px 5px; border-radius: 4px; white-space: nowrap; }
+.hero { position: relative; background: #15122a; color: #eef; border-bottom: 6px solid var(--gold); overflow: hidden; }
+.hero::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .5;
+  background-image: linear-gradient(rgba(95,224,138,.12) 1px, transparent 1px), linear-gradient(90deg, rgba(95,224,138,.12) 1px, transparent 1px); background-size: 16px 16px; }
+.hero-in { position: relative; display: flex; gap: 16px; align-items: center; padding: 20px 16px 12px; max-width: 780px; }
+.skull { flex: none; width: 72px; height: 72px; color: #5fe08a; filter: drop-shadow(0 0 8px rgba(95,224,138,.7)); }
+.hero small { font: 700 12px/1 "Pixelify Sans", monospace; letter-spacing: .16em; color: var(--gold); }
+.hero h1 { margin: 6px 0 4px; font: 700 34px/1.05 "Pixelify Sans", "Courier New", monospace; color: #5fe08a; text-shadow: 0 0 10px rgba(95,224,138,.55); }
+.hero p { margin: 0; color: #cfd3ea; }
+.hero code { background: rgba(255,255,255,.12); color: #fff; }
+.hud { position: relative; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding: 8px 16px 12px; max-width: 780px; font: 600 14px "JetBrains Mono", monospace; color: #cfd3ea; }
+.hud b { color: var(--gold); }
+.bar { flex: 1 1 120px; height: 12px; background: rgba(255,255,255,.12); border: 2px solid #5fe08a; }
+.bar i { display: block; height: 100%; width: 0; background: #5fe08a; transition: width .4s; }
+main { padding: 8px 16px 48px; max-width: 780px; }
+.outside, .rules { border-radius: 10px; padding: 10px 14px; margin: 14px 0; }
+.outside { background: #fdecec; color: #5a1010; border: 2px solid var(--bad); }
+.rules { background: var(--surface); border: 2px dashed var(--line); font-size: 15px; }
+.leg { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 8px; color: var(--ink-2); }
+.leg span { display: inline-flex; gap: 6px; align-items: center; }
+.s { display: inline-block; width: 26px; height: 15px; }
+.s.r { border: 2px solid #2a6fd6; background: #e6efff; } .s.o { border: 2px solid #1f8f55; background: #e3f6ea; }
+.s.e { border: 2px solid #a87400; background: #fff3c4; border-radius: 50%; } .s.d { width: 10px; height: 10px; border-radius: 50%; background: var(--ink); }
+.k { font: 700 15px "JetBrains Mono", monospace; color: var(--ink); }
+.card { background: var(--surface); border: 2px solid var(--line); border-left: 8px solid var(--gold-d); border-radius: 10px; padding: 10px 14px 12px; margin: 14px 0; }
+.card header { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; font: 700 12px/1.3 "Pixelify Sans", monospace; letter-spacing: .08em; }
+.tag { color: #fff; background: var(--gold-d); padding: 3px 8px; }
+.t-dfd .tag { background: var(--sky); } .t-lesen .tag { background: var(--rose); } .t-fill .tag { background: var(--good); } .t-quiz .tag { background: var(--violet); }
+.t-dfd { border-left-color: var(--sky); } .t-lesen { border-left-color: var(--rose); } .t-fill { border-left-color: var(--good); } .t-quiz { border-left-color: var(--violet); }
+@media (prefers-color-scheme: dark) { .tag { color: #12101f; } }
+.where { color: var(--ink-2); font-family: "Atkinson Hyperlegible", sans-serif; letter-spacing: 0; font-weight: 400; font-size: 13px; }
+.xp { margin-left: auto; color: var(--ink-2); }
+.card h3 { margin: 6px 0 2px; font: 700 20px/1.2 "Pixelify Sans", "Courier New", monospace; }
+.card p { margin: 4px 0 8px; }
+.card.ok { border-color: var(--good); border-left-color: var(--good); box-shadow: 0 0 0 1px var(--good) inset; }
+.card.ok h3::after { content: " ✓"; color: var(--good); }
+.res { font-size: 15px; min-height: 0; }
+.card.ok .res { color: var(--good); } .card.bad .res { color: var(--bad); }
+.res:not(:empty) { margin-top: 6px; }
+.act { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+button.fp { min-height: 44px; padding: 0 16px; border-radius: 8px; border: 3px solid var(--gold-d); border-bottom-width: 5px; background: var(--gold); color: #2b2300; font: 700 16px/1 "Atkinson Hyperlegible", sans-serif; cursor: pointer; }
+button.fp:active { transform: translateY(2px); border-bottom-width: 3px; }
+button.fp.alt { border-color: var(--sky); background: var(--surface); color: var(--ink); }
+.quiz { display: flex; gap: 8px; flex-wrap: wrap; }
+.quiz input { flex: 1 1 180px; min-width: 0; min-height: 44px; font: 600 18px "JetBrains Mono", monospace; padding: 4px 10px; border: 2px solid var(--line); border-radius: 8px; background: var(--surface-2); color: var(--ink); }
+.dfdfig { margin: 8px 0; padding: 10px; background: var(--surface-2); border-radius: 8px; overflow-x: auto; }
+.dfdfig svg { display: block; width: 100%; height: auto; margin: 0 auto; font-family: "JetBrains Mono", ui-monospace, monospace; }
+.dfdfig .ed { fill: none; stroke: var(--c-edge); stroke-width: 2.2; } .dfdfig .ah { fill: var(--c-edge); }
+.dfdfig rect.in { fill: var(--c-in-fill); stroke: var(--c-in-stroke); stroke-width: 2.2; } .dfdfig rect.out { fill: var(--c-out-fill); stroke: var(--c-out-stroke); stroke-width: 2.2; }
+.dfdfig ellipse { fill: var(--c-fn-fill); stroke: var(--c-fn-stroke); stroke-width: 2.4; } .dfdfig .sp { fill: var(--c-ink); }
+.dfdfig text { text-anchor: middle; font-size: 15px; font-weight: 700; }
+.dfdfig .t-in { fill: var(--c-in-ink); } .dfdfig .t-out { fill: var(--c-out-ink); } .dfdfig .t-fn { fill: var(--c-fn-ink); } .dfdfig .t-k { fill: var(--c-ink); font-size: 17px; }
+.dfdfig .sn { fill: var(--c-fn-stroke); font-size: 11px; }
+.win { text-align: center; background: #15122a; color: #eef; border: 3px solid #5fe08a; border-radius: 12px; padding: 18px; box-shadow: 0 0 24px rgba(95,224,138,.35); }
+.win small { font: 700 12px "Pixelify Sans", monospace; letter-spacing: .16em; color: var(--gold); }
+.win h2 { margin: 6px 0; font: 700 30px "Pixelify Sans", monospace; color: #5fe08a; text-shadow: 0 0 10px rgba(95,224,138,.6); }
+</style></head>
+<body>
+<div class="hero"><div class="hero-in"><svg viewBox="0 0 16 16" class="skull" aria-hidden="true" shape-rendering="crispEdges"><path fill="currentColor" d="M4 2h8v1h1v1h1v5h-1v2h-2v2H5v-2H3V9H2V4h1V3h1zM5 6v2h2V6zm4 0v2h2V6zM7 9v1h2V9zM6 12h1v1H6zm3 0h1v1H9z"/></svg><div><small>HACKER-CHALLENGE · LEVEL 1.4</small><h1>WENN-Hacks</h1><p>Entscheidungen, Grenzfälle, verschachtelte WENNs. FlowPad testet genau an den Grenzen – „größer“ und „größer gleich“ sind hier zwei verschiedene Welten.</p></div></div>
+<div class="hud"><span>FlowCode <b>5J6P9</b></span><span class="bar"><i id="bar"></i></span><span><b id="xp">0</b> / 100 XP</span></div></div>
+<main>
+<div class="outside" id="outside" hidden><b>Diese Challenge läuft in FlowPad.</b> Öffne FlowPad und gib den FlowCode <b>5J6P9</b> ein (Menü → Projekt über FlowCode öffnen).</div>
+<div class="rules"><b>Regeln:</b> Keine Tipps. FlowPad prüft jede Lösung mit vielen anderen Zahlen – wer Ergebnisse abtippt, statt mit Zellen zu rechnen, fliegt auf.
+Diagramm-Aufgaben werden nur im Diagramm gelöst (dann <b>Prüfen</b>), Ausfüll-Aufgaben prüfst du hier im Lernpfad. Das <b><i>fx</i></b>-Handbuch ist erlaubt.
+<div class="leg"><span><i class="s r"></i>Eingabe</span><span><i class="s e"></i>Funktion / Rechenzeichen</span><span><b class="k">2</b>Konstante</span><span><i class="s d"></i>Verteiler</span><span><i class="s o"></i>Ausgabe</span></div></div>
+<section class="card t-fill" id="t0"><header><span class="tag">#1 · AUSFÜLLEN</span><span class="where">Tabelle „Freibad“</span><span class="xp">15 XP</span></header>
+<h3>Eintritt</h3><p>Eintritt laut Preisliste: unter 6 Jahren, unter 18 Jahren, Erwachsene. Eine Formel in <b>D2</b>, ausfüllen bis <b>D9</b>. Die Preise kommen aus der Preisliste.</p><div class="act"><button class="fp alt" data-open="0">Tabelle öffnen</button><button class="fp" data-check="0">Prüfen</button></div><div class="res" aria-live="polite"></div></section>
+<section class="card t-dfd" id="t1"><header><span class="tag">#2 · DIAGRAMM</span><span class="where">Tabelle „Freibad“</span><span class="xp">15 XP</span></header>
+<h3>Ermäßigung</h3><p>Wer einen Ausweis hat (<code>ja</code>), bekommt die Ermäßigung aus <b>H5</b> auf den Eintritt. Alle anderen zahlen den vollen Eintritt. Diagramm für <b>E2</b>.</p><div class="act"><button class="fp alt" data-open="1">Aufgabe in FlowPad öffnen</button></div><div class="res" aria-live="polite"></div></section>
+<section class="card t-fill" id="t2"><header><span class="tag">#3 · AUSFÜLLEN</span><span class="where">Tabelle „Freibad“</span><span class="xp">15 XP</span></header>
+<h3>Zu zahlen</h3><p>Fülle <b>E2</b> bis <b>E9</b> aus.</p><div class="act"><button class="fp alt" data-open="2">Tabelle öffnen</button><button class="fp" data-check="2">Prüfen</button></div><div class="res" aria-live="polite"></div></section>
+<section class="card t-formel" id="t3"><header><span class="tag">#4 · FORMEL</span><span class="where">Tabelle „Merch-Shop“</span><span class="xp">10 XP</span></header>
+<h3>Versand</h3><p>Versand kostet 4,90 €. Ab 50 € Warenwert ist er gratis. Formel in <b>B3</b>.</p><div class="act"><button class="fp alt" data-open="3">Aufgabe in FlowPad öffnen</button></div><div class="res" aria-live="polite"></div></section>
+<section class="card t-formel" id="t4"><header><span class="tag">#5 · FORMEL</span><span class="where">Tabelle „Merch-Shop“</span><span class="xp">10 XP</span></header>
+<h3>Gutschein</h3><p>Mit dem Code <code>HACK10</code> gibt es 10 % Rabatt auf den Warenwert – aber <b>höchstens 8 €</b>. Ohne gültigen Code gibt es nichts. Formel in <b>B4</b>.</p><div class="act"><button class="fp alt" data-open="4">Aufgabe in FlowPad öffnen</button></div><div class="res" aria-live="polite"></div></section>
+<section class="card t-dfd" id="t5"><header><span class="tag">#6 · DIAGRAMM</span><span class="where">Tabelle „Merch-Shop“</span><span class="xp">15 XP</span></header>
+<h3>Bonuspunkte</h3><p>Für je <b>volle</b> 10 € Warenwert gibt es einen Bonuspunkt. Ab 100 € Warenwert gibt es doppelt so viele Punkte. Diagramm für <b>B5</b>.</p><div class="act"><button class="fp alt" data-open="5">Aufgabe in FlowPad öffnen</button></div><div class="res" aria-live="polite"></div></section>
+<section class="card t-lesen" id="t6"><header><span class="tag">#7 · LESEN</span><span class="where">Tabelle „Rangrechner“</span><span class="xp">10 XP</span></header>
+<h3>Geheimer Rangrechner</h3><p>Welche Formel steckt in diesem Diagramm? Schreibe sie in <b>B2</b>.</p><figure class="dfdfig"><svg viewBox="6.657754010695186 9 782.524064171123 502" style="max-width:783px;min-width:563px" role="img" aria-label="Datenflussdiagramm"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="ah"/></marker></defs><path class="ed" d="M89.65775401069519,65 C89.65775401069519,95 89.65775401069519,94 89.65775401069519,124" marker-end="url(#ah)"/><path class="ed" d="M89.65775401069519,137 C89.65775401069519,209.17966573661693 129.6951871657754,209.17966573661693 129.6951871657754,281.35933147323385" marker-end="url(#ah)"/><text class="sn" x="118.6951871657754" y="272.35933147323385">1</text><path class="ed" d="M198.84491978609626,249 C198.84491978609626,279 159.6951871657754,251.35933147323385 159.6951871657754,281.35933147323385" marker-end="url(#ah)"/><text class="sn" x="148.6951871657754" y="272.35933147323385">2</text><path class="ed" d="M144.6951871657754,326 C144.6951871657754,356 286.02139037433153,338.0814157129579 286.02139037433153,368.0814157129579" marker-end="url(#ah)"/><text class="sn" x="275.02139037433153" y="359.0814157129579">1</text><path class="ed" d="M309.80748663101605,335 C309.80748663101605,365 316.02139037433153,335 316.02139037433153,365" marker-end="url(#ah)"/><text class="sn" x="305.02139037433153" y="356">2</text><path class="ed" d="M89.65775401069519,137 C89.65775401069519,167 240.6577540106952,164.59453499259536 240.6577540106952,194.59453499259536" marker-end="url(#ah)"/><text class="sn" x="229.6577540106952" y="185.59453499259536">1</text><path class="ed" d="M421.65775401069516,163 C421.65775401069516,193 270.65775401069516,164.59453499259536 270.65775401069516,194.59453499259536" marker-end="url(#ah)"/><text class="sn" x="259.65775401069516" y="185.59453499259536">2</text><path class="ed" d="M255.6577540106952,240 C255.6577540106952,270 462.67379679144386,252.0814157129579 462.67379679144386,282.0814157129579" marker-end="url(#ah)"/><text class="sn" x="451.67379679144386" y="273.0814157129579">1</text><path class="ed" d="M528.1818181818181,249 C528.1818181818181,279 492.67379679144386,249 492.67379679144386,279" marker-end="url(#ah)"/><text class="sn" x="481.67379679144386" y="270">2</text><path class="ed" d="M694.1818181818181,249 C694.1818181818181,279 522.6737967914439,252.0814157129579 522.6737967914439,282.0814157129579" marker-end="url(#ah)"/><text class="sn" x="511.6737967914439" y="273.0814157129579">3</text><path class="ed" d="M492.67379679144386,326 C492.67379679144386,356 346.02139037433153,338.0814157129579 346.02139037433153,368.0814157129579" marker-end="url(#ah)"/><text class="sn" x="335.02139037433153" y="359.0814157129579">3</text><path class="ed" d="M316.02139037433153,412 C316.02139037433153,442 316.02139037433153,424 316.02139037433153,454" marker-end="url(#ah)"/><ellipse class="fn" cx="316.02139037433153" cy="389" rx="60" ry="23"/><text class="t-fn" x="316.02139037433153" y="394">WENN</text><ellipse class="fn" cx="144.6951871657754" cy="303" rx="34" ry="23"/><text class="t-fn" x="144.6951871657754" y="308">&gt;</text><rect class="in" x="22.657754010695186" y="25" width="134" height="40"/><text class="t-in" x="89.65775401069519" y="50">Prozent (B1)</text><circle class="sp" cx="89.65775401069519" cy="131" r="6"/><text class="t-k" x="198.84491978609626" y="245">85</text><text class="t-k" x="309.80748663101605" y="331">"Alpha Hacker"</text><ellipse class="fn" cx="492.67379679144386" cy="303" rx="60" ry="23"/><text class="t-fn" x="492.67379679144386" y="308">WENN</text><ellipse class="fn" cx="255.6577540106952" cy="217" rx="41" ry="23"/><text class="t-fn" x="255.6577540106952" y="222">&gt;=</text><text class="t-k" x="421.65775401069516" y="159">55</text><text class="t-k" x="528.1818181818181" y="245">"True Hacker"</text><text class="t-k" x="694.1818181818181" y="245">"Little Hacker"</text><rect class="out" x="262.52139037433153" y="455" width="107" height="40"/><text class="t-out" x="316.02139037433153" y="480">Rang (B2)</text></svg></figure><div class="act"><button class="fp alt" data-open="6">Aufgabe in FlowPad öffnen</button></div><div class="res" aria-live="polite"></div></section>
+<section class="card t-formel" id="t7"><header><span class="tag">#8 · FORMEL</span><span class="where">Tabelle „Achterbahn“</span><span class="xp">10 XP</span></header>
+<h3>Achterbahn</h3><p>Mitfahren darf, wer mindestens 140 cm groß ist – oder mindestens 120 cm groß <b>und</b> in Begleitung (<code>ja</code>). In <b>B3</b> soll <code>ja</code> oder <code>nein</code> stehen.</p><div class="act"><button class="fp alt" data-open="7">Aufgabe in FlowPad öffnen</button></div><div class="res" aria-live="polite"></div></section>
+<section class="win" id="win" hidden><small>CHALLENGE 1.4 COMPLETE</small><h2>Grid gehackt!</h2><p>Alle Aufgaben gelöst. Sichere dein Projekt (oben rechts in FlowPad) – und dann ab zur nächsten Station auf der Lernlandkarte.</p></section>
+</main>
+<script>
+/* MiniCalc-Engine: kleine Tabellenkalkulation mit deutschen Funktionsnamen.
+   Formeln: =, ; als Trennzeichen, Dezimalkomma, $-Bezüge, Bereiche A1:B3. */
+/* Übernommen aus der DFD-Werkstatt (Informatik 9). Änderung für FlowPad: Bezüge behalten ihre $-Zeichen (ac/ar). */
+var CalcEngine = (() => {
+  const ERR = e => ({ err: e });
+  const isErr = v => v && typeof v === 'object' && 'err' in v;
+  const colName = c => String.fromCharCode(65 + c);
+  const addr = (r, c) => colName(c) + (r + 1);
+  function parseAddr(a) { const m = /^\$?([A-Z])\$?(\d+)$/.exec(a.toUpperCase()); return m ? { r: +m[2] - 1, c: m[1].charCodeAt(0) - 65 } : null; }
+  function rangeCells(a) {
+    const [p, q] = a.split(':'); const A = parseAddr(p), B = parseAddr(q || p); const out = [];
+    for (let r = Math.min(A.r, B.r); r <= Math.max(A.r, B.r); r++) for (let c = Math.min(A.c, B.c); c <= Math.max(A.c, B.c); c++) out.push(addr(r, c));
+    return out;
+  }
+
+  // ---------- Tokenizer ----------
+  function tokenize(src) {
+    const t = []; let i = 0;
+    while (i < src.length) {
+      const ch = src[i];
+      if (ch === ' ' || ch === ' ') { i++; continue; }
+      const rest = src.slice(i); let m;
+      if (ch === '"' || ch === '“' || ch === '„' || ch === '”') {
+        let j = i + 1, s = '';
+        while (j < src.length && !'"“”„'.includes(src[j])) { s += src[j]; j++; }
+        if (j >= src.length) throw ERR('#NAME?');
+        t.push({ k: 'str', v: s }); i = j + 1; continue;
+      }
+      if ((m = /^(\$?)([A-Za-z])(\$?)(\d+)/.exec(rest))) {
+        const after = rest.slice(m[0].length);
+        if (!/^[A-Za-zÄÖÜäöüß0-9_(]/.test(after)) {
+          t.push({ k: 'ref', ac: !!m[1], c: m[2].toUpperCase().charCodeAt(0) - 65, ar: !!m[3], r: +m[4] - 1, pos: i, len: m[0].length });
+          i += m[0].length; continue;
+        }
+      }
+      if ((m = /^\d+(,\d+)?|^,\d+/.exec(rest))) { t.push({ k: 'num', v: parseFloat(m[0].replace(',', '.')) }); i += m[0].length; continue; }
+      if ((m = /^[A-Za-zÄÖÜäöüß][A-Za-zÄÖÜäöüß0-9_.]*/.exec(rest))) { t.push({ k: 'name', v: m[0].toUpperCase() }); i += m[0].length; continue; }
+      if ((m = /^(<=|>=|<>|[-+*\/^&=<>();:%])/.exec(rest))) { t.push({ k: 'op', v: m[0] }); i += m[0].length; continue; }
+      throw ERR('#NAME?');
+    }
+    return t;
+  }
+
+  // ---------- Parser ----------
+  function parse(src) {
+    const t = tokenize(src); let p = 0;
+    const peek = () => t[p], next = () => t[p++];
+    const isOp = (v) => t[p] && t[p].k === 'op' && t[p].v === v;
+    function expect(v) { if (!isOp(v)) throw ERR('#NAME?'); p++; }
+    function comparison() {
+      let a = concat();
+      while (t[p] && t[p].k === 'op' && ['=', '<>', '<', '>', '<=', '>='].includes(t[p].v)) { const o = next().v; a = { k: 'bin', o, a, b: concat() }; }
+      return a;
+    }
+    function concat() { let a = additive(); while (isOp('&')) { next(); a = { k: 'bin', o: '&', a, b: additive() }; } return a; }
+    function additive() { let a = term(); while (isOp('+') || isOp('-')) { const o = next().v; a = { k: 'bin', o, a, b: term() }; } return a; }
+    function term() { let a = power(); while (isOp('*') || isOp('/')) { const o = next().v; a = { k: 'bin', o, a, b: power() }; } return a; }
+    function power() { let a = unary(); while (isOp('^')) { next(); a = { k: 'bin', o: '^', a, b: unary() }; } return a; }
+    function unary() { if (isOp('-')) { next(); return { k: 'neg', a: unary() }; } if (isOp('+')) { next(); return unary(); } return postfix(); }
+    function postfix() { let a = primary(); while (isOp('%')) { next(); a = { k: 'bin', o: '/', a, b: { k: 'num', v: 100 } }; } return a; }
+    function primary() {
+      const tk = next();
+      if (!tk) throw ERR('#NAME?');
+      if (tk.k === 'num') return { k: 'num', v: tk.v };
+      if (tk.k === 'str') return { k: 'str', v: tk.v };
+      if (tk.k === 'ref') {
+        if (isOp(':')) { next(); const b = next(); if (!b || b.k !== 'ref') throw ERR('#NAME?'); return { k: 'range', a: tk, b }; }
+        return { k: 'ref', r: tk.r, c: tk.c, ac: tk.ac, ar: tk.ar };
+      }
+      if (tk.k === 'name') {
+        if (isOp('(')) {
+          next(); const args = [];
+          if (!isOp(')')) { args.push(comparison()); while (isOp(';')) { next(); args.push(comparison()); } }
+          expect(')');
+          return { k: 'fn', n: tk.v, args };
+        }
+        if (tk.v === 'WAHR') return { k: 'bool', v: true };
+        if (tk.v === 'FALSCH') return { k: 'bool', v: false };
+        throw ERR('#NAME?');
+      }
+      if (tk.k === 'op' && tk.v === '(') { const e = comparison(); expect(')'); return e; }
+      throw ERR('#NAME?');
+    }
+    const ast = comparison();
+    if (p < t.length) throw ERR('#NAME?');
+    return ast;
+  }
+
+  // ---------- Werte ----------
+  function rawToValue(raw) {
+    if (raw === undefined || raw === null || raw === '') return null;
+    const s = String(raw).trim();
+    if (/^-?\d+(,\d+)?$/.test(s)) return parseFloat(s.replace(',', '.'));
+    if (/^-?\d+\.\d+$/.test(s)) return parseFloat(s);
+    if (/^-?\d+(,\d+)?\s*%$/.test(s)) return parseFloat(s.replace(',', '.')) / 100;
+    if (/^-?\d+(,\d+)?\s*€$/.test(s)) return parseFloat(s.replace(',', '.'));
+    if (s.toUpperCase() === 'WAHR') return true;
+    if (s.toUpperCase() === 'FALSCH') return false;
+    return String(raw);
+  }
+  function toNum(v) {
+    if (isErr(v)) return v;
+    if (v === null) return 0;
+    if (typeof v === 'number') return v;
+    if (typeof v === 'boolean') return v ? 1 : 0;
+    const x = rawToValue(v);
+    if (typeof x === 'number') return x;
+    return ERR('#WERT!');
+  }
+  function toStr(v) {
+    if (v === null) return '';
+    if (typeof v === 'number') return fmtNum(v);
+    if (typeof v === 'boolean') return v ? 'WAHR' : 'FALSCH';
+    return String(v);
+  }
+  function toBool(v) {
+    if (isErr(v)) return v;
+    if (typeof v === 'boolean') return v;
+    if (v === null) return false;
+    if (typeof v === 'number') return v !== 0;
+    const u = String(v).toUpperCase();
+    if (u === 'WAHR') return true; if (u === 'FALSCH') return false;
+    return ERR('#WERT!');
+  }
+  function fmtNum(x, dec) {
+    if (!isFinite(x)) return '#ZAHL!';
+    let s;
+    if (dec !== undefined) s = x.toFixed(dec);
+    else { s = String(parseFloat(x.toPrecision(12))); if (/e/.test(s)) s = x.toPrecision(6); }
+    return s.replace('.', ',');
+  }
+  function cmp(a, b) {
+    if (typeof a === 'number' && typeof b === 'number') return a - b;
+    if (a === null) a = typeof b === 'string' ? '' : 0;
+    if (b === null) b = typeof a === 'string' ? '' : 0;
+    if (typeof a === 'boolean') a = a ? 1 : 0;
+    if (typeof b === 'boolean') b = b ? 1 : 0;
+    if (typeof a === 'number' && typeof b === 'number') return a - b;
+    if (typeof a === 'number') return -1;
+    if (typeof b === 'number') return 1;
+    return String(a).toLowerCase().localeCompare(String(b).toLowerCase());
+  }
+  function crit(c) {
+    // Kriterium für ZÄHLENWENN/SUMMEWENN
+    if (typeof c === 'number') return v => typeof v === 'number' && v === c;
+    const m = /^(<=|>=|<>|<|>|=)?(.*)$/.exec(String(c));
+    const op = m[1] || '=', rv = rawToValue(m[2]);
+    return v => {
+      if (v === null) return op === '<>' ? true : false;
+      const d = cmp(v, rv);
+      if (typeof rv === 'number' && typeof v !== 'number') return op === '<>';
+      return { '=': d === 0, '<>': d !== 0, '<': d < 0, '>': d > 0, '<=': d <= 0, '>=': d >= 0 }[op];
+    };
+  }
+  const EPOCH = Date.UTC(1899, 11, 30);
+  const toSerial = ms => (ms - EPOCH) / 864e5;
+  const fromSerial = n => new Date(EPOCH + n * 864e5);
+  function round(x, n) { const f = Math.pow(10, n); const y = Math.abs(x) * f; const r = Math.floor(y + 0.5 + 1e-9); return Math.sign(x) * r / f; }
+
+  // ---------- Blatt ----------
+  class Sheet {
+    constructor(rows, cols, raw) { this.rows = rows; this.cols = cols; this.raw = Object.assign({}, raw || {}); this.cache = {}; }
+    set(a, v) { if (v === '' || v === null || v === undefined) delete this.raw[a]; else this.raw[a] = v; this.cache = {}; }
+    get(a) { return this.raw[a]; }
+    isFormula(a) { const r = this.raw[a]; return typeof r === 'string' && r.trim().startsWith('='); }
+    value(a, stack) {
+      if (a in this.cache) return this.cache[a];
+      stack = stack || new Set();
+      if (stack.has(a)) return ERR('#ZIRKEL!');
+      const raw = this.raw[a];
+      let v;
+      if (typeof raw === 'string' && raw.trim().startsWith('=')) {
+        stack.add(a);
+        if (raw.toUpperCase().includes('#BEZUG!')) { stack.delete(a); this.cache[a] = ERR('#BEZUG!'); return this.cache[a]; }
+        try {
+          const ast = parse(raw.trim().slice(1));
+          v = this.ev(ast, stack);
+          if (v && v.range) v = ERR('#WERT!');
+          if (v === null) v = 0;
+        } catch (e) { v = isErr(e) ? e : ERR('#NAME?'); }
+        stack.delete(a);
+      } else v = rawToValue(raw);
+      this.cache[a] = v;
+      return v;
+    }
+    refVal(r, c, stack) {
+      if (r < 0 || c < 0 || r >= this.rows || c >= this.cols) return ERR('#BEZUG!');
+      return this.value(addr(r, c), stack);
+    }
+    rangeVals(n, stack) {
+      const r0 = Math.min(n.a.r, n.b.r), r1 = Math.max(n.a.r, n.b.r), c0 = Math.min(n.a.c, n.b.c), c1 = Math.max(n.a.c, n.b.c);
+      if (r0 < 0 || c0 < 0 || r1 >= this.rows || c1 >= this.cols) return ERR('#BEZUG!');
+      const out = [];
+      for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) out.push(this.value(addr(r, c), stack));
+      return { range: out };
+    }
+    ev(n, st) {
+      switch (n.k) {
+        case 'num': return n.v;
+        case 'str': return n.v;
+        case 'bool': return n.v;
+        case 'ref': return this.refVal(n.r, n.c, st);
+        case 'range': return this.rangeVals(n, st);
+        case 'neg': { const a = toNum(this.ev(n.a, st)); return isErr(a) ? a : -a; }
+        case 'bin': {
+          let a = this.ev(n.a, st), b = this.ev(n.b, st);
+          if (a && a.range) a = ERR('#WERT!'); if (b && b.range) b = ERR('#WERT!');
+          if (isErr(a)) return a; if (isErr(b)) return b;
+          if (n.o === '&') return toStr(a) + toStr(b);
+          if (['=', '<>', '<', '>', '<=', '>='].includes(n.o)) {
+            const d = cmp(a, b);
+            return { '=': d === 0, '<>': d !== 0, '<': d < 0, '>': d > 0, '<=': d <= 0, '>=': d >= 0 }[n.o];
+          }
+          const x = toNum(a), y = toNum(b);
+          if (isErr(x)) return x; if (isErr(y)) return y;
+          if (n.o === '+') return x + y; if (n.o === '-') return x - y; if (n.o === '*') return x * y;
+          if (n.o === '/') return y === 0 ? ERR('#DIV/0!') : x / y;
+          if (n.o === '^') return Math.pow(x, y);
+        }
+        case 'fn': return this.fn(n, st);
+      }
+      return ERR('#NAME?');
+    }
+    nums(args, st, countText) {
+      // sammelt Zahlen: aus Bereichen nur echte Zahlen, direkte Argumente werden umgewandelt
+      const out = [];
+      for (const a of args) {
+        const v = this.ev(a, st);
+        if (isErr(v)) return v;
+        if (v && v.range) { for (const x of v.range) { if (isErr(x)) return x; if (typeof x === 'number') out.push(x); } }
+        else { const x = toNum(v); if (isErr(x)) return x; out.push(x); }
+      }
+      return out;
+    }
+    fn(n, st) {
+      const A = n.args, name = n.n.replace('ZAEHLENWENN', 'ZÄHLENWENN');
+      const need = (k) => { if (A.length < k) throw ERR('#WERT!'); };
+      switch (name) {
+        case 'SUMME': { const v = this.nums(A, st); return isErr(v) ? v : v.reduce((s, x) => s + x, 0); }
+        case 'MITTELWERT': { const v = this.nums(A, st); if (isErr(v)) return v; return v.length ? v.reduce((s, x) => s + x, 0) / v.length : ERR('#DIV/0!'); }
+        case 'MIN': { const v = this.nums(A, st); if (isErr(v)) return v; return v.length ? Math.min(...v) : 0; }
+        case 'MAX': { const v = this.nums(A, st); if (isErr(v)) return v; return v.length ? Math.max(...v) : 0; }
+        case 'ANZAHL': { let k = 0; for (const a of A) { const v = this.ev(a, st); if (v && v.range) k += v.range.filter(x => typeof x === 'number').length; else if (typeof v === 'number') k++; } return k; }
+        case 'ANZAHL2': { let k = 0; for (const a of A) { const v = this.ev(a, st); if (v && v.range) k += v.range.filter(x => x !== null && x !== '').length; else if (v !== null) k++; } return k; }
+        case 'RUNDEN': { need(2); const x = toNum(this.ev(A[0], st)), d = toNum(this.ev(A[1], st)); if (isErr(x)) return x; if (isErr(d)) return d; return round(x, Math.trunc(d)); }
+        case 'ABS': { need(1); const x = toNum(this.ev(A[0], st)); return isErr(x) ? x : Math.abs(x); }
+        case 'WURZEL': { need(1); const x = toNum(this.ev(A[0], st)); if (isErr(x)) return x; return x < 0 ? ERR('#ZAHL!') : Math.sqrt(x); }
+        case 'POTENZ': { need(2); const x = toNum(this.ev(A[0], st)), y = toNum(this.ev(A[1], st)); if (isErr(x)) return x; if (isErr(y)) return y; return Math.pow(x, y); }
+        case 'WENN': {
+          need(1);
+          const b = toBool(this.ev(A[0], st)); if (isErr(b)) return b;
+          if (b) return A.length > 1 ? this.ev(A[1], st) : true;
+          return A.length > 2 ? this.ev(A[2], st) : false;
+        }
+        case 'UND': case 'ODER': {
+          const vals = [];
+          for (const a of A) { const v = this.ev(a, st); if (v && v.range) vals.push(...v.range.filter(x => x !== null)); else vals.push(v); }
+          let res = name === 'UND';
+          for (const v of vals) { const b = toBool(v); if (isErr(b)) return b; res = name === 'UND' ? res && b : res || b; }
+          return res;
+        }
+        case 'NICHT': { need(1); const b = toBool(this.ev(A[0], st)); return isErr(b) ? b : !b; }
+        case 'ZÄHLENWENN': {
+          need(2); const r = this.ev(A[0], st); const c = this.ev(A[1], st); if (isErr(c)) return c;
+          const list = r && r.range ? r.range : [r]; const f = crit(c); return list.filter(v => !isErr(v) && f(v)).length;
+        }
+        case 'SUMMEWENN': {
+          need(2); const r = this.ev(A[0], st); const c = this.ev(A[1], st); const s = A[2] ? this.ev(A[2], st) : r;
+          const list = r && r.range ? r.range : [r], sl = s && s.range ? s.range : [s], f = crit(c);
+          let sum = 0; list.forEach((v, i) => { if (!isErr(v) && f(v) && typeof sl[i] === 'number') sum += sl[i]; }); return sum;
+        }
+        case 'ABRUNDEN': case 'AUFRUNDEN': {
+          need(1); const x = toNum(this.ev(A[0], st)), d = A[1] ? toNum(this.ev(A[1], st)) : 0; if (isErr(x)) return x; if (isErr(d)) return d;
+          const f = Math.pow(10, Math.trunc(d)), y = Math.abs(x) * f, r = name === 'ABRUNDEN' ? Math.floor(y + 1e-9) : Math.ceil(y - 1e-9);
+          return Math.sign(x) * r / f;
+        }
+        case 'GANZZAHL': { need(1); const x = toNum(this.ev(A[0], st)); return isErr(x) ? x : Math.floor(x); }
+        case 'OBERGRENZE': {
+          need(2); const x = toNum(this.ev(A[0], st)), s_ = toNum(this.ev(A[1], st)); if (isErr(x)) return x; if (isErr(s_)) return s_;
+          if (s_ === 0) return 0; if (x > 0 && s_ < 0) return ERR('#ZAHL!'); return Math.ceil(x / s_ - 1e-9) * s_;
+        }
+        case 'PRODUKT': { const v = this.nums(A, st); return isErr(v) ? v : v.reduce((p, x) => p * x, 1); }
+        case 'QUOTIENT': { need(2); const a = toNum(this.ev(A[0], st)), b = toNum(this.ev(A[1], st)); if (isErr(a)) return a; if (isErr(b)) return b; return b === 0 ? ERR('#DIV/0!') : Math.trunc(a / b); }
+        case 'REST': { need(2); const a = toNum(this.ev(A[0], st)), b = toNum(this.ev(A[1], st)); if (isErr(a)) return a; if (isErr(b)) return b; return b === 0 ? ERR('#DIV/0!') : a - b * Math.floor(a / b); }
+        case 'VORZEICHEN': { need(1); const x = toNum(this.ev(A[0], st)); return isErr(x) ? x : Math.sign(x); }
+        case 'ZUFALLSZAHL': return Math.random();
+        case 'ZUFALLSBEREICH': { need(2); const a = toNum(this.ev(A[0], st)), b = toNum(this.ev(A[1], st)); if (isErr(a)) return a; if (isErr(b)) return b; return Math.ceil(a) + Math.floor(Math.random() * (Math.floor(b) - Math.ceil(a) + 1)); }
+        case 'CODE': { need(1); const t = this.ev(A[0], st); if (isErr(t)) return t; const s2 = toStr(t); return s2.length ? s2.charCodeAt(0) : ERR('#WERT!'); }
+        case 'ZEICHEN': { need(1); const x = toNum(this.ev(A[0], st)); if (isErr(x)) return x; return x < 1 || x > 255 ? ERR('#WERT!') : String.fromCharCode(Math.trunc(x)); }
+        case 'GROSS': case 'KLEIN': case 'LÄNGE': {
+          need(1); const t = this.ev(A[0], st); if (isErr(t)) return t; const s2 = toStr(t);
+          return name === 'GROSS' ? s2.toUpperCase() : name === 'KLEIN' ? s2.toLowerCase() : s2.length;
+        }
+        case 'LINKS': case 'RECHTS': {
+          need(1); const t = this.ev(A[0], st); if (isErr(t)) return t; const n = A[1] ? toNum(this.ev(A[1], st)) : 1; if (isErr(n)) return n;
+          if (n < 0) return ERR('#WERT!'); const s2 = toStr(t); return name === 'LINKS' ? s2.slice(0, n) : (n === 0 ? '' : s2.slice(-n));
+        }
+        case 'TEIL': {
+          need(3); const t = this.ev(A[0], st), a = toNum(this.ev(A[1], st)), n = toNum(this.ev(A[2], st)); if (isErr(t)) return t; if (isErr(a)) return a; if (isErr(n)) return n;
+          if (a < 1 || n < 0) return ERR('#WERT!'); return toStr(t).substr(a - 1, n);
+        }
+        case 'FINDEN': {
+          need(2); const q = this.ev(A[0], st), t = this.ev(A[1], st), a = A[2] ? toNum(this.ev(A[2], st)) : 1; if (isErr(q)) return q; if (isErr(t)) return t; if (isErr(a)) return a;
+          const i = toStr(t).indexOf(toStr(q), a - 1); return i < 0 || a < 1 ? ERR('#WERT!') : i + 1;
+        }
+        case 'IDENTISCH': { need(2); const a = this.ev(A[0], st), b = this.ev(A[1], st); if (isErr(a)) return a; if (isErr(b)) return b; return toStr(a) === toStr(b); }
+        case 'WECHSELN': {
+          need(3); const t = toStr(this.ev(A[0], st)), alt = toStr(this.ev(A[1], st)), neu = toStr(this.ev(A[2], st));
+          if (!alt) return t;
+          if (A[3]) { const n = toNum(this.ev(A[3], st)); if (isErr(n)) return n; let i = -1; for (let k = 0; k < n; k++) { i = t.indexOf(alt, i + 1); if (i < 0) return t; } return t.slice(0, i) + neu + t.slice(i + alt.length); }
+          return t.split(alt).join(neu);
+        }
+        case 'TEXTKETTE': { let s2 = ''; for (const a of A) { const v = this.ev(a, st); if (isErr(v)) return v; if (v && v.range) s2 += v.range.map(toStr).join(''); else s2 += toStr(v); } return s2; }
+        case 'DATUM': {
+          need(3); const y = toNum(this.ev(A[0], st)), m = toNum(this.ev(A[1], st)), d = toNum(this.ev(A[2], st)); if (isErr(y)) return y; if (isErr(m)) return m; if (isErr(d)) return d;
+          return toSerial(Date.UTC(y < 1900 ? y + 1900 : y, m - 1, d));
+        }
+        case 'HEUTE': { const n = new Date(); return toSerial(Date.UTC(n.getFullYear(), n.getMonth(), n.getDate())); }
+        case 'JETZT': { const n = new Date(); return toSerial(Date.UTC(n.getFullYear(), n.getMonth(), n.getDate(), n.getHours(), n.getMinutes(), n.getSeconds())); }
+        case 'JAHR': case 'MONAT': case 'TAG': case 'WOCHENTAG': {
+          need(1); const x = toNum(this.ev(A[0], st)); if (isErr(x)) return x; if (x < 0) return ERR('#ZAHL!');
+          const dt = fromSerial(Math.floor(x));
+          if (name === 'JAHR') return dt.getUTCFullYear(); if (name === 'MONAT') return dt.getUTCMonth() + 1; if (name === 'TAG') return dt.getUTCDate();
+          const typ = A[1] ? toNum(this.ev(A[1], st)) : 1, wd = dt.getUTCDay();
+          return typ === 2 ? (wd + 6) % 7 + 1 : typ === 3 ? (wd + 6) % 7 : wd + 1;
+        }
+        case 'STUNDE': case 'MINUTE': case 'SEKUNDE': {
+          need(1); const x = toNum(this.ev(A[0], st)); if (isErr(x)) return x; if (x < 0) return ERR('#ZAHL!');
+          const sec = Math.round((x - Math.floor(x)) * 86400) % 86400;
+          return name === 'STUNDE' ? Math.floor(sec / 3600) : name === 'MINUTE' ? Math.floor(sec / 60) % 60 : sec % 60;
+        }
+        case 'ZEIT': {
+          need(3); const h = toNum(this.ev(A[0], st)), m = toNum(this.ev(A[1], st)), s3 = toNum(this.ev(A[2], st)); if (isErr(h)) return h; if (isErr(m)) return m; if (isErr(s3)) return s3;
+          const t = ((h * 3600 + m * 60 + s3) % 86400 + 86400) % 86400; return t / 86400;
+        }
+        case 'VERKETTEN': { let s = ''; for (const a of A) { const v = this.ev(a, st); if (isErr(v)) return v; s += toStr(v); } return s; }
+      }
+      return ERR('#NAME?');
+    }
+  }
+
+  // Formel beim Kopieren verschieben (relative Teile ändern sich)
+  function shiftFormula(src, dr, dc) {
+    if (typeof src !== 'string' || !src.trim().startsWith('=')) return src;
+    let out = '', i = 0, inStr = false;
+    while (i < src.length) {
+      const ch = src[i];
+      if (ch === '"') { inStr = !inStr; out += ch; i++; continue; }
+      if (!inStr) {
+        const m = /^(\$?)([A-Za-z])(\$?)(\d+)/.exec(src.slice(i));
+        const prev = i > 0 ? src[i - 1] : '';
+        if (m && !/[A-Za-zÄÖÜäöüß0-9_]/.test(prev) && !/^[A-Za-zÄÖÜäöüß0-9_(]/.test(src.slice(i + m[0].length))) {
+          let c = m[2].toUpperCase().charCodeAt(0) - 65, r = +m[4] - 1;
+          if (!m[1]) c += dc; if (!m[3]) r += dr;
+          if (c < 0 || r < 0 || c > 25) out += '#BEZUG!';
+          else out += m[1] + String.fromCharCode(65 + c) + m[3] + (r + 1);
+          i += m[0].length; continue;
+        }
+      }
+      out += ch; i++;
+    }
+    return out;
+  }
+  // Bezüge in einer Formel finden (für farbige Markierung)
+  function refsIn(src) {
+    if (typeof src !== 'string' || !src.trim().startsWith('=')) return [];
+    let toks; try { toks = tokenize(src.trim().slice(1)); } catch (e) { return []; }
+    const off = src.indexOf('=') + 1, out = [];
+    for (let i = 0; i < toks.length; i++) {
+      const t = toks[i];
+      if (t.k !== 'ref') continue;
+      if (toks[i + 1] && toks[i + 1].k === 'op' && toks[i + 1].v === ':' && toks[i + 2] && toks[i + 2].k === 'ref') {
+        const b = toks[i + 2];
+        out.push({ start: off + t.pos, end: off + b.pos + b.len, cells: rangeCells(addr(t.r, t.c) + ':' + addr(b.r, b.c)) });
+        i += 2;
+      } else out.push({ start: off + t.pos, end: off + t.pos + t.len, cells: [addr(t.r, t.c)] });
+    }
+    return out;
+  }
+  function display(v, fmt) {
+    if (v === null || v === undefined) return '';
+    if (isErr(v)) return v.err;
+    if (typeof v === 'boolean') return v ? 'WAHR' : 'FALSCH';
+    if (typeof v === 'number') {
+      if (fmt === 'eur') return fmtNum(v, 2).replace(/\B(?=(\d{3})+(?!\d))/, '.') + ' €';
+      if (fmt === 'pct') return fmtNum(round(v * 100, 2)) + ' %';
+      if (fmt === 'd1') return fmtNum(v, 1);
+      if (fmt === 'd2') return fmtNum(v, 2);
+      if (fmt === 'int') return fmtNum(Math.round(v));
+      return fmtNum(v);
+    }
+    return String(v);
+  }
+  // Bezug als Text, mit $-Zeichen, z. B. „$C$1“
+  const refText = t => (t.ac ? '$' : '') + colName(t.c) + (t.ar ? '$' : '') + (t.r + 1);
+  return { refText, tokenize, Sheet, parse, shiftFormula, refsIn, display, isErr, addr, parseAddr, rangeCells, colName, fmtNum };
+})();
+
+// Prüft Ausfüll-Aufgaben: eine Formel, ausgefüllt, rechnet bei vielen Testbelegungen richtig.
+// Läuft im Lernpfad (Browser) und im Prüfskript (Node). E = MiniCalc-Engine von FlowPad.
+function fillCheck(t, cells, rows, cols, E) {
+  var isF = function (s) { return typeof s === 'string' && s.trim().charAt(0) === '='; };
+  var norm = function (s) { return String(s || '').replace(/\s+/g, '').toUpperCase(); };
+  var same = function (a, b) { return (typeof a === 'number' && typeof b === 'number') ? Math.abs(a - b) < 1e-7 * Math.max(1, Math.abs(b)) : E.display(a) === E.display(b); };
+  var exp = {}, order = [];
+  for (var i = 0; i < t.expect.length; i++) {
+    var x = t.expect[i], o = E.parseAddr(x.from), src = cells[x.from], end = x.range.split(':')[1];
+    if (!isF(src)) return { ok: false, msg: 'In <b>' + x.from + '</b> steht noch keine Formel.' };
+    var list = E.rangeCells(x.range);
+    for (var j = 0; j < list.length; j++) {
+      var a = list[j], p = E.parseAddr(a), dr = p.r - o.r, dc = p.c - o.c;
+      if (!isF(cells[a])) return { ok: false, msg: 'In <b>' + a + '</b> steht keine Formel. Fülle <b>' + x.from + '</b> bis <b>' + end + '</b> aus.' };
+      if (norm(cells[a]) !== norm(E.shiftFormula(src, dr, dc))) return { ok: false, msg: '<b>' + a + '</b> passt nicht zur Formel in <b>' + x.from + '</b>. Schreibe nur <b>eine</b> Formel und fülle sie aus.' };
+      exp[a] = E.shiftFormula(x.formula, dr, dc); order.push(a);
+    }
+  }
+  var vc = [];
+  Object.keys(t.vary || {}).forEach(function (rg) { E.rangeCells(rg).forEach(function (a) { vc.push([a, t.vary[rg]]); }); });
+  var sets = [{}];
+  for (var k = 0; k < 8; k++) {
+    var s = {};
+    vc.forEach(function (v, n) { s[v[0]] = v[1] === 'num' ? String(((k * 7 + n * 13) % 17) + 2 + (k % 2 ? ',5' : '')) : v[1][(k * 3 + n * 5) % v[1].length]; });
+    sets.push(s);
+  }
+  for (var q = 0; q < sets.length; q++) {
+    var S = new E.Sheet(rows, cols, Object.assign({}, cells, sets[q])), R = new E.Sheet(rows, cols, Object.assign({}, cells, sets[q], exp));
+    for (var m = 0; m < order.length; m++) {
+      var c = order[m], va = S.value(c), vb = R.value(c);
+      if (!same(va, vb)) return { ok: false, msg: '<b>' + c + '</b> rechnet ' + (q ? 'mit anderen Werten in der Tabelle ' : '') + 'falsch: deins <b>' + E.display(va) + '</b>, richtig wäre <b>' + E.display(vb) + '</b>.' };
+    }
+  }
+  return { ok: true, msg: 'Alle ' + order.length + ' Zellen rechnen richtig – auch mit ' + (sets.length - 1) + ' anderen Testbelegungen.' };
+}
+
+var T = [{"type":"fill","xp":15,"sheet":"c14-freibad","expect":[{"from":"D2","formula":"=WENN(B2<6;$H$2;WENN(B2<18;$H$3;$H$4))","range":"D2:D9"}],"vary":{"B2:B9":["5","6","17","18","40","3","12","0"],"H2:H4":"num"},"open":[{"action":"sheet","title":"Freibad","select":"D2","show":true,"id":"c14-freibad","cells":{"A1":"Name","B1":"Alter","C1":"Ausweis","D1":"Eintritt","E1":"Zu zahlen","G1":"Preisliste","G2":"unter 6 Jahren","H2":"0","G3":"unter 18 Jahren","H3":"2,5","G4":"Erwachsene","H4":"4,5","G5":"Ermäßigung mit Ausweis","H5":"50%","A2":"Mia","B2":"5","C2":"nein","A3":"Ben","B3":"6","C3":"ja","A4":"Lea","B4":"17","C4":"ja","A5":"Tom","B5":"18","C5":"nein","A6":"Ali","B6":"35","C6":"nein","A7":"Zoe","B7":"12","C7":"ja","A8":"Max","B8":"19","C8":"ja","A9":"Ida","B9":"72","C9":"nein"},"widths":{"A":80,"B":70,"C":80,"D":90,"E":100,"G":230,"H":80},"fmt":{"H2:H4":"eur","H5":"pct","D2:E9":"eur"},"styles":{"A1:E1":"head","G1":"head","H2:H5":"inp"}},{"action":"say","text":"Eintritt: Eintritt laut Preisliste: unter 6 Jahren, unter 18 Jahren, Erwachsene. Eine Formel in <b>D2</b>, ausfüllen bis <b>D9</b>. Die Preise kommen aus der Preisliste."}]},{"type":"dfd","xp":15,"sheet":"c14-freibad","cell":"E2","open":[{"action":"task","sheetTitle":"Freibad","cell":"E2","target":"=WENN(C2=\"ja\";D2*(1-$H$5);D2)","title":"Ermäßigung","prompt":"Wer einen Ausweis hat (<code>ja</code>), bekommt die Ermäßigung aus <b>H5</b> auf den Eintritt. Alle anderen zahlen den vollen Eintritt. Diagramm für <b>E2</b>.","mode":"diagramm","id":"c14-freibad","cells":{"A1":"Name","B1":"Alter","C1":"Ausweis","D1":"Eintritt","E1":"Zu zahlen","G1":"Preisliste","G2":"unter 6 Jahren","H2":"0","G3":"unter 18 Jahren","H3":"2,5","G4":"Erwachsene","H4":"4,5","G5":"Ermäßigung mit Ausweis","H5":"50%","A2":"Mia","B2":"5","C2":"nein","A3":"Ben","B3":"6","C3":"ja","A4":"Lea","B4":"17","C4":"ja","A5":"Tom","B5":"18","C5":"nein","A6":"Ali","B6":"35","C6":"nein","A7":"Zoe","B7":"12","C7":"ja","A8":"Max","B8":"19","C8":"ja","A9":"Ida","B9":"72","C9":"nein"},"widths":{"A":80,"B":70,"C":80,"D":90,"E":100,"G":230,"H":80},"fmt":{"H2:H4":"eur","H5":"pct","D2:E9":"eur"},"styles":{"A1:E1":"head","G1":"head","H2:H5":"inp"},"dfd":"leer","tests":[{"C2":"ja","D2":"4,5","H5":"50%"},{"C2":"nein","D2":"4,5","H5":"50%"},{"C2":"ja","D2":"2,5","H5":"20%"},{"C2":"nein","D2":"2,5","H5":"20%"},{"C2":"ja","D2":"0","H5":"30%"}]}]},{"type":"fill","xp":15,"sheet":"c14-freibad","expect":[{"from":"E2","formula":"=WENN(C2=\"ja\";D2*(1-$H$5);D2)","range":"E2:E9"}],"vary":{"C2:C9":["ja","nein"],"B2:B9":["5","6","17","18","40"],"H5":["50%","20%","30%"]},"open":[{"action":"sheet","title":"Freibad","select":"E2","show":true,"id":"c14-freibad","cells":{"A1":"Name","B1":"Alter","C1":"Ausweis","D1":"Eintritt","E1":"Zu zahlen","G1":"Preisliste","G2":"unter 6 Jahren","H2":"0","G3":"unter 18 Jahren","H3":"2,5","G4":"Erwachsene","H4":"4,5","G5":"Ermäßigung mit Ausweis","H5":"50%","A2":"Mia","B2":"5","C2":"nein","A3":"Ben","B3":"6","C3":"ja","A4":"Lea","B4":"17","C4":"ja","A5":"Tom","B5":"18","C5":"nein","A6":"Ali","B6":"35","C6":"nein","A7":"Zoe","B7":"12","C7":"ja","A8":"Max","B8":"19","C8":"ja","A9":"Ida","B9":"72","C9":"nein"},"widths":{"A":80,"B":70,"C":80,"D":90,"E":100,"G":230,"H":80},"fmt":{"H2:H4":"eur","H5":"pct","D2:E9":"eur"},"styles":{"A1:E1":"head","G1":"head","H2:H5":"inp"}},{"action":"say","text":"Zu zahlen: Fülle <b>E2</b> bis <b>E9</b> aus."}]},{"type":"formel","xp":10,"sheet":"c14-shop","cell":"B3","open":[{"action":"task","sheetTitle":"Merch-Shop","cell":"B3","target":"=WENN(B1>=50;0;4,9)","title":"Versand","prompt":"Versand kostet 4,90 €. Ab 50 € Warenwert ist er gratis. Formel in <b>B3</b>.","mode":"formel","id":"c14-shop","cells":{"A1":"Warenwert","B1":"42","A2":"Gutschein-Code","B2":"HACK10","A3":"Versand","A4":"Rabatt","A5":"Bonuspunkte"},"widths":{"A":160,"B":100},"fmt":{"B1":"eur","B3":"eur","B4":"eur"},"styles":{"B1:B2":"inp","B3:B5":"out"}}]},{"type":"formel","xp":10,"sheet":"c14-shop","cell":"B4","open":[{"action":"task","sheetTitle":"Merch-Shop","cell":"B4","target":"=WENN(B2=\"HACK10\";MIN(B1*10%;8);0)","title":"Gutschein","prompt":"Mit dem Code <code>HACK10</code> gibt es 10 % Rabatt auf den Warenwert – aber <b>höchstens 8 €</b>. Ohne gültigen Code gibt es nichts. Formel in <b>B4</b>.","mode":"formel","id":"c14-shop","cells":{"A1":"Warenwert","B1":"42","A2":"Gutschein-Code","B2":"HACK10","A3":"Versand","A4":"Rabatt","A5":"Bonuspunkte"},"widths":{"A":160,"B":100},"fmt":{"B1":"eur","B3":"eur","B4":"eur"},"styles":{"B1:B2":"inp","B3:B5":"out"},"tests":[{"B2":"HACK10","B1":"42"},{"B2":"HACK10","B1":"120"},{"B2":"HACK10","B1":"80"},{"B2":"","B1":"42"},{"B2":"SALE","B1":"200"}]}]},{"type":"dfd","xp":15,"sheet":"c14-shop","cell":"B5","open":[{"action":"task","sheetTitle":"Merch-Shop","cell":"B5","target":"=GANZZAHL(B1/10)*WENN(B1>=100;2;1)","title":"Bonuspunkte","prompt":"Für je <b>volle</b> 10 € Warenwert gibt es einen Bonuspunkt. Ab 100 € Warenwert gibt es doppelt so viele Punkte. Diagramm für <b>B5</b>.","mode":"diagramm","id":"c14-shop","cells":{"A1":"Warenwert","B1":"42","A2":"Gutschein-Code","B2":"HACK10","A3":"Versand","A4":"Rabatt","A5":"Bonuspunkte"},"widths":{"A":160,"B":100},"fmt":{"B1":"eur","B3":"eur","B4":"eur"},"styles":{"B1:B2":"inp","B3:B5":"out"},"dfd":"leer","tests":[{"B1":"42"},{"B1":"99,99"},{"B1":"100"},{"B1":"9"},{"B1":"155"},{"B1":"10"}]}]},{"type":"lesen","xp":10,"sheet":"c14-rang","cell":"B2","open":[{"action":"task","sheetTitle":"Rangrechner","cell":"B2","target":"=WENN(B1>85;\"Alpha Hacker\";WENN(B1>=55;\"True Hacker\";\"Little Hacker\"))","title":"Geheimer Rangrechner","prompt":"Welche Formel steckt in diesem Diagramm? Schreibe sie in <b>B2</b>.","mode":"formel","id":"c14-rang","cells":{"A1":"Prozent","B1":"73","A2":"Rang"},"widths":{"A":120,"B":150},"styles":{"B1":"inp","B2":"out"},"tests":[{"B1":"85"},{"B1":"86"},{"B1":"55"},{"B1":"54"},{"B1":"0"},{"B1":"100"},{"B1":"73"}]}]},{"type":"formel","xp":10,"sheet":"c14-bahn","cell":"B3","open":[{"action":"task","sheetTitle":"Achterbahn","cell":"B3","target":"=WENN(ODER(B1>=140;UND(B1>=120;B2=\"ja\"));\"ja\";\"nein\")","title":"Achterbahn","prompt":"Mitfahren darf, wer mindestens 140 cm groß ist – oder mindestens 120 cm groß <b>und</b> in Begleitung (<code>ja</code>). In <b>B3</b> soll <code>ja</code> oder <code>nein</code> stehen.","mode":"formel","id":"c14-bahn","cells":{"A1":"Größe (cm)","B1":"128","A2":"Begleitung","B2":"ja","A3":"Darf mitfahren"},"widths":{"A":170,"B":80},"styles":{"B1:B2":"inp","B3":"out"},"tests":[{"B1":"150","B2":"nein"},{"B1":"140","B2":"nein"},{"B1":"139","B2":"nein"},{"B1":"130","B2":"ja"},{"B1":"120","B2":"ja"},{"B1":"119","B2":"ja"},{"B1":"125","B2":"nein"}]}]}], KEY = 'fp-challenge-1.4', TOTAL = 100;
+var done = {}; try { done = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(done)); } catch (e) { } }
+function card(i) { return document.getElementById('t' + i); }
+function show(i, ok, html) { var c = card(i); c.classList.toggle('ok', !!ok); c.classList.toggle('bad', !ok); if (html !== undefined) c.querySelector('.res').innerHTML = html; }
+function paint() {
+  var xp = 0; T.forEach(function (t, i) { if (done[i]) { xp += t.xp; card(i).classList.add('ok'); card(i).classList.remove('bad'); } });
+  document.getElementById('xp').textContent = xp; document.getElementById('bar').style.width = Math.round(100 * xp / TOTAL) + '%';
+  document.getElementById('win').hidden = xp < TOTAL;
+}
+function solved(i, html) { done[i] = 1; save(); show(i, true, html); paint(); }
+var inside = !!(window.FlowPad && window.FlowPad.inside);
+if (!inside) document.getElementById('outside').hidden = false;
+function send(list) {
+  if (!inside) { document.getElementById('outside').scrollIntoView({ behavior: 'smooth' }); return; }
+  list.forEach(function (m, k) { setTimeout(function () { var d = {}; for (var x in m) if (x !== 'action') d[x] = m[x]; FlowPad.send(m.action, d); }, k * 250); });
+}
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('button'); if (!b) return;
+  if (b.dataset.open) send(T[+b.dataset.open].open);
+  if (b.dataset.check) {
+    var i = +b.dataset.check, t = T[i];
+    if (!inside) return send([]);
+    FlowPad.getSheet(t.sheet).then(function (r) {
+      if (r.id !== t.sheet) { show(i, false, 'Öffne zuerst die Tabelle mit <b>Tabelle öffnen</b>.'); return; }
+      var res = fillCheck(t, r.cells, r.rows, r.cols, CalcEngine);
+      if (res.ok) solved(i, '✓ ' + res.msg); else show(i, false, '✗ ' + res.msg);
+      FlowPad.say((res.ok ? '✓ ' : '✗ ') + res.msg, res.ok);
+    }).catch(function () { show(i, false, 'FlowPad antwortet nicht. Versuche es noch einmal.'); });
+  }
+  if (b.dataset.quiz) {
+    var j = +b.dataset.quiz, norm = function (s) { return String(s).replace(/\s+/g, '').replace(/^=/, '').replace(/,/g, ';').toUpperCase(); };
+    var v = document.getElementById('q' + j).value;
+    if (!v.trim()) return;
+    if (T[j].answers.some(function (a) { return norm(a) === norm(v); })) solved(j, '✓ Richtig.'); else show(j, false, '✗ Nein.');
+  }
+});
+document.addEventListener('keydown', function (e) { if (e.key === 'Enter' && e.target.id && e.target.id.charAt(0) === 'q') { e.preventDefault(); e.target.nextElementSibling.click(); } });
+if (inside) FlowPad.onResult(function (r) {
+  T.forEach(function (t, i) {
+    if (t.sheet !== r.task || t.cell !== r.cell || t.type === 'fill') return;
+    if (t.type === 'dfd' && r.how !== 'diagramm') return;
+    if (r.ok) solved(i, '✓ Gelöst' + (r.formula ? ': <code>' + r.formula.replace(/</g, '&lt;') + '</code>' : '') + '.');
+    else if (!done[i]) show(i, false, '✗ Noch nicht – FlowPad zeigt dir, bei welchen Werten es nicht passt.');
+  });
+});
+paint();
+</script>
+</body></html>

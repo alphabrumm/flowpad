@@ -141,3 +141,12 @@ Lehrkraft alle Codes mit Links, doppelte rot) oder die beim Bauen erzeugte `lear
   aus `fonts/` statt von Google Fonts, damit FlowPad keine fremden Server anfragt.
 * Neue oder geänderte Lernpfade: `node tools/adapt-lernpfad.mjs Lernpfad.html learn/9/Lernpfad.html` (der Adapter steht in
   `tools/lernpfad-adapter.js`; mehrfaches Ausführen ersetzt ihn).
+
+### Hacker-Challenges (Übungen ohne Hilfen)
+
+Zu jedem Level gibt es einen kniffeligen Übungs-Lernpfad: `C1-1_Challenge_Formel-Hacks.html` (**3TSRD**),
+`C1-2_Challenge_Bezugs-Hacks.html` (**DZB5R**), `C1-3_Challenge_Funktions-Hacks.html` (**PXJTT**), `C1-4_Challenge_WENN-Hacks.html` (**5J6P9**).
+Aufgabentypen: Formel in eine Zelle schreiben, Diagramm bauen (nur im Diagramm lösbar), Diagramm lesen (Bild im Lernpfad → Formel),
+Ausfüllen (eine Formel, ausgefüllt; der Lernpfad holt sich die Tabelle mit `getSheet`, prüft, dass alle Zellen aus derselben Formel stammen,
+und rechnet mit MiniCalc und acht anderen Testbelegungen nach) und Kopf-Hacks ohne FlowPad. Fortschritt und XP merkt sich der Lernpfad.
+Die Seiten werden aus einer Aufgabenliste erzeugt; dabei werden alle Musterlösungen und typische falsche Lösungen mit FlowPads Engine gegengeprüft.
