@@ -81,7 +81,7 @@ export const DFD = (() => {
     const d = fdef(node.fn);
     if (!d.v) return d.p.length;
     const used = edges.filter(e => e.to === node.id).reduce((m, e) => Math.max(m, e.slot + 1), 0);
-    return Math.min(8, Math.max(2, used + 1));
+    return Math.min(8, Math.max(1, used + 1));
   }
   const slotName = (node, i) => isOp(node.fn) ? OPS[node.fn][i] : (fdef(node.fn).v ? fdef(node.fn).p[0] + (i + 1) : fdef(node.fn).p[i]);
   const slotRequired = (node, i) => isOp(node.fn) ? true : fdef(node.fn).v ? i === 0 : !(fdef(node.fn).opt && i >= fdef(node.fn).p.length - fdef(node.fn).opt);
@@ -424,7 +424,7 @@ export const DFD = (() => {
         if (n.kind === 'fn') for (let i = 0; i < cnt; i++) {
           const q = slotPos(n, i, cnt), full = model.edges.some(e => e.to === n.id && e.slot === i);
           const wiring = !!(connectFrom || (drag && drag.mode === 'wire'));
-          ns += `<g class="slot${full ? ' full' : ''}${slotRequired(n, i) ? '' : ' opt'}${wiring && !full ? ' target' : ''}" data-slot="${i}" transform="translate(${q.x - n.x},${q.y - n.y})"><circle r="16" class="slot-hit"/>${wiring && !full ? '<circle r="11" class="ring"/>' : ''}${full ? '' : '<circle r="4.5" class="slot-dot"/>'}<text x="-11" y="-6">${i + 1}</text></g>`;
+          ns += `<g class="slot${full ? ' full' : ''}${slotRequired(n, i) ? '' : ' opt'}${wiring && !full ? ' target' : ''}" data-slot="${i}" transform="translate(${q.x - n.x},${q.y - n.y})"><circle r="16" class="slot-hit"/>${wiring && !full ? '<circle r="11" class="ring"/>' : ''}${full ? '' : '<circle r="4.5" class="slot-dot"/>'}<text x="-11" y="-6">${i + 1}${fdef(n.fn).v && !isOp(n.fn) && i === cnt - 1 ? '…' : ''}</text></g>`;
         }
         if (canOut(n) && (sel === n.id || connectFrom === n.id)) {
           const p = outPos(n), hy = p.y - n.y + (n.kind === 'split' ? 12 : 4);
