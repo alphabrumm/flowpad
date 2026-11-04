@@ -320,7 +320,7 @@ export const DFD = (() => {
     root.innerHTML = `
       <div class="dfd-palette" role="toolbar" aria-label="Bausteine">
         <button type="button" class="dfd-pal" data-add="in" title="Eingabe: eine Zelle oder ein Bereich der Tabelle"><span class="sym-rect"></span>Eingabe</button>
-        <button type="button" class="dfd-pal" data-add="const" title="Konstante: eine feste Zahl oder ein Text"><span class="sym-const">2</span>Konstante</button>
+        <button type="button" class="dfd-pal" data-add="const" title="Konstante: eine feste Zahl oder ein Text"><span class="sym-const">#</span>Konstante</button>
         <button type="button" class="dfd-pal" data-add="fn" title="Funktion oder Rechenzeichen (Ellipse)"><span class="sym-ell"></span>Funktion</button>
         <button type="button" class="dfd-pal" data-add="split" title="Verteiler: gibt ein Datum an mehrere Funktionen weiter"><span class="sym-dot"></span>Verteiler</button>
         <button type="button" class="dfd-pal" data-add="out" title="Ausgabe: die Zelle, in der das Ergebnis steht"><span class="sym-rect out"></span>Ausgabe</button>
