@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 // Was zur App gehört (alles andere – tools/, .github/, Doku – bleibt draußen)
-const APP = ['index.html', 'css', 'js', 'fonts', 'learn', 'icon.svg', 'icon-180.png', 'icon-192.png', 'icon-512.png', 'manifest.webmanifest'];
+const APP = ['index.html', 'css', 'js', 'fonts', 'learn', 'icon.svg', 'icon-180.png', 'icon-192.png', 'icon-512.png', 'favicon.ico', 'favicon-32.png', 'manifest.webmanifest'];
 const out = path.resolve(process.argv[2] || path.join(root, 'dist'));
 const KLASSEN = [9, 10, 11, 12, 13];
 const ALPHABET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
