@@ -9,7 +9,7 @@
 | rechts | Lernpfad (nur, wenn das Projekt einen hat). Breiter/schmaler und „nur Lernpfad“ über die Knöpfe im Kopf. |
 | unten (iPad hochkant, Handy) | Umschalten zwischen Lernpfad, Tabelle und Diagramm. |
 
-Trennlinie zwischen Tabelle und Diagramm lässt sich ziehen (wird gemerkt).
+Trennlinie zwischen Tabelle und Diagramm lässt sich ziehen (wird gemerkt). Ist der Lernpfad eingeklappt (Knopf rechts oben im Lernpfad), steht das Diagramm rechts neben der Tabelle; die senkrechte Trennlinie wird ebenfalls gemerkt.
 
 **Reiter:** Ein Projekt kann mehrere Tabellen haben – jede mit ihren eigenen Diagrammen. Die Reiter stehen oben in der Menüleiste;
 „+“ legt eine neue Tabelle an, Antippen des aktiven Reiters öffnet Umbenennen, Löschen und (bei Tabellen aus dem Lernpfad) „Neu aus dem Lernpfad laden“.
@@ -109,7 +109,7 @@ Lehrkraft alle Codes mit Links, doppelte rot) oder die beim Bauen erzeugte `lear
 
 | Datei | Aufgabe |
 |---|---|
-| `index.html`, `css/style.css` | Oberfläche, Themes (Werkstatt mit Bananengelb, Standard, Hacker; hell/dunkel) |
+| `index.html`, `css/style.css` | Oberfläche, Themes (Werkstatt mit Gold, Standard, Hacker; hell/dunkel) |
 | `js/engine.js` | MiniCalc: Tabellenkalkulation mit deutschen Funktionen (aus der DFD-Werkstatt) |
 | `js/dfd.js` | DFD: Katalog, Formel ↔ Diagramm, Layout, Regeln, Vergleich, Zeichenfläche |
 | `js/handbuch.js` | Handbuch der Funktionen (fx-Knopf) mit Beispielen |

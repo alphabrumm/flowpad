@@ -12,9 +12,9 @@
   --split: .45;
   /* Werkstatt hell */
   --bg: #eef3f9; --surface: #ffffff; --surface-2: #e3ebf5; --ink: #142235; --ink-2: #546a84; --line: #c9d6e6;
-  --bar: #ffffff; --bar-ink: #142235; --bar-2: #f1f4f8; --acc: #ffd21f; --acc-ink: #2b2300; --glow: #ffe135; --stripe: #c43fd3;
+  --bar: #ffffff; --bar-ink: #142235; --bar-2: #f1f4f8; --acc: #f2b01e; --acc-ink: #2e1f00; --glow: #f6bf3a; --stripe: transparent;
   --blue: #2a6fd6; --blue-soft: #dfeaff; --sun: #ffc23d; --sun-soft: #fff1c9;
-  --good: #1f8a45; --bad: #c23b3b; --warn: #a86400; --next: #ffe98a; --next-edge: #e8b800;
+  --good: #1f8a45; --bad: #c23b3b; --warn: #a86400; --next: #fde3a1; --next-edge: #d99a0b;
   --r0: #2a6fd6; --r1: #d63a3a; --r2: #8a3bc9; --r3: #1f8f55; --r4: #e07a12; --r5: #128a9a;
   --c-canvas: #ffffff; --c-dots: #d5dfec; --c-ink: #1c2533; --c-edge: #33415a; --c-sel: #e07a12;
   --c-in-fill: #e6efff; --c-in-stroke: #2a6fd6; --c-in-ink: #14315a;
@@ -24,8 +24,8 @@
 }
 :root[data-effective="dark"] {
   --bg: #0d1626; --surface: #142036; --surface-2: #1b2a45; --ink: #e8f0fa; --ink-2: #a5b7cc; --line: #2a3d5c;
-  --bar: #070d18; --bar-ink: #dfe9f7; --bar-2: #101b2e; --acc: #ffd21f; --acc-ink: #2b2300; --glow: #ffe135; --stripe: #d65ae0; --blue: #7fb0ff; --blue-soft: #1b2f52; --sun-soft: #3d331a;
-  --good: #6fd08b; --bad: #ff8a8a; --warn: #ffb35c; --next: #4d3f05; --next-edge: #ffd21f;
+  --bar: #070d18; --bar-ink: #dfe9f7; --bar-2: #101b2e; --acc: #f2b01e; --acc-ink: #2e1f00; --glow: #f6bf3a; --stripe: transparent; --blue: #7fb0ff; --blue-soft: #1b2f52; --sun-soft: #3d331a;
+  --good: #6fd08b; --bad: #ff8a8a; --warn: #ffb35c; --next: #4a3507; --next-edge: #f2b01e;
   --r0: #7fb0ff; --r1: #ff8a8a; --r2: #d0a3ff; --r3: #6fd08b; --r4: #ffb35c; --r5: #6fd6e0;
   --c-canvas: #101a2c; --c-dots: #24344f; --c-ink: #e8f0fa; --c-edge: #a9bad2; --c-sel: #ffa040;
   --c-in-fill: #17305a; --c-in-stroke: #7fb0ff; --c-in-ink: #dbe8ff;
@@ -68,6 +68,7 @@ code { font-family: var(--font-code); font-size: .9em; background: var(--surface
 /* ---------- Kopfzeile ---------- */
 .topbar { display: flex; align-items: center; gap: 4px; padding: 2px max(8px, env(safe-area-inset-right)) 2px max(8px, env(safe-area-inset-left));
   padding-top: max(2px, env(safe-area-inset-top)); background: var(--bar); color: var(--bar-ink); border-bottom: 3px solid var(--stripe, var(--glow)); min-height: 40px; }
+:root[data-skin="werkstatt"] .topbar { border-bottom: 0; }
 .topbar .iconbtn { min-width: 38px; min-height: 36px; }
 .topbar .ic { width: 19px; height: 19px; }
 .topbar .btn { min-height: 32px; padding: 0 10px; font-size: .92em; }
@@ -308,7 +309,7 @@ button.taskbadge { cursor: pointer; font: inherit; font-size: .8em; font-weight:
 .skin-picker button { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 4px; border: 2px solid var(--line); border-radius: 8px; background: var(--surface); cursor: pointer; font-size: .85em; }
 .skin-picker button.active { border-color: var(--acc); font-weight: 700; }
 .skin-swatch { width: 42px; height: 20px; border-radius: 4px; border: 1px solid var(--line); }
-.skin-werkstatt .skin-swatch { background: linear-gradient(90deg, #0f1a2b 50%, #ffe135 50%); }
+.skin-werkstatt .skin-swatch { background: linear-gradient(90deg, #0f1a2b 50%, #f6bf3a 50%); }
 .skin-standard .skin-swatch { background: linear-gradient(90deg, #f4f5f7 50%, #2f5be0 50%); }
 .skin-hacker .skin-swatch { background: linear-gradient(90deg, #000 50%, #00ff9c 50%); }
 .setting-row { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
@@ -416,3 +417,8 @@ button.taskbadge { cursor: pointer; font: inherit; font-size: .8em; font-weight:
 .dfd-edit input.f-cell { width: 5.2em; }
 .dfd-edit input.f-name { width: 8.5em; }
 .dfd-field { gap: 4px; }
+
+/* Lernpfad eingeklappt: Diagramm rechts neben der Tabelle (senkrechte Teilung) */
+body.lp-collapsed[data-layout="wide"] .left { grid-template-rows: 1fr; grid-template-columns: minmax(260px, calc(var(--vsplit, .5) * (100% - 14px))) 14px minmax(300px, 1fr); }
+body.lp-collapsed[data-layout="wide"] .splitter { cursor: col-resize; border-block: 0; border-inline: 1px solid var(--line); }
+body.lp-collapsed[data-layout="wide"] .splitter span { width: 5px; height: 54px; }

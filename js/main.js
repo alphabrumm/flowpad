@@ -398,6 +398,7 @@ function applyLayout() {
     cb.querySelector('path:last-child').setAttribute('d', collapsed ? 'M11 9l-3 3 3 3' : 'M8 9l3 3-3 3');
     const ratio = +pref.get('split', '0.45');
     document.documentElement.style.setProperty('--split', String(Math.max(0.2, Math.min(0.8, ratio))));
+    document.documentElement.style.setProperty('--vsplit', String(Math.max(0.25, Math.min(0.75, +pref.get('vsplit', '0.5')))));
     setTimeout(() => editor.fit(), 30);
 }
 window.addEventListener('resize', () => applyLayout());
@@ -410,8 +411,19 @@ $('#lpPane').addEventListener('click', () => { if (document.body.classList.conta
 (() => {
     const sp = $('#splitter'); let drag = null;
     sp.addEventListener('pointerdown', e => { e.preventDefault(); drag = { y0: e.clientY, h: $('#left').getBoundingClientRect() }; sp.setPointerCapture(e.pointerId); sp.classList.add('active'); });
-    sp.addEventListener('pointermove', e => { if (!drag) return; const r = (e.clientY - drag.h.top) / drag.h.height; document.documentElement.style.setProperty('--split', String(Math.max(0.2, Math.min(0.8, r)))); });
-    const end = e => { if (!drag) return; drag = null; sp.classList.remove('active'); pref.set('split', getComputedStyle(document.documentElement).getPropertyValue('--split').trim()); editor.fit(); };
+    // senkrecht geteilt (Lernpfad eingeklappt): links/rechts ziehen, sonst oben/unten
+    const vertical = () => document.body.classList.contains('lp-collapsed') && document.body.dataset.layout === 'wide';
+    sp.addEventListener('pointermove', e => {
+        if (!drag) return;
+        if (vertical()) { const r = (e.clientX - drag.h.left) / drag.h.width; document.documentElement.style.setProperty('--vsplit', String(Math.max(0.25, Math.min(0.75, r)))); }
+        else { const r = (e.clientY - drag.h.top) / drag.h.height; document.documentElement.style.setProperty('--split', String(Math.max(0.2, Math.min(0.8, r)))); }
+    });
+    const end = e => {
+        if (!drag) return; drag = null; sp.classList.remove('active');
+        const cs = getComputedStyle(document.documentElement);
+        if (vertical()) pref.set('vsplit', cs.getPropertyValue('--vsplit').trim()); else pref.set('split', cs.getPropertyValue('--split').trim());
+        editor.fit();
+    };
     sp.addEventListener('pointerup', end); sp.addEventListener('pointercancel', end);
 })();
 
