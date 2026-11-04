@@ -424,7 +424,7 @@ export const DFD = (() => {
         if (n.kind === 'fn') for (let i = 0; i < cnt; i++) {
           const q = slotPos(n, i, cnt), full = model.edges.some(e => e.to === n.id && e.slot === i);
           const wiring = !!(connectFrom || (drag && drag.mode === 'wire'));
-          ns += `<g class="slot${full ? ' full' : ''}${slotRequired(n, i) ? '' : ' opt'}${wiring && !full ? ' target' : ''}" data-slot="${i}" transform="translate(${q.x - n.x},${q.y - n.y})"><circle r="16" class="slot-hit"/>${wiring && !full ? '<circle r="11" class="ring"/>' : ''}<text x="${full ? -11 : 0}" y="${full ? -4 : 5}">${i + 1}</text></g>`;
+          ns += `<g class="slot${full ? ' full' : ''}${slotRequired(n, i) ? '' : ' opt'}${wiring && !full ? ' target' : ''}" data-slot="${i}" transform="translate(${q.x - n.x},${q.y - n.y})"><circle r="16" class="slot-hit"/>${wiring && !full ? '<circle r="11" class="ring"/>' : ''}${full ? '' : '<circle r="4.5" class="slot-dot"/>'}<text x="-11" y="-6">${i + 1}</text></g>`;
         }
         if (canOut(n) && (sel === n.id || connectFrom === n.id)) {
           const p = outPos(n), hy = p.y - n.y + (n.kind === 'split' ? 12 : 4);

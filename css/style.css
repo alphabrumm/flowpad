@@ -422,3 +422,8 @@ button.taskbadge { cursor: pointer; font: inherit; font-size: .8em; font-weight:
 body.lp-collapsed[data-layout="wide"] .left { grid-template-rows: 1fr; grid-template-columns: minmax(260px, calc(var(--vsplit, .5) * (100% - 14px))) 14px minmax(300px, 1fr); }
 body.lp-collapsed[data-layout="wide"] .splitter { cursor: col-resize; border-block: 0; border-inline: 1px solid var(--line); }
 body.lp-collapsed[data-layout="wide"] .splitter span { width: 5px; height: 54px; }
+
+/* freier Eingang: kleiner Punkt auf dem Rand, Nummer außerhalb der Ellipse */
+.dfd .slot .slot-dot { fill: var(--c-canvas); stroke: var(--c-fn-stroke); stroke-width: 2; }
+.dfd .slot.opt .slot-dot { stroke-dasharray: 2 2; }
+.dfd .slot.target .slot-dot { display: none; }
