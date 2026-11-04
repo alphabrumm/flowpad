@@ -427,3 +427,28 @@ body.lp-collapsed[data-layout="wide"] .splitter span { width: 5px; height: 54px;
 .dfd .slot .slot-dot { fill: var(--c-canvas); stroke: var(--c-fn-stroke); stroke-width: 2; }
 .dfd .slot.opt .slot-dot { stroke-dasharray: 2 2; }
 .dfd .slot.target .slot-dot { display: none; }
+
+/* ---------- Ablauf (Datenfluss-Animation) ---------- */
+.dfd-flowbar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 5px 8px; background: var(--next); border-bottom: 2px solid var(--next-edge); }
+.dfd-flowbar .fb-title { font-family: var(--title-font); font-weight: 700; margin-right: 4px; }
+.dfd-flowbar .fbtn { min-height: 34px; padding: 0 10px; }
+.dfd-flowbar .fbtn[aria-pressed="true"] { background: var(--glow); border-color: var(--next-edge); }
+#btnFlow.active { background: var(--glow); border-color: var(--next-edge); }
+.dfd.is-flowing .dfd-palette { opacity: .45; pointer-events: none; }
+.dfd .flow-tag rect { fill: var(--glow); stroke: var(--next-edge); stroke-width: 2; }
+.dfd .flow-tag text { text-anchor: middle; font-size: 14px; font-weight: 800; fill: var(--acc-ink, #2e1f00); }
+.dfd .flow-tag.small rect { fill: var(--surface); stroke: var(--next-edge); }
+.dfd .flow-tag.small text { fill: var(--ink); font-size: 13px; }
+.dfd .flow-tag.err rect { fill: var(--bad); stroke: var(--bad); }
+.dfd .flow-tag.err text { fill: #fff; }
+.dfd .flow-tag.final { animation: flowpulse 1s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.dfd .flow-tag.final rect { stroke-width: 3; }
+@keyframes flowpulse { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
+.dfd .edge.flow-active { stroke: var(--next-edge); stroke-width: 3.4; }
+.dfd .node.flow-lit .shape { stroke-width: 3.6; filter: drop-shadow(0 0 6px color-mix(in srgb, var(--glow) 80%, transparent)); }
+.dfd .node.flow-busy .shape { stroke: var(--next-edge); stroke-dasharray: 6 4; }
+.dfd .node.flow-err .shape { stroke: var(--bad); fill: color-mix(in srgb, var(--bad) 15%, var(--c-canvas)); }
+.dfd .node.flow-done .shape { animation: flowglow 1s ease-in-out infinite; }
+@keyframes flowglow { 0%, 100% { stroke-width: 2.4; } 50% { stroke-width: 6; } }
+.dfd .flow-gear path { fill: var(--next-edge); stroke: var(--acc-ink, #2e1f00); stroke-width: 1.2; }
+.dfd .flow-gear .hole { fill: var(--c-canvas); }

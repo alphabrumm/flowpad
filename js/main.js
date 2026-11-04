@@ -148,6 +148,18 @@ const editor = DFD.Editor($('#dfd'), {
     labelOf,
     startPick(done, text) { if (layoutMode() !== 'wide') showView('tabelle'); grid.startPick(ref => { done(ref); if (layoutMode() !== 'wide') showView('diagramm'); }, text); },
     cancelPick: () => grid.cancelPick(),
+    /** Teilformel mit den Werten der Tabelle ausrechnen (Ablauf) */
+    evalTerm(t) {
+        const sh = new E.Sheet(project.sheet.rows, project.sheet.cols, Object.assign({}, project.sheet.cells, { __flow: t }));
+        const v = sh.value('__flow');
+        return { value: v, text: E.display(v), err: E.isErr(v) };
+    },
+    rangeValues(ref) {
+        const sh = new E.Sheet(project.sheet.rows, project.sheet.cols, project.sheet.cells);
+        try { return E.rangeCells(String(ref).replace(/\$/g, '')).map(a => E.display(sh.value(a), (project.sheet.fmt || {})[a])); } catch (e) { return []; }
+    },
+    onFlowState(on) { $('#btnFlow').classList.toggle('active', on); $('#btnFlow').querySelector('span').textContent = on ? 'Stopp' : 'Ablauf'; },
+    onFlowDone() { grid.setHot([cell]); setTimeout(() => grid.setHot([]), 1600); },
     /** Ausgabe des Diagramms soll in eine andere Zelle: Diagramm dorthin umziehen */
     async moveOutput(ref) {
         ref = String(ref).toUpperCase();
@@ -162,6 +174,7 @@ const editor = DFD.Editor($('#dfd'), {
     },
 });
 function showCell(a, keepMsg) {
+    if (editor.flowing) editor.stopFlow();
     cell = a;
     grid.cancelPick();
     const model = project.dfds[a] ? JSON.parse(JSON.stringify(project.dfds[a])) : { nodes: [], edges: [] };
@@ -257,6 +270,7 @@ $('#btnDfdClear').addEventListener('click', async () => {
     pushUndo(); delete project.dfds[cell]; touch(); grid.setMarks(new Set(Object.keys(project.dfds))); showCell(cell);
 });
 $('#dfdTask').addEventListener('click', () => { const t = project.tasks?.[cell]; if (t) editor.say(`<b>${esc(t.title || 'Aufgabe')}</b>${t.prompt ? ': ' + t.prompt : ''}`); });
+$('#btnFlow').addEventListener('click', () => editor.runFlow());
 $('#btnZoomIn').addEventListener('click', () => editor.zoomBy(1.2));
 $('#btnZoomOut').addEventListener('click', () => editor.zoomBy(1 / 1.2));
 $('#btnZoomFit').addEventListener('click', () => editor.fit());

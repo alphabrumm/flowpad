@@ -114,8 +114,10 @@ export const DFD = (() => {
     if (outs.length > 1) return { err: 'Nimm genau eine Ausgabe.' };
     const byId = Object.fromEntries(model.nodes.map(n => [n.id, n]));
     const into = (id, slot) => model.edges.find(e => e.to === id && e.slot === slot);
-    const used = new Set(); let missing = 0, cyc = false; const sub = {};
-    function ex(id, stack) {
+    const used = new Set(); let missing = 0, cyc = false; const sub = {}, terms = {};
+    // terms: Teilformel jedes Bausteins (für den Ablauf)
+    const ex = (id, stack) => { const r = ex0(id, stack); terms[id] = r.t; return r; };
+    function ex0(id, stack) {
       const n = byId[id]; used.add(id);
       if (stack.has(id)) { cyc = true; return { t: '?', p: 9 }; }
       stack = new Set(stack); stack.add(id);
@@ -141,7 +143,7 @@ export const DFD = (() => {
     }
     const r = ex(outs[0].id, new Set());
     const unused = model.nodes.filter(n => !used.has(n.id));
-    return { text: '=' + r.t, missing, cyc, unused, out: outs[0], sub };
+    return { text: '=' + r.t, missing, cyc, unused, out: outs[0], sub, terms };
   }
 
   // ---------------- Bewerten ----------------
@@ -325,7 +327,7 @@ export const DFD = (() => {
       </div>
       <div class="dfd-body"><div class="dfd-stage"><div class="dfd-edit" hidden></div><div class="dfd-canvas"><svg xmlns="http://www.w3.org/2000/svg" role="application" aria-label="Zeichenfläche für das Datenflussdiagramm">
         <defs><marker id="dfdArrow-${uid}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="arrowhead"/></marker></defs>
-        <g class="edges"></g><g class="nodes"></g><path class="rubber" fill="none" stroke-width="3" stroke-dasharray="6 5"/></svg>
+        <g class="edges"></g><g class="nodes"></g><g class="flow-layer"></g><path class="rubber" fill="none" stroke-width="3" stroke-dasharray="6 5"/></svg>
         <div class="dfd-empty" hidden></div></div></div></div>
       <div class="dfd-formula"><span>Formel des Diagramms:</span> <code></code></div>
       <div class="dfd-msg" aria-live="polite"></div>`;
@@ -402,6 +404,7 @@ export const DFD = (() => {
 
     // ---------- Zeichnen ----------
     function render() {
+      if (!flowing) { flowLayer.innerHTML = ''; if (flowBar && !flowBar.hidden) flowBar.hidden = true; }
       applyZoom();
       let es = '';
       model.edges.forEach((e, i) => {
@@ -558,6 +561,7 @@ export const DFD = (() => {
       return node;
     }
     svg.addEventListener('pointerdown', ev => {
+      if (flowing) return;
       const handle = ev.target.closest('[data-handle]'), g = ev.target.closest('.node'), edgeEl = ev.target.closest('[data-edge]');
       const p = pt(ev);
       if (connectFrom) {
@@ -616,6 +620,153 @@ export const DFD = (() => {
       };
     }
 
+    // ================= Ablauf: Werte fließen durch das Diagramm =================
+    const flowLayer = svg.querySelector('.flow-layer');
+    const flowBar = document.createElement('div'); flowBar.className = 'dfd-flowbar'; flowBar.hidden = true;
+    flowBar.innerHTML = `<span class="fb-title">Ablauf</span>
+      <button type="button" class="fbtn" data-fb="slower" title="Langsamer">🐢</button>
+      <button type="button" class="fbtn" data-fb="faster" title="Schneller">🐇</button>
+      <button type="button" class="fbtn" data-fb="step" aria-pressed="false" title="Schritt für Schritt">Schritt</button>
+      <button type="button" class="fbtn primary" data-fb="next" hidden>Weiter ›</button>
+      <button type="button" class="fbtn danger" data-fb="stop">■ Stopp</button>
+      <button type="button" class="fbtn primary" data-fb="again" hidden>▶ Nochmal</button>
+      <button type="button" class="fbtn" data-fb="close" hidden>✕ Fertig</button>`;
+    root.querySelector('.dfd-stage').prepend(flowBar);
+    let flowing = false, flowToken = 0, speed = 1, stepMode = false, stepWait = null;
+    const SVGNS = 'http://www.w3.org/2000/svg';
+    const mk = (tag, attrs, parent) => { const el = document.createElementNS(SVGNS, tag); for (const k in attrs) el.setAttribute(k, attrs[k]); (parent || flowLayer).appendChild(el); return el; };
+    const wait = ms => new Promise(res => setTimeout(res, ms / speed));
+    const alive = tok => flowing && tok === flowToken;
+    flowBar.addEventListener('click', e => {
+      const b = e.target.closest('[data-fb]'); if (!b) return;
+      const a = b.dataset.fb;
+      if (a === 'slower') speed = Math.max(0.25, speed / 1.6);
+      if (a === 'faster') speed = Math.min(5, speed * 1.6);
+      if (a === 'step') { stepMode = !stepMode; b.setAttribute('aria-pressed', String(stepMode)); if (!stepMode && stepWait) { const w = stepWait; stepWait = null; w(); } }
+      if (a === 'next' && stepWait) { const w = stepWait; stepWait = null; w(); }
+      if (a === 'stop') stopFlow();
+      if (a === 'again') { runFlow(); return; }
+      if (a === 'close') { flowBar.hidden = true; flowLayer.innerHTML = ''; render(); return; }
+      flowBar.querySelector('[data-fb=next]').hidden = !stepMode;
+    });
+    const short = (v, max = 14) => { const t = String(v); return t.length > max ? t.slice(0, max - 1) + '…' : t; };
+    function tag(x, y, text, cls, parent) {
+      const g = mk('g', { class: 'flow-tag ' + (cls || ''), transform: `translate(${x},${y})` }, parent);
+      const w = Math.max(26, [...String(text)].length * 9 + 14);
+      mk('rect', { x: -w / 2, y: -13, width: w, height: 26, rx: 13 }, g);
+      const t = mk('text', { y: 5 }, g); t.textContent = text;
+      return g;
+    }
+    function gear(x, y) {
+      const g = mk('g', { class: 'flow-gear', transform: `translate(${x},${y})` });
+      const inner = mk('g', {}, g);
+      let d = ''; const R = 11, r = 8, n = 8;
+      for (let i = 0; i < n * 2; i++) { const a = (i / (n * 2)) * Math.PI * 2, rr = i % 2 ? r : R; d += (i ? 'L' : 'M') + (Math.cos(a) * rr).toFixed(2) + ',' + (Math.sin(a) * rr).toFixed(2); }
+      mk('path', { d: d + 'Z' }, inner); mk('circle', { r: 3.4, class: 'hole' }, inner);
+      const start = performance.now();
+      (function spin(t) { if (!g.isConnected) return; inner.setAttribute('transform', `rotate(${((t - start) * 0.36 * speed) % 360})`); requestAnimationFrame(spin); })(start);
+      return g;
+    }
+    /** Schildchen entlang eines Pfeils laufen lassen */
+    function travel(edgeIdx, text, cls, tok) {
+      const path = gE.querySelectorAll('path.edge')[edgeIdx];
+      if (!path) return Promise.resolve();
+      const len = path.getTotalLength(), dur = Math.max(450, Math.min(1100, len * 4));
+      const g = tag(0, 0, text, cls); path.classList.add('flow-active');
+      const t0 = performance.now();
+      return new Promise(res => {
+        (function step(now) {
+          if (!alive(tok)) { g.remove(); return res(); }
+          const k = Math.min(1, ((now - t0) * speed) / dur), e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+          const p = path.getPointAtLength(e * len); g.setAttribute('transform', `translate(${p.x},${p.y})`);
+          if (k < 1) requestAnimationFrame(step); else { g.remove(); path.classList.remove('flow-active'); res(); }
+        })(t0);
+      });
+    }
+    function barState(done) {
+      ['slower', 'faster', 'step', 'stop'].forEach(k => flowBar.querySelector(`[data-fb=${k}]`).hidden = done);
+      flowBar.querySelector('[data-fb=next]').hidden = done || !stepMode;
+      ['again', 'close'].forEach(k => flowBar.querySelector(`[data-fb=${k}]`).hidden = !done);
+      flowBar.querySelector('.fb-title').textContent = done ? 'Ablauf fertig' : 'Ablauf';
+    }
+    function stopFlow() {
+      flowing = false; flowToken++; flowBar.hidden = true; flowLayer.innerHTML = ''; root.classList.remove('is-flowing');
+      if (stepWait) { const w = stepWait; stepWait = null; w(); }
+      if (host.onFlowState) host.onFlowState(false);
+    }
+    /** Ablauf starten. Liefert false, wenn das Diagramm nicht vollständig ist. */
+    async function runFlow() {
+      if (flowing) { stopFlow(); return true; }
+      const f = formula(model);
+      if (f.err || f.missing || f.cyc) { say('✗ ' + (f.err || (f.cyc ? 'Das Diagramm enthält einen Kreis.' : 'Erst alle Pfeile verbinden – dann kann der Ablauf starten.')), 'bad'); return false; }
+      sel = null; edgeSel = null; connectFrom = null; render();
+      flowBar.hidden = false; barState(false); fit();
+      flowing = true; const tok = ++flowToken; root.classList.add('is-flowing'); flowBar.hidden = false;
+      flowBar.querySelector('[data-fb=next]').hidden = !stepMode;
+      if (host.onFlowState) host.onFlowState(true);
+      flowLayer.innerHTML = '';
+      const used = model.nodes.filter(n => f.terms[n.id] !== undefined);
+      const inEdges = id => model.edges.filter(e => e.to === id);
+      const val = {}, disp = {};
+      // Werte berechnen
+      used.forEach(n => {
+        if (n.kind === 'in' && !/:/.test(n.ref || '')) { const one = host.rangeValues(n.ref)[0] ?? ''; val[n.id] = one; disp[n.id] = short(one === '' ? 'leer' : one); return; }
+        if (n.kind === 'in' && /:/.test(n.ref || '')) { const list = host.rangeValues(n.ref); val[n.id] = list; disp[n.id] = short(list.filter(x => x !== '').join('; ') || 'leer', 16); return; }
+        const v = host.evalTerm('=' + f.terms[n.id]);
+        val[n.id] = v.value; disp[n.id] = short(v.text === '' ? 'leer' : v.text); if (v.err) disp[n.id + 'err'] = true;
+      });
+      // Ebenen: Quellen zuerst, jede Ellipse sobald alle Eingänge da sind
+      const level = {};
+      const lv = id => { if (level[id] !== undefined) return level[id]; const ins = inEdges(id); level[id] = ins.length ? Math.max(...ins.map(e => lv(e.from))) + 1 : 0; return level[id]; };
+      used.forEach(n => lv(n.id));
+      const maxL = Math.max(...Object.values(level));
+      const edgeIndex = e => model.edges.indexOf(e);
+      const badge = (n, text, err) => {
+        const s0 = size(n);
+        if (n.kind === 'split') return tag(n.x + 26, n.y - 18, text, 'small' + (err ? ' err' : ''));
+        if (n.kind === 'out') return null;
+        if (n.kind === 'in' || n.kind === 'const') return tag(n.x, n.y - s0.h / 2 - 17, text, 'small' + (err ? ' err' : ''));
+        return tag(n.x + s0.w / 2 + 8 + Math.max(26, [...text].length * 9 + 14) / 2, n.y, text, 'small' + (err ? ' err' : ''));
+      };
+      say('Die Werte aus der Tabelle fließen von oben nach unten durch das Diagramm …');
+      // Ebene 0: Eingaben und Konstanten leuchten auf
+      for (const n of used.filter(n => level[n.id] === 0)) {
+        const g = gN.querySelector(`.node[data-id="${n.id}"]`); g && g.classList.add('flow-lit');
+        if (n.kind !== 'const') badge(n, disp[n.id], disp[n.id + 'err']);
+      }
+      await wait(700);
+      for (let L = 1; L <= maxL; L++) {
+        if (!alive(tok)) return true;
+        if (stepMode) { say(`Schritt ${L} von ${maxL}: tippe auf <b>Weiter</b>.`); await new Promise(res => stepWait = res); if (!alive(tok)) return true; }
+        const nodes = used.filter(n => level[n.id] === L);
+        // Pakete laufen in die Bausteine dieser Ebene
+        await Promise.all(nodes.flatMap(n => inEdges(n.id).map(e => travel(edgeIndex(e), disp[e.from], disp[e.from + 'err'] ? 'err' : '', tok))));
+        if (!alive(tok)) return true;
+        // Ellipsen arbeiten: Zahnrad unter der Ellipse
+        const fns = nodes.filter(n => n.kind === 'fn');
+        const gears = fns.map(n => { gN.querySelector(`.node[data-id="${n.id}"]`)?.classList.add('flow-busy'); return gear(n.x, n.y + size(n).h / 2 + 15); });
+        if (fns.length) await wait(1000);
+        gears.forEach(g => g.remove());
+        for (const n of nodes) {
+          const g = gN.querySelector(`.node[data-id="${n.id}"]`);
+          const source = disp[n.id + 'err'] && n.kind === 'fn' && !inEdges(n.id).some(e => disp[e.from + 'err']);
+          if (g) { g.classList.remove('flow-busy'); g.classList.add('flow-lit'); if (source) g.classList.add('flow-err'); }
+          if (n.kind === 'out') {
+            g && g.classList.add('flow-done');
+            const s0 = size(n), tw = Math.max(26, [...disp[n.id]].length * 9 + 14); tag(n.x + s0.w / 2 + 10 + tw / 2, n.y, disp[n.id], 'final' + (disp[n.id + 'err'] ? ' err' : ''));
+          } else badge(n, disp[n.id], disp[n.id + 'err']);
+        }
+        if (fns.length) await wait(350);
+      }
+      if (!alive(tok)) return true;
+      const out = used.find(n => n.kind === 'out');
+      say(disp[out.id + 'err'] ? `Ergebnis: <b>${esc(disp[out.id])}</b> – an der rot markierten Ellipse entsteht der Fehler.` : `Ergebnis: <b>${esc(disp[out.id])}</b> kommt in der Ausgabe an.`, disp[out.id + 'err'] ? 'bad' : 'good');
+      if (host.onFlowDone) host.onFlowDone(out);
+      flowing = false; barState(true); root.classList.remove('is-flowing');
+      if (host.onFlowState) host.onFlowState(false);
+      return true;
+    }
+
     return {
       /** Diagramm anzeigen. info: { outRef, emptyHtml } */
       setModel(m, info) {
@@ -632,6 +783,7 @@ export const DFD = (() => {
       getModel: () => model,
       formula: () => formula(model),
       render, say, fit, zoomBy,
+      runFlow, stopFlow, get flowing() { return flowing; },
       clearSelection() { sel = null; edgeSel = null; connectFrom = null; render(); },
     };
   }

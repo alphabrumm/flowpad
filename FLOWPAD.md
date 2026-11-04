@@ -27,6 +27,9 @@ wenn es keinen gibt, aus der Beschriftung links in derselben Zeile. `$`-Bezüge 
 * **Formel → DFD** – zeichnet das Diagramm zur Formel der Zelle (gleiche Teilausdrücke werden nur einmal berechnet und verteilt).
 * **DFD → Zelle** – schreibt die Formel des Diagramms in die Ausgabezelle und rechnet. Die Ausgabezelle lässt sich am Ausgabe-Baustein ändern („Ausgabe in“: Zelle eintippen oder ▦ und antippen) – das Diagramm zieht dann in diese Zelle um. Stand vorher eine andere Formel in der Zelle,
   vergleicht FlowPad beide und meldet, ob sie gleich rechnen (Rückgängig mit ↶).
+* **Ablauf** – die Werte aus der Tabelle fließen Schritt für Schritt durch das Diagramm: Eingaben leuchten mit ihrem Wert auf, Wertschildchen laufen
+  die Pfeile entlang, unter jeder Ellipse dreht sich kurz ein Zahnrad, dann kommt das Zwischenergebnis heraus; am Ende pulsiert das Ergebnis an der Ausgabe.
+  Langsamer/schneller, „Schritt“ (eine Ebene pro Tipp, gut am Beamer), Stopp. Ein Fehler wie #DIV/0! wird rot, die Ellipse, an der er entsteht, ist markiert.
 * **Prüfen** – Regeln der Notation (fehlende Pfeile, Verteiler mit nur einem Ausgang, doppelte Eingaben, doppelt berechnete Funktionen),
   dann Vergleich mit der Aufgabe bzw. mit der Formel in der Zelle.
 
