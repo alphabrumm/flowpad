@@ -1839,7 +1839,7 @@ if (typeof module !== 'undefined') module.exports = DFD;
       + '<div class="fpa-row"><button type="button" class="fbtn fpa-go" data-a="load">' + GORI + 'Tabelle links in FlowPad laden</button>'
       + (canCheck ? '<button type="button" class="fbtn primary" data-a="check">Prüfen</button>' : '')
       + '<span class="fpa-state"></span></div>'
-      + '<p class="fpa-note">Du arbeitest links in der Tabelle von FlowPad. ' + (canCheck ? 'Mit <b>Prüfen</b> schaut der Lernpfad nach, ob alles stimmt.' : 'Probiere dort alles aus.') + ' Tipp: Mit <b>Formel → DFD</b> siehst du zu jeder Formel das Datenflussdiagramm.</p></div>'
+      + '<p class="fpa-note">Du arbeitest links in der Tabelle von FlowPad. ' + (canCheck ? 'Mit <b>Prüfen</b> schaut der Lernpfad nach, ob alles stimmt.' : 'Probiere dort alles aus.') + ' Tipp: Mit <b><i>fx</i> → DFD</b> siehst du zu jeder Formel das Datenflussdiagramm.</p></div>'
       + '<div class="calc-foot"><div class="calc-msg" aria-live="polite"></div></div>';
     var msg = el.querySelector('.calc-msg');
     var say = function (t, cls) { msg.className = 'calc-msg' + (cls ? ' ' + cls : ''); msg.innerHTML = t; };

@@ -6,6 +6,7 @@ import E from './engine.js';
 import DFD from './dfd.js';
 import { Grid } from './grid.js';
 import { openHandbuch } from './handbuch.js';
+import { initTips } from './tips.js';
 import * as Store from './store.js';
 import { readLernpfadFile, loadLernpfadUrl, withBridge, titleOf, nameFromUrl } from './lernpfad.js';
 import { normalizeCode, codeFormatError, resolveCode, codeOfUrl, loadLearnIndex } from './flowcode.js';
@@ -158,7 +159,11 @@ const editor = DFD.Editor($('#dfd'), {
         const sh = new E.Sheet(project.sheet.rows, project.sheet.cols, project.sheet.cells);
         try { return E.rangeCells(String(ref).replace(/\$/g, '')).map(a => E.display(sh.value(a), (project.sheet.fmt || {})[a])); } catch (e) { return []; }
     },
-    onFlowState(on) { $('#btnFlow').classList.toggle('active', on); $('#btnFlow').querySelector('span').textContent = on ? 'Stopp' : 'Ablauf'; },
+    onFlowState(on) {
+        const b = $('#btnFlow'); b.classList.toggle('active', on);
+        b.querySelector('path').setAttribute('d', on ? 'M7 7h10v10H7z' : 'M8 5v14l11-7z');
+        b.title = on ? 'Ablauf stoppen' : 'Ablauf: die Werte fließen durch das Diagramm'; b.setAttribute('aria-label', on ? 'Ablauf stoppen' : 'Ablauf');
+    },
     onFlowDone() { grid.setHot([cell]); setTimeout(() => grid.setHot([]), 1600); },
     /** Ausgabe des Diagramms soll in eine andere Zelle: Diagramm dorthin umziehen */
     async moveOutput(ref) {
@@ -183,7 +188,7 @@ function showCell(a, keepMsg) {
     const raw = project.sheet.cells[a], isF = typeof raw === 'string' && raw.trim().startsWith('=');
     editor.setModel(model, {
         outRef: a,
-        emptyHtml: isF ? `In <b>${esc(a)}</b> steht eine Formel. Tippe auf <b>Formel → DFD</b>, dann entsteht das Datenflussdiagramm.`
+        emptyHtml: isF ? `In <b>${esc(a)}</b> steht eine Formel. Tippe auf <b><i>fx</i> → DFD</b>, dann entsteht das Datenflussdiagramm.`
             : `Baue hier das Datenflussdiagramm für <b>${esc(a)}</b>: Bausteine oben antippen, verbinden, dann <b>DFD → Zelle</b>.`,
     });
     updateCellInfo();
@@ -641,6 +646,8 @@ async function teacherList() {
     });
 }
 on('#drawerTeacher', teacherList);
+
+initTips($('#btnBulb'));
 
 // ================= Start =================
 async function start() {

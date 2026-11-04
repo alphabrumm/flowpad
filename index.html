@@ -32,6 +32,7 @@
     <div id="tabs" class="tabs" role="tablist" aria-label="Tabellen"></div>
     <button id="btnUndo" class="iconbtn" title="Rückgängig" aria-label="Rückgängig" disabled><svg class="ic" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button>
     <button id="btnRedo" class="iconbtn" title="Wiederholen" aria-label="Wiederholen" disabled><svg class="ic" viewBox="0 0 24 24"><path d="M15 14l5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg></button>
+    <button id="btnBulb" class="iconbtn bulb" title="Tipp: Finger etwa eine Sekunde auf einen Knopf legen – dann wird er erklärt" aria-label="Tipp zur Hilfe"><svg class="ic" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/></svg></button>
     <button id="btnSave" class="btn download" title="Projekt als Datei sichern"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg><span class="hide-narrow">Sichern</span></button>
 </header>
 
@@ -45,10 +46,10 @@
             <div class="dfd-head">
                 <div class="dfd-cellinfo"><span class="cellbadge" id="dfdCell">A1</span><span id="dfdCellName" class="cellname"></span><button id="dfdTask" class="taskbadge" type="button" hidden title="Aufgabe noch einmal anzeigen">Aufgabe</button></div>
                 <div class="dfd-actions">
-                    <button id="btnToDfd" class="btn" title="Aus der Formel der Zelle das Datenflussdiagramm zeichnen"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h7"/><path d="M4 9h5"/><path d="M15 4v10"/><path d="M11 10l4 4 4-4"/><ellipse cx="15" cy="19" rx="5" ry="2.5"/></svg><span>Formel → DFD</span></button>
-                    <button id="btnToCell" class="btn" title="Formel des Diagramms in die Zelle schreiben und ausrechnen"><svg class="ic" viewBox="0 0 24 24"><ellipse cx="9" cy="17" rx="5" ry="2.5"/><path d="M9 14V4"/><path d="M5 8l4-4 4 4"/><rect x="15" y="3" width="6" height="5"/></svg><span>DFD → Zelle</span></button>
-                    <button id="btnFlow" class="btn" title="Ablauf: die Werte fließen durch das Diagramm"><svg class="ic" viewBox="0 0 24 24"><path d="M7 5v14l11-7z" fill="currentColor"/></svg><span>Ablauf</span></button>
-                    <button id="btnCheck" class="btn primary" title="Regeln prüfen und mit der Formel bzw. der Aufgabe vergleichen"><svg class="ic" viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg><span>Prüfen</span></button>
+                    <button id="btnToDfd" class="btn" title="Aus der Formel der Zelle das Datenflussdiagramm zeichnen"><span class="fxlbl"><b><i>fx</i></b> → DFD</span></button>
+                    <button id="btnToCell" class="btn" title="Formel des Diagramms in die Zelle schreiben und ausrechnen"><span>DFD → Zelle</span></button>
+                    <button id="btnFlow" class="calc-tool" title="Ablauf: die Werte fließen durch das Diagramm" aria-label="Ablauf"><svg class="ic" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></button>
+                    <button id="btnCheck" class="calc-tool" title="Prüfen: Regeln und Rechnung des Diagramms kontrollieren" aria-label="Prüfen"><svg class="ic" viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
                     <span class="dfd-tools">
                         <button id="btnZoomOut" class="iconbtn small" title="Verkleinern" aria-label="Verkleinern">−</button>
                         <button id="btnZoomFit" class="iconbtn small" title="Einpassen" aria-label="Einpassen"><svg class="ic" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>

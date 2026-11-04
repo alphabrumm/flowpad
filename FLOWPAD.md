@@ -24,7 +24,7 @@ Eingaben heißen „Name (Zelle)“, z. B. **Preis (B2)**: Der Name kommt aus de
 wenn es keinen gibt, aus der Beschriftung links in derselben Zeile. `$`-Bezüge bleiben erhalten (`Satz ($B$6)`).
 
 ### Knöpfe im Diagramm
-* **Formel → DFD** – zeichnet das Diagramm zur Formel der Zelle (gleiche Teilausdrücke werden nur einmal berechnet und verteilt).
+* **fx → DFD** – zeichnet das Diagramm zur Formel der Zelle (gleiche Teilausdrücke werden nur einmal berechnet und verteilt).
 * **DFD → Zelle** – schreibt die Formel des Diagramms in die Ausgabezelle und rechnet. Die Ausgabezelle lässt sich am Ausgabe-Baustein ändern („Ausgabe in“: Zelle eintippen oder ▦ und antippen) – das Diagramm zieht dann in diese Zelle um. Stand vorher eine andere Formel in der Zelle,
   vergleicht FlowPad beide und meldet, ob sie gleich rechnen (Rückgängig mit ↶).
 * **Ablauf** – die Werte aus der Tabelle fließen Schritt für Schritt durch das Diagramm: Eingaben leuchten mit ihrem Wert auf, Wertschildchen laufen
@@ -39,6 +39,10 @@ der Formeln selbst (Grenzfälle wie `>=100` gegen `>100`). Bei vertauschten Eing
 Bausteine: Eingabe (danach Zelle oben antippen oder über einen Bereich ziehen), Konstante, Funktion (Katalog mit allen Funktionen der
 DFD-Werkstatt und Rechenzeichen), Verteiler, Ausgabe. Verbinden: Baustein antippen, am orangen Pfeil zum Ziel ziehen oder den Pfeil
 antippen und dann das Ziel. Ausgewählte Bausteine und Pfeile werden in der gelben Leiste bearbeitet und gelöscht.
+
+## Hilfe per langem Drücken
+
+Finger etwa eine Sekunde auf einen Knopf legen: Statt ihn auszulösen, erscheint eine Erklärung (bei den Rechenzeichen über der Tabelle mit Beispiel). Die Glühbirne oben links neben „Sichern“ weist darauf hin. Texte in `js/tips.js`.
 
 ## Projekte und Dateien
 

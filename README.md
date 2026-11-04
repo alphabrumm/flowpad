@@ -3,7 +3,7 @@
 FlowPad ist eine touchfreundliche Web-App für den Informatikunterricht (Informatik 9, LehrplanPLUS Bayern):
 **oben eine kleine Tabellenkalkulation, unten das Datenflussdiagramm (DFD) der gewählten Zelle, rechts ein Lernpfad.**
 
-* Formel → DFD: Zelle mit Formel antippen, „Formel → DFD“ zeichnet das Diagramm (Eingaben beschriftet wie „Preis (B2)“).
+* fx → DFD: Zelle mit Formel antippen, „fx → DFD“ zeichnet das Diagramm (Eingaben beschriftet wie „Preis (B2)“).
 * DFD → Zelle: Diagramm bauen, „Prüfen“ vergleicht es mit vielen Testwerten, „DFD → Zelle“ schreibt die Formel in die Zelle.
 * Lernpfade (HTML/ZIP) reisen in der Projektdatei mit und können FlowPad Aufgaben schicken.
 * FlowCodes (5 Zeichen) öffnen Lernprojekte, genau wie die JCodes von JPad.
