@@ -520,10 +520,11 @@ button, [role=button] { -webkit-touch-callout: none; -webkit-user-select: none; 
 .vt[aria-pressed="true"] { background: var(--glow); color: var(--acc-ink, #000); }
 .vt:disabled { opacity: .3; cursor: default; }
 .topsep { width: 1px; align-self: stretch; margin: 6px 4px; background: var(--line); }
-body:not([data-layout="wide"]) .viewtoggles, body:not([data-layout="wide"]) .topsep { display: none; }
+body[data-layout="narrow"] .viewtoggles, body[data-layout="narrow"] .topsep { display: none; }
+body:not([data-layout="wide"]) #tgLp { display: none; }
 /* Tabelle oder Diagramm ausgeblendet: der andere Bereich füllt die linke Seite */
-body.hide-grid[data-layout="wide"] #gridPane, body.hide-dfd[data-layout="wide"] #dfdPane,
-body.hide-grid[data-layout="wide"] #splitter, body.hide-dfd[data-layout="wide"] #splitter { display: none; }
-body.hide-grid[data-layout="wide"] .left, body.hide-dfd[data-layout="wide"] .left { grid-template-rows: 1fr !important; grid-template-columns: 1fr !important; }
+body.hide-grid:not([data-layout="narrow"]) #gridPane, body.hide-dfd:not([data-layout="narrow"]) #dfdPane,
+body.hide-grid:not([data-layout="narrow"]) #splitter, body.hide-dfd:not([data-layout="narrow"]) #splitter { display: none; }
+body.hide-grid:not([data-layout="narrow"]) .left, body.hide-dfd:not([data-layout="narrow"]) .left { grid-template-rows: 1fr !important; grid-template-columns: 1fr !important; }
 body.hide-left[data-layout="wide"] .left { display: none; }
 body.hide-left[data-layout="wide"] .lp-pane { flex: 1 1 auto; }

@@ -443,8 +443,11 @@ function applyLayout() {
     let showGrid = pref.get('showGrid', '1') === '1', showDfd = pref.get('showDfd', '1') === '1';
     if (!showGrid && !showDfd && !showLp) showGrid = showDfd = true;   // nie alles aus
     document.body.classList.toggle('lp-collapsed', wide && has && !showLp);
-    document.body.classList.toggle('hide-grid', wide && !showGrid);
-    document.body.classList.toggle('hide-dfd', wide && !showDfd);
+    // Tabelle/Diagramm ausblenden geht auch hochkant (iPad); nur am Handy gibt es je eine Ansicht
+    const side = mode !== 'narrow';
+    if (side && !wide && !showGrid && !showDfd) showGrid = showDfd = true;
+    document.body.classList.toggle('hide-grid', side && !showGrid);
+    document.body.classList.toggle('hide-dfd', side && !showDfd);
     document.body.classList.toggle('hide-left', wide && !showGrid && !showDfd);
     $('#tgGrid').setAttribute('aria-pressed', String(showGrid));
     $('#tgDfd').setAttribute('aria-pressed', String(showDfd));
@@ -469,12 +472,14 @@ function setViews(v) {
     if (g !== undefined) pref.set('showGrid', g ? '1' : '0');
     if (d !== undefined) pref.set('showDfd', d ? '1' : '0');
     if (l !== undefined && has) pref.set('lpCollapsed', l ? '0' : '1');
-    if (layoutMode() !== 'wide') { if (g === false && d) showView('diagramm'); else if (g) showView('tabelle'); }
+    if (layoutMode() === 'narrow') { if (g === false && d) showView('diagramm'); else if (g) showView('tabelle'); }
+    else if (layoutMode() === 'medium' && (g || d)) showView('tabelle');
     applyLayout();
 }
 /** Eine Ansicht sicher einblenden (z. B. Tabelle nach „DFD → Zelle“) */
 function ensureView(which) {
-    if (layoutMode() !== 'wide') { if (which === 'grid') showView('tabelle'); return; }
+    if (layoutMode() === 'narrow') { if (which === 'grid') showView('tabelle'); return; }
+    if (layoutMode() === 'medium' && view === 'lernpfad') showView('tabelle');
     const key = which === 'grid' ? 'showGrid' : 'showDfd';
     if (pref.get(key, '1') !== '1') { pref.set(key, '1'); applyLayout(); }
 }
@@ -483,7 +488,7 @@ function toggleView(which) {
     const has = !!project?.lernpfadHtml;
     const st = { grid: pref.get('showGrid', '1') === '1', dfd: pref.get('showDfd', '1') === '1', lp: has && pref.get('lpCollapsed', '0') !== '1' };
     st[which] = !st[which];
-    if (!st.grid && !st.dfd && !st.lp) { toast('Eine Ansicht bleibt immer sichtbar.'); return; }
+    if (!st.grid && !st.dfd && (!st.lp || layoutMode() !== 'wide')) { toast(layoutMode() === 'wide' ? 'Eine Ansicht bleibt immer sichtbar.' : 'Tabelle oder Diagramm bleibt immer sichtbar.'); return; }
     pref.set('showGrid', st.grid ? '1' : '0'); pref.set('showDfd', st.dfd ? '1' : '0'); if (has) pref.set('lpCollapsed', st.lp ? '0' : '1');
     applyLayout();
 }

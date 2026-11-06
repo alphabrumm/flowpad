@@ -9,7 +9,7 @@
 | rechts | Lernpfad (nur, wenn das Projekt einen hat). Breiter/schmaler und „nur Lernpfad“ über die Knöpfe im Kopf. |
 | unten (iPad hochkant, Handy) | Umschalten zwischen Lernpfad, Tabelle und Diagramm. |
 
-Trennlinie zwischen Tabelle und Diagramm lässt sich ziehen (wird gemerkt). **Ansichten-Schalter** (Querformat, oben links neben ↶): Tabelle, Diagramm und Lernpfad lassen sich einzeln ein- und ausblenden (gefüllt = sichtbar, eine Ansicht bleibt immer). Ist der Lernpfad ausgeblendet, steht das Diagramm rechts neben der Tabelle; die senkrechte Trennlinie wird ebenfalls gemerkt.
+Trennlinie zwischen Tabelle und Diagramm lässt sich ziehen (wird gemerkt). **Ansichten-Schalter** (oben links neben ↶): Tabelle, Diagramm und Lernpfad lassen sich einzeln ein- und ausblenden (gefüllt = sichtbar, eine Ansicht bleibt immer). Hochkant am iPad gibt es die Schalter für Tabelle und Diagramm; den Lernpfad erreicht man dort über die Leiste unten. Ist der Lernpfad ausgeblendet, steht das Diagramm rechts neben der Tabelle; die senkrechte Trennlinie wird ebenfalls gemerkt.
 
 **Reiter:** Ein Projekt kann mehrere Tabellen haben – jede mit ihren eigenen Diagrammen. Die Reiter stehen oben in der Menüleiste;
 „+“ legt eine neue Tabelle an, Antippen des aktiven Reiters öffnet Umbenennen, Löschen und (bei Tabellen aus dem Lernpfad) „Neu aus dem Lernpfad laden“.
