@@ -283,19 +283,68 @@ $('#btnDfdClear').addEventListener('click', async () => {
     pushUndo(); delete project.dfds[cell]; touch(); grid.setMarks(new Set(Object.keys(project.dfds))); showCell(cell);
 });
 /** Arbeitsauftrag aus dem Lernpfad fest über dem Diagramm, solange die Zelle gewählt ist (zweizeilig, Tippen klappt auf) */
+/* ---------- Auftragskarte: schwebend, frei verschiebbar ----------
+ * Erscheint rechts oben in der passenden Ansicht (Formel → Tabelle, sonst Diagramm),
+ * schmal und hochkant, damit sie wenig verdeckt. Am Griff oben lässt sie sich überall hinziehen. */
+const tbState = { key: null, moved: false, mini: false };
+function taskHome(t) {
+    const el = t && t.mode === 'formel' ? document.querySelector('#grid .calc-scroll') : $('#dfd');
+    const r = el && el.getBoundingClientRect();
+    return r && r.width > 40 && r.height > 40 ? r : null;
+}
+function clampTaskBar() {
+    const bar = $('#taskBar'); if (bar.hidden) return;
+    const w = bar.offsetWidth, h = bar.offsetHeight, vw = innerWidth, vh = innerHeight;
+    const x = Math.min(Math.max(4, bar.offsetLeft), vw - w - 4), y = Math.min(Math.max(4, bar.offsetTop), Math.max(4, vh - Math.min(h, 60)));
+    bar.style.left = x + 'px'; bar.style.top = y + 'px';
+}
+function placeTaskBar() {
+    const bar = $('#taskBar'); if (bar.hidden) return;
+    if (tbState.moved) { clampTaskBar(); return; }
+    const t = project && project.tasks?.[tbState.key ? tbState.key.split('|')[0] : cell], r = taskHome(t), w = bar.offsetWidth;
+    const x = r ? r.right - w - 10 : innerWidth - w - 12, y = r ? r.top + 10 : 60;
+    bar.style.left = Math.max(4, x) + 'px'; bar.style.top = Math.max(4, y) + 'px';
+    if (r) bar.style.maxHeight = Math.max(140, Math.min(innerHeight * 0.6, innerHeight - y - 10)) + 'px'; else bar.style.maxHeight = '';
+}
 function showTaskBar(t) {
     const bar = $('#taskBar');
     if (!t) { bar.hidden = true; bar.innerHTML = ''; return; }
-    // Formel-Aufgaben stehen über der Tabelle, Diagramm-Aufgaben über dem Diagramm
-    const home = t.mode === 'formel' ? document.querySelector('#grid .calc-preview') : $('#dfd');
-    if (home && bar.nextElementSibling !== home) home.before(bar);
-    bar.hidden = false; bar.classList.remove('open');
-    bar.classList.toggle('done', !!t.done);
+    const tc = Object.keys(project.tasks || {}).find(k => project.tasks[k] === t) || cell;
+    const key = tc + '|' + (t.mode || '') + '|' + (t.title || '');
+    if (key !== tbState.key) { tbState.key = key; tbState.moved = false; tbState.mini = false; }
+    bar.hidden = false;
+    bar.classList.toggle('done', !!t.done); bar.classList.toggle('mini', tbState.mini);
     const what = t.mode === 'formel' ? 'Formel' : t.mode === 'diagramm' ? 'Diagramm' : 'Aufgabe';
-    bar.innerHTML = `<span class="tb-ic" aria-hidden="true">${t.done ? '✓' : '🎯'}</span><div class="tb-text"><b>${esc(t.title || 'Aufgabe')}</b> <span class="tb-kind">${what} für ${esc(cell)}${t.done ? ' · geschafft' : ''}</span>${t.prompt ? '<br>' + t.prompt : ''}${t.hint && !t.done ? `<div class="tb-hint">💡 ${t.hint}</div>` : ''}</div><span class="tb-more" aria-hidden="true">▾</span>`;
-    requestAnimationFrame(() => { const tx = bar.querySelector('.tb-text'); bar.classList.toggle('more', !!tx && tx.scrollHeight > tx.clientHeight + 2); });
+    bar.innerHTML = `<div class="tb-grip" title="Ziehen zum Verschieben" aria-hidden="true"><span></span></div>`
+        + `<button type="button" class="tb-fold" aria-label="${tbState.mini ? 'Auftrag aufklappen' : 'Auftrag zuklappen'}">${tbState.mini ? '▾' : '▴'}</button>`
+        + `<div class="tb-head"><span class="tb-ic" aria-hidden="true">${t.done ? '✓' : '🎯'}</span><b>${esc(t.title || 'Aufgabe')}</b></div>`
+        + `<div class="tb-body"><div class="tb-kind">${what} für ${esc(tc)}${t.done ? ' · geschafft' : ''}</div>${t.prompt ? `<div class="tb-prompt">${t.prompt}</div>` : ''}${t.hint && !t.done ? `<div class="tb-hint">💡 ${t.hint}</div>` : ''}</div>`;
+    requestAnimationFrame(placeTaskBar);
 }
-$('#taskBar').addEventListener('click', () => { const b = $('#taskBar'); if (b.classList.contains('more') || b.classList.contains('open')) b.classList.toggle('open'); });
+(() => {
+    const bar = $('#taskBar'); let drag = null;
+    bar.addEventListener('click', ev => {
+        if (!ev.target.closest('.tb-fold')) return;
+        tbState.mini = !tbState.mini; const t = project.tasks?.[(tbState.key || '').split('|')[0]]; if (t) showTaskBar(t);
+    });
+    bar.addEventListener('pointerdown', ev => {
+        if (!ev.target.closest('.tb-grip, .tb-head')) return;
+        ev.preventDefault();
+        drag = { id: ev.pointerId, dx: ev.clientX - bar.offsetLeft, dy: ev.clientY - bar.offsetTop };
+        try { bar.setPointerCapture(ev.pointerId); } catch (e) { }
+        bar.classList.add('dragging');
+    });
+    bar.addEventListener('pointermove', ev => {
+        if (!drag || ev.pointerId !== drag.id) return;
+        tbState.moved = true;
+        bar.style.left = (ev.clientX - drag.dx) + 'px'; bar.style.top = (ev.clientY - drag.dy) + 'px'; clampTaskBar();
+    });
+    const end = ev => { if (drag && ev.pointerId === drag.id) { drag = null; bar.classList.remove('dragging'); } };
+    bar.addEventListener('pointerup', end); bar.addEventListener('pointercancel', end);
+    window.addEventListener('resize', () => requestAnimationFrame(placeTaskBar));
+    const ro = new ResizeObserver(() => placeTaskBar());
+    ['#gridPane', '#dfdPane', '#left'].forEach(s => { const el = document.querySelector(s); if (el) ro.observe(el); });
+})();
 $('#btnFlow').addEventListener('click', () => editor.runFlow());
 // Diagrammkopf: Passt er nicht in eine Zeile, zeigen „fx → DFD“ und „DFD → Zelle“ nur ihre Symbole
 (() => {
