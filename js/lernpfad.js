@@ -108,7 +108,7 @@ export function withBridge(html, state) {
         + `<script>(function(){var L=[],W={};window.FlowPad={inside:true,`
         + `send:function(action,data){var m={type:"flowpad",action:action};for(var k in data)m[k]=data[k];parent.postMessage(m,"*");},`
         + `getSheet:function(id){var r=String(Math.random()).slice(2);var me=this;return new Promise(function(ok,no){var t=setTimeout(function(){no(new Error("FlowPad antwortet nicht"));},4000);W[r]=function(m){clearTimeout(t);ok(m);};me.send("getSheet",{req:r,id:id});});},`
-        + `say:function(text,ok){this.send("say",{text:text,ok:ok});},sheet:function(d){this.send("sheet",d);},task:function(d){this.send("task",d);},select:function(c){this.send("select",{cell:c});},`
+        + `say:function(text,ok){this.send("say",{text:text,ok:ok});},sheet:function(d){this.send("sheet",d);},views:function(d){this.send("views",d);},task:function(d){this.send("task",d);},select:function(c){this.send("select",{cell:c});},`
         + `onResult:function(f){L.push(f);}};`
         + `window.addEventListener("message",function(e){var m=e.data;if(m&&m.type==="flowpad-sheet"&&W[m.req]){var f=W[m.req];delete W[m.req];f(m);return;}if(!m||m.type!=="flowpad-result")return;`
         + `document.querySelectorAll("[data-flowpad-cell]").forEach(function(el){if(el.getAttribute("data-flowpad-cell")===m.cell){el.classList.toggle("flowpad-ok",!!m.ok);el.classList.toggle("flowpad-bad",!m.ok);}});`

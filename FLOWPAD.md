@@ -94,6 +94,7 @@ Ohne eigenes Skript: Knöpfe mit `data-flowpad` (JSON).
 | `task` | `cell`, `target` (Musterformel), `title`, `prompt` (HTML), `mode` (`diagramm`, `formel` oder leer = beides), `dfd: "leer"` (vorhandenes Diagramm entfernen), `tests` (eigene Testbelegungen, z. B. `[{"B2":"Fatima"}]`), optional `cells` usw. wie bei `sheet`. |
 | `dfd` | `cell`, `term` – zeigt das Diagramm zu einer Formel (zum Lesen). |
 | `select` | `cell` |
+| `ansichten` | `tabelle`, `diagramm`, `lernpfad` (true/false) – blendet Ansichten ein/aus, damit sich Schüler auf eine Aufgabe konzentrieren. Auch als Feld `ansichten` bei `task` und `sheet`. „DFD → Zelle“ blendet die Tabelle immer wieder ein. |
 | `xlsx` | `name`, `data` (Base64 einer .xlsx) – lädt eine Excel-Vorlage in die Tabelle (bei mehreren Blättern das mit den meisten Zahlen/Formeln). |
 | `say` | `text`, `ok` (true/false) – kurze Rückmeldung links in FlowPad. |
 | `getSheet` | nur per Skript: `FlowPad.getSheet().then(s => …)` liefert `{ id, cells, rows, cols }`, damit der Lernpfad selbst prüfen kann. |

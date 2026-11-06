@@ -227,6 +227,7 @@ $('#btnToDfd').addEventListener('click', async () => {
     if (layoutMode() === 'narrow') showView('diagramm');
 });
 $('#btnToCell').addEventListener('click', () => {
+    ensureView('grid');
     const f = editor.formula(), model = editor.getModel();
     const err = DFD.ruleCheck(model, f);
     if (f.err || f.missing || f.cyc) { editor.say('✗ ' + (err || f.err), 'bad'); return; }
@@ -353,6 +354,7 @@ async function lernpfadAction(m) {
             switchTab(ex, start);
             toast(`„${esc(project.tabs[ex].name)}“ geöffnet – dein Stand ist noch da`);
             if (m.show && layoutMode() !== 'wide') showView('tabelle');
+        if (m.ansichten || m.views) setViews(m.ansichten || m.views); else if (m.show) ensureView('grid');
             return 'existing';
         }
         const maxR = Math.max(0, ...Object.keys(cells).map(a => (E.parseAddr(a) || { r: 0 }).r + 1)), maxC = Math.max(0, ...Object.keys(cells).map(a => (E.parseAddr(a) || { c: 0 }).c + 1));
@@ -362,6 +364,7 @@ async function lernpfadAction(m) {
         else addTab(tab, start);
         toast(`Neuer Reiter „${esc(tab.name)}“`);
         if (m.show && layoutMode() !== 'wide') showView('tabelle');
+        if (m.ansichten || m.views) setViews(m.ansichten || m.views); else if (m.show) ensureView('grid');
         return 'new';
     }
     if (m.action === 'task') {
@@ -374,6 +377,8 @@ async function lernpfadAction(m) {
         touch();
         grid.select(a);
         if (layoutMode() !== 'wide') showView(m.mode === 'formel' ? 'tabelle' : 'diagramm');
+        if (m.ansichten || m.views) setViews(m.ansichten || m.views);
+        else ensureView(m.mode === 'formel' ? 'grid' : 'dfd');
         return;
     }
     if (m.action === 'getSheet') {
@@ -405,6 +410,7 @@ async function lernpfadAction(m) {
         if (layoutMode() !== 'wide') showView('tabelle');
         return;
     }
+    if (m.action === 'views' || m.action === 'ansichten') { setViews(m); return; }
     if (m.action === 'select') { const a = String(m.cell || '').toUpperCase(); if (validCell(a)) { grid.select(a); if (layoutMode() !== 'wide') showView('tabelle'); } return; }
     if (m.action === 'dfd') {
         const a = String(m.cell || cell).toUpperCase(); if (!validCell(a)) return;
@@ -453,6 +459,25 @@ window.addEventListener('resize', () => applyLayout());
 document.querySelectorAll('#bottomnav [data-view]').forEach(b => b.addEventListener('click', () => showView(b.dataset.view)));
 $('#btnLpWide').addEventListener('click', () => { pref.set('lpWide', pref.get('lpWide', '0') === '1' ? '0' : '1'); applyLayout(); });
 $('#btnLpCollapse').addEventListener('click', e => { e.stopPropagation(); toggleView('lp'); });
+/**
+ * Ansichten setzen (z. B. vom Lernpfad): { tabelle, diagramm, lernpfad } – fehlende Angaben bleiben, wie sie sind.
+ * Im Hochformat wird zur passenden Ansicht gewechselt.
+ */
+function setViews(v) {
+    const has = !!project?.lernpfadHtml, pick = (...k) => { for (const x of k) if (typeof v[x] === 'boolean') return v[x]; return undefined; };
+    const g = pick('tabelle', 'grid'), d = pick('diagramm', 'dfd'), l = pick('lernpfad', 'lp');
+    if (g !== undefined) pref.set('showGrid', g ? '1' : '0');
+    if (d !== undefined) pref.set('showDfd', d ? '1' : '0');
+    if (l !== undefined && has) pref.set('lpCollapsed', l ? '0' : '1');
+    if (layoutMode() !== 'wide') { if (g === false && d) showView('diagramm'); else if (g) showView('tabelle'); }
+    applyLayout();
+}
+/** Eine Ansicht sicher einblenden (z. B. Tabelle nach „DFD → Zelle“) */
+function ensureView(which) {
+    if (layoutMode() !== 'wide') { if (which === 'grid') showView('tabelle'); return; }
+    const key = which === 'grid' ? 'showGrid' : 'showDfd';
+    if (pref.get(key, '1') !== '1') { pref.set(key, '1'); applyLayout(); }
+}
 /** Ansicht umschalten; mindestens eine bleibt sichtbar */
 function toggleView(which) {
     const has = !!project?.lernpfadHtml;
