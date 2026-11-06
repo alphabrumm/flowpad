@@ -124,7 +124,12 @@ function labelOf(ref) {
 }
 const grid = Grid($('#grid'), {
     getSheet: () => project.sheet,
-    commit(a, raw) { pushUndo(); setCell(a, raw); afterSheetChange(); checkFormulaTask(a); },
+    commit(a, raw) {
+        pushUndo(); setCell(a, raw); afterSheetChange();
+        // Aufgabenzelle: nach dem Prüfen auf der Zelle bleiben, solange sie nicht gelöst ist (sonst verschwinden Auftrag und Tipp)
+        const t = project.tasks?.[a];
+        if (t && t.target && t.mode !== 'diagramm') setTimeout(() => { checkFormulaTask(a); if (!t.done && grid.selected !== a) grid.select(a); if (lastTaskMsg) grid.say(lastTaskMsg.html, lastTaskMsg.cls); }, 0);
+    },
     setMany(map) { pushUndo(); Object.entries(map).forEach(([a, v]) => setCell(a, v)); afterSheetChange(); },
     onSelect(a) { showCell(a); },
     onFx() { openHandbuch(txt => grid.insertText(txt)); },
@@ -286,7 +291,7 @@ function showTaskBar(t) {
     bar.hidden = false; bar.classList.remove('open');
     bar.classList.toggle('done', !!t.done);
     const what = t.mode === 'formel' ? 'Formel' : t.mode === 'diagramm' ? 'Diagramm' : 'Aufgabe';
-    bar.innerHTML = `<span class="tb-ic" aria-hidden="true">${t.done ? '✓' : '🎯'}</span><div class="tb-text"><b>${esc(t.title || 'Aufgabe')}</b> <span class="tb-kind">${what} für ${esc(cell)}${t.done ? ' · geschafft' : ''}</span>${t.prompt ? '<br>' + t.prompt : ''}</div><span class="tb-more" aria-hidden="true">▾</span>`;
+    bar.innerHTML = `<span class="tb-ic" aria-hidden="true">${t.done ? '✓' : '🎯'}</span><div class="tb-text"><b>${esc(t.title || 'Aufgabe')}</b> <span class="tb-kind">${what} für ${esc(cell)}${t.done ? ' · geschafft' : ''}</span>${t.prompt ? '<br>' + t.prompt : ''}${t.hint && !t.done ? `<div class="tb-hint">💡 ${t.hint}</div>` : ''}</div><span class="tb-more" aria-hidden="true">▾</span>`;
     requestAnimationFrame(() => { const tx = bar.querySelector('.tb-text'); bar.classList.toggle('more', !!tx && tx.scrollHeight > tx.clientHeight + 2); });
 }
 $('#taskBar').addEventListener('click', () => { const b = $('#taskBar'); if (b.classList.contains('more') || b.classList.contains('open')) b.classList.toggle('open'); });
@@ -304,13 +309,31 @@ $('#btnZoomOut').addEventListener('click', () => editor.zoomBy(1 / 1.2));
 $('#btnZoomFit').addEventListener('click', () => editor.fit());
 
 /** Formel direkt in die Zelle geschrieben: mit einer Aufgabe vergleichen */
+/** Zahlenformat einer Zelle (fmt-Einträge dürfen Bereiche sein, z. B. „D2:E4“) */
+function fmtOf(a) { const f = project.sheet.fmt || {}; if (f[a]) return f[a]; for (const k in f) { try { if (k.includes(':') && E.rangeCells(k).includes(a)) return f[k]; } catch (e) { } } return undefined; }
+let lastTaskMsg = null;
 function checkFormulaTask(a) {
+    lastTaskMsg = null;
     const task = project.tasks?.[a], raw = project.sheet.cells[a];
-    if (!task || !task.target || !(typeof raw === 'string' && raw.trim().startsWith('='))) return;
-    if (task.mode === 'diagramm') return;
+    if (!task || !task.target || task.mode === 'diagramm') return;
+    const fmt = fmtOf(a);
+    // Erwartetes Ergebnis mit den Werten der Tabelle (für den Tipp)
+    const want = E.display(new E.Sheet(project.sheet.rows, project.sheet.cols, Object.assign({}, project.sheet.cells, { [a]: task.target })).value(a), fmt);
+    const tip = `Tipp: In ${a} soll mit den Werten der Tabelle <b>${esc(want)}</b> herauskommen.`;
+    if (!(typeof raw === 'string' && raw.trim().startsWith('='))) {
+        if (raw === undefined || raw === '') return;
+        task.hint = tip; showTaskBar(task); touch();
+        report(a, false, 'formel', raw);
+        lastTaskMsg = { html: `✗ In ${a} steht noch keine Formel. Eine Formel beginnt mit <b>=</b> – das Ergebnis selbst ausrechnen und eintippen gilt nicht.`, cls: 'bad' };
+        grid.say(`✗ In ${a} steht noch keine Formel. Eine Formel beginnt mit <b>=</b> – das Ergebnis selbst ausrechnen und eintippen gilt nicht.`, 'bad');
+        return;
+    }
     const res = DFD.compare(raw, task.target, ctxFor(a));
+    if (res.ok) delete task.hint; else task.hint = Object.keys(res.set || {}).length ? `Tipp: Mit den Werten der Tabelle stimmt es – aber nicht bei anderen Werten. ${testText(res)}: <b>${esc(E.display(res.a, fmt))}</b> statt <b>${esc(E.display(res.b, fmt))}</b>. Prüfe, ob du die richtigen Zellen verwendest.` : tip;
     report(a, res.ok, 'formel', raw);
-    grid.say(res.ok ? `✓ Richtig! <code>${esc(raw)}</code> rechnet wie verlangt.` : `✗ <code>${esc(raw)}</code> rechnet noch nicht wie verlangt. ${testText(res)}: <b>${esc(E.display(res.a))}</b> statt <b>${esc(E.display(res.b))}</b>.`, res.ok ? 'good' : 'bad');
+    showTaskBar(task);
+    lastTaskMsg = { html: res.ok ? `✓ Richtig! <code>${esc(raw)}</code> rechnet wie verlangt.` : `✗ <code>${esc(raw)}</code> rechnet noch nicht wie verlangt – oben in der Aufgabe steht ein Tipp.`, cls: res.ok ? 'good' : 'bad' };
+    grid.say(lastTaskMsg.html, lastTaskMsg.cls);
 }
 function report(a, ok, how, formula) {
     const t = project.tasks?.[a]; if (t) { t.done = t.done || ok; touch(); if (a === cell) { showTaskBar(t); editor.setFormulaHidden(t.mode === 'formel' && !t.done); } }

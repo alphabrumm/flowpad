@@ -105,14 +105,21 @@ export function withBridge(html, state) {
         + `var t=id?(document.getElementById(id)||document.getElementsByName(id)[0]):document.body;if(t)t.scrollIntoView({behavior:"smooth",block:"start"});return;}`
         + `if(/^(https?:|mailto:)/i.test(h)){if(!a.target){e.preventDefault();window.open(a.href,"_blank","noopener");}return;}`
         + `if(!/^(data:|blob:|javascript:)/i.test(h))e.preventDefault();},true);<\/script>`
-        + `<script>(function(){var L=[],W={};window.FlowPad={inside:true,`
+        + `<script>(function(){var L=[],W={},G={};try{G=JSON.parse(localStorage.getItem("flowpad-geschafft")||"{}")||{};}catch(x){}window.FlowPad={inside:true,`
         + `send:function(action,data){var m={type:"flowpad",action:action};for(var k in data)m[k]=data[k];parent.postMessage(m,"*");},`
         + `getSheet:function(id){var r=String(Math.random()).slice(2);var me=this;return new Promise(function(ok,no){var t=setTimeout(function(){no(new Error("FlowPad antwortet nicht"));},4000);W[r]=function(m){clearTimeout(t);ok(m);};me.send("getSheet",{req:r,id:id});});},`
         + `say:function(text,ok){this.send("say",{text:text,ok:ok});},sheet:function(d){this.send("sheet",d);},views:function(d){this.send("views",d);},task:function(d){this.send("task",d);},select:function(c){this.send("select",{cell:c});},`
         + `onResult:function(f){L.push(f);}};`
         + `window.addEventListener("message",function(e){var m=e.data;if(m&&m.type==="flowpad-sheet"&&W[m.req]){var f=W[m.req];delete W[m.req];f(m);return;}if(!m||m.type!=="flowpad-result")return;`
         + `document.querySelectorAll("[data-flowpad-cell]").forEach(function(el){if(el.getAttribute("data-flowpad-cell")===m.cell){el.classList.toggle("flowpad-ok",!!m.ok);el.classList.toggle("flowpad-bad",!m.ok);}});`
+        + `if(m.ok){G[m.cell]=1;if(m.task)G[m.task]=1;try{localStorage.setItem("flowpad-geschafft",JSON.stringify(G));}catch(x){}lock();}`
         + `L.forEach(function(f){try{f(m);}catch(x){}});});`
+        + `function lock(){document.querySelectorAll("[data-flowpad-nach]").forEach(function(el){var need=el.getAttribute("data-flowpad-nach").split(/[ ,;]+/),ok=need.every(function(k){return G[k]||G[k.toUpperCase()];});`
+        + `el.classList.toggle("flowpad-locked",!ok);el.querySelectorAll("button,input,select,textarea").forEach(function(b){b.disabled=!ok;});if(el.matches("button"))el.disabled=!ok;`
+        + `var tag=el.querySelector(":scope > .flowpad-lockinfo");if(!ok&&!tag){tag=document.createElement("div");tag.className="flowpad-lockinfo";tag.textContent="🔒 Geht weiter, sobald die Formel in "+need.join(", ")+" stimmt.";if(el.matches("button"))el.insertAdjacentElement("afterend",tag);else el.prepend(tag);}`
+        + `if(ok&&tag)tag.remove();if(ok&&el.matches("button")&&el.nextElementSibling&&el.nextElementSibling.classList.contains("flowpad-lockinfo"))el.nextElementSibling.remove();});}`
+        + `var st=document.createElement("style");st.textContent=".flowpad-locked{opacity:.55}.flowpad-locked button{cursor:not-allowed}.flowpad-lockinfo{font-size:.9em;font-weight:700;margin:4px 0;opacity:1}";`
+        + `document.addEventListener("DOMContentLoaded",function(){document.head.appendChild(st);lock();});`
         + `document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("[data-flowpad]");if(!b)return;e.preventDefault();`
         + `try{var d=JSON.parse(b.getAttribute("data-flowpad"));var a=d.action;delete d.action;window.FlowPad.send(a,d);}catch(x){console.error("data-flowpad: kein gültiges JSON",x);}});})();<\/script>`;
     const m = html.match(/<head[^>]*>/i) || html.match(/<html[^>]*>/i);

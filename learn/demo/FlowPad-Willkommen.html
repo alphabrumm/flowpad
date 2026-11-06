@@ -71,8 +71,8 @@ li::marker { color: var(--sky-d); }
   <b>Aufgabe:</b> Schreibe in <b>D2</b> die Formel für den Gesamtpreis der Brezeln: Preis mal Anzahl.
   <br><button class="fp alt" data-flowpad='{"action":"task","cell":"D2","target":"=B2*C2","title":"Gesamtpreis","prompt":"Schreibe in D2 die Formel für den Gesamtpreis der Brezeln: Preis mal Anzahl. Tippe in die Eingabezeile <code>=</code>, dann die Zelle B2 antippen, <code>*</code> tippen, C2 antippen und mit ✓ übernehmen.","mode":"formel","ansichten":{"tabelle":true,"diagramm":false}}'>Aufgabe in FlowPad öffnen</button>
 </div>
-<p>Ist D2 richtig? Dann lass uns diese Formel nun in ein <b>Datenflussdiagramm</b> umwandeln.</p>
-<button class="fp alt" data-flowpad='{"action":"ansichten","tabelle":true,"diagramm":true}'>Diagramm-Ansicht öffnen</button>
+<p>Stimmt deine Formel in D2? Dann lass uns sie nun in ein <b>Datenflussdiagramm</b> umwandeln. Der Knopf wird frei, sobald D2 richtig ist – bei einem Fehler steht in FlowPad über der Tabelle ein Tipp, was herauskommen soll.</p>
+<div data-flowpad-nach="D2"><button class="fp alt" data-flowpad='{"action":"ansichten","tabelle":true,"diagramm":true}'>Diagramm-Ansicht öffnen</button></div>
 <p>Unter der Tabelle erscheint jetzt die Diagramm-Ansicht. Tippe in der Tabelle auf <b>D2</b> und dann im Diagramm auf <b><i>fx</i> → DFD</b>: FlowPad stellt die gewählte Formel als Diagramm dar und beschriftet die Eingaben mit den Spaltenköpfen – <b>Preis (B2)</b> und <b>Anzahl (C2)</b> fließen in die Ellipse <b>*</b>, das Ergebnis in die Ausgabe <b>Gesamt (D2)</b>.</p>
 <div class="debbie"><b>Debbie Debug:</b> Fülle D2 mit <b>Nach unten ausfüllen</b> aus und tippe D3 an. Das Diagramm von D3 ist noch leer – jede Zelle hat ihr eigenes. Mit <b><i>fx</i> → DFD</b> siehst du, dass jetzt <b>B3</b> und <b>C3</b> hineinfließen.</div>
 
@@ -80,7 +80,7 @@ li::marker { color: var(--sky-d); }
 <p>Jetzt andersherum: Der Endpreis ist der Gesamtpreis minus Rabatt. Der Rabatt ist Gesamtpreis mal Rabattsatz (B6). Für dieses Diagramm brauchst du <b>beide Ansichten</b>: die Tabelle, um die Eingaben anzutippen, und das Diagramm zum Bauen.</p>
 <div class="card task" data-flowpad-cell="E2"><span class="state"></span>
   <b>Aufgabe:</b> Baue das Diagramm für <b>E2</b> selbst. Der Gesamtpreis wird zweimal gebraucht – dafür gibt es den <b>Verteiler</b>.
-  <br><button class="fp alt" data-flowpad='{"action":"task","cell":"E2","target":"=D2-D2*$B$6","title":"Endpreis","prompt":"Baue das Diagramm für den Endpreis: Gesamt minus Gesamt mal Rabatt. Eingaben sind <b>Gesamt (D2)</b> und <b>Rabatt (B6)</b> – tippe dafür <b>Eingabe</b> und dann die Zelle in der Tabelle. Der Gesamtpreis wird zweimal gebraucht: Führe ihn in einen <b>Verteiler</b>. Wenn alles verbunden ist: <b>Prüfen</b> und danach <b>DFD → Zelle</b>.","mode":"diagramm","dfd":"leer","ansichten":{"tabelle":true,"diagramm":true}}'>Aufgabe in FlowPad öffnen</button>
+  <br><span data-flowpad-nach="D2"><button class="fp alt" data-flowpad='{"action":"task","cell":"E2","target":"=D2-D2*$B$6","title":"Endpreis","prompt":"Baue das Diagramm für den Endpreis: Gesamt minus Gesamt mal Rabatt. Eingaben sind <b>Gesamt (D2)</b> und <b>Rabatt (B6)</b> – tippe dafür <b>Eingabe</b> und dann die Zelle in der Tabelle. Der Gesamtpreis wird zweimal gebraucht: Führe ihn in einen <b>Verteiler</b>. Wenn alles verbunden ist: <b>Prüfen</b> und danach <b>DFD → Zelle</b>.","mode":"diagramm","dfd":"leer","ansichten":{"tabelle":true,"diagramm":true}}'>Aufgabe in FlowPad öffnen</button></span>
 </div>
 <ul>
   <li><b>Eingabe</b> antippen, dann in der Tabelle die Zelle antippen (für einen Bereich darüberziehen).</li>
@@ -99,7 +99,7 @@ li::marker { color: var(--sky-d); }
 
 <h2><span class="nr">5</span>Den Datenfluss ansehen</h2>
 <p>Im Diagramm startet <b>▶</b> den <b>Ablauf</b>: Die Werte aus der Tabelle fließen von oben nach unten, unter jeder Ellipse dreht sich ein Zahnrad, und am Ende pulsiert das Ergebnis in der Ausgabe.</p>
-<button class="fp alt" id="btnFlowDemo">Diagramm für D2 zeigen</button>
+<div data-flowpad-nach="D2"><button class="fp alt" id="btnFlowDemo">Diagramm für D2 zeigen</button></div>
 <p>Tippe danach im Diagramm auf <b>▶</b>. Mit 🐢 und 🐇 änderst du das Tempo, mit <b>Schritt</b> geht es Ellipse für Ellipse weiter.</p>
 
 <h2><span class="nr">6</span>Hilfe</h2>

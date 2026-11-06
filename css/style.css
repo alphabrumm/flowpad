@@ -538,3 +538,4 @@ body.hide-left[data-layout="wide"] .lp-pane { flex: 1 1 auto; }
 .hb-group.open .hb-ghead { border-bottom: 1px solid var(--line); background: var(--next); }
 .hb-group > ul { padding: 8px; }
 .hb-group:not(.open) > ul { display: none; }
+.taskbar .tb-hint { margin-top: 4px; padding: 4px 8px; border-radius: 6px; background: var(--surface); border: 1px dashed var(--next-edge); }

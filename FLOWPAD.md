@@ -100,6 +100,8 @@ Ohne eigenes Skript: Knöpfe mit `data-flowpad` (JSON).
 | `say` | `text`, `ok` (true/false) – kurze Rückmeldung links in FlowPad. |
 | `getSheet` | nur per Skript: `FlowPad.getSheet().then(s => …)` liefert `{ id, cells, rows, cols }`, damit der Lernpfad selbst prüfen kann. |
 
+**Weiter erst nach richtiger Formel:** Elemente mit `data-flowpad-nach="D2"` (auch mehrere Zellen oder eine Aufgaben-id) sind gesperrt und zeigen „🔒 Geht weiter, sobald die Formel in D2 stimmt“, bis FlowPad die Aufgabe als gelöst meldet. Der Stand wird im Projekt gemerkt. Bei falscher Formel steht in der Auftragsleiste ein Tipp, welches Ergebnis herauskommen soll.
+
 Mit Skript: `FlowPad.sheet({...})`, `FlowPad.task({...})`, `FlowPad.select("D2")`, `FlowPad.send(action, {...})` und
 `FlowPad.onResult(r => …)`. Ergebnis: `{ type: "flowpad-result", cell, ok, how: "diagramm" | "formel", formula }` –
 gemeldet bei **Prüfen**, **DFD → Zelle** und wenn eine Formel direkt in eine Aufgabenzelle geschrieben wird.
