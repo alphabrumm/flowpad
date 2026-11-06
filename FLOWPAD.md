@@ -45,6 +45,7 @@ antippen und dann das Ziel. Ausgewählte Bausteine und Pfeile werden in der gelb
 Finger etwa eine Sekunde auf einen Knopf legen: Statt ihn auszulösen, erscheint eine Erklärung (bei den Rechenzeichen über der Tabelle mit Beispiel). Die Glühbirne oben links neben „Sichern“ weist darauf hin. Texte in `js/tips.js`.
 
 ### Aufgaben aus dem Lernpfad
+Bei Formel-Aufgaben (`mode: "formel"`) ist die Zeile „Formel des Diagramms“ unter dem Diagramm ausgeblendet, bis die Aufgabe gelöst ist – sonst stünde bei „Diagramm gegeben, Formel gesucht“ die Lösung schon da.
 Hat die gewählte Zelle eine Aufgabe aus dem Lernpfad, steht der Arbeitsauftrag fest in einer goldenen Leiste – bei Formel-Aufgaben über der Tabelle, sonst über dem Diagramm (zwei Zeilen, Antippen klappt auf). Nach dem Lösen wird sie grün mit „✓ geschafft“. Die Meldezeile unter dem Diagramm zeigt nur Rückmeldungen.
 
 ## Projekte und Dateien

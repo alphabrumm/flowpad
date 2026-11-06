@@ -202,6 +202,7 @@ function updateCellInfo() {
     const lab = labelOf(cell);
     $('#dfdCellName').textContent = lab ? lab : '';
     showTaskBar(t);
+    editor.setFormulaHidden(!!(t && t.mode === 'formel' && !t.done));
     const raw = project.sheet.cells[cell];
     $('#btnToDfd').disabled = !(typeof raw === 'string' && raw.trim().startsWith('='));
 }
@@ -312,7 +313,7 @@ function checkFormulaTask(a) {
     grid.say(res.ok ? `✓ Richtig! <code>${esc(raw)}</code> rechnet wie verlangt.` : `✗ <code>${esc(raw)}</code> rechnet noch nicht wie verlangt. ${testText(res)}: <b>${esc(E.display(res.a))}</b> statt <b>${esc(E.display(res.b))}</b>.`, res.ok ? 'good' : 'bad');
 }
 function report(a, ok, how, formula) {
-    const t = project.tasks?.[a]; if (t) { t.done = t.done || ok; touch(); if (a === cell) showTaskBar(t); }
+    const t = project.tasks?.[a]; if (t) { t.done = t.done || ok; touch(); if (a === cell) { showTaskBar(t); editor.setFormulaHidden(t.mode === 'formel' && !t.done); } }
     postToLernpfad({ type: 'flowpad-result', cell: a, ok, how, formula, task: t?.id });
 }
 

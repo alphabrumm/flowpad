@@ -452,6 +452,8 @@ export const DFD = (() => {
       gN.innerHTML = ns;
       const f = formula(model);
       fcode.textContent = f.err ? '–' : f.text;
+      // Aufgabe „Formel aus dem Diagramm“: Formelzeile ausblenden, sonst stünde die Lösung schon da
+      root.querySelector('.dfd-formula').hidden = formulaHidden;
       root.querySelector('[data-add=out]').disabled = model.nodes.some(n => n.kind === 'out');
       empty.hidden = model.nodes.length > 0;
       renderEdit();
@@ -646,6 +648,7 @@ export const DFD = (() => {
       <button type="button" class="fbtn primary" data-fb="again" hidden>▶ Nochmal</button>
       <button type="button" class="fbtn" data-fb="close" hidden>✕ Fertig</button>`;
     root.querySelector('.dfd-stage').prepend(flowBar);
+    let formulaHidden = false;
     let flowing = false, flowToken = 0, speed = 0.5, stepMode = false, stepWait = null;
     const SVGNS = 'http://www.w3.org/2000/svg';
     const mk = (tag, attrs, parent) => { const el = document.createElementNS(SVGNS, tag); for (const k in attrs) el.setAttribute(k, attrs[k]); (parent || flowLayer).appendChild(el); return el; };
@@ -798,6 +801,7 @@ export const DFD = (() => {
       formula: () => formula(model),
       render, say, fit, zoomBy,
       runFlow, stopFlow, get flowing() { return flowing; },
+      setFormulaHidden(on) { formulaHidden = !!on; root.querySelector('.dfd-formula').hidden = formulaHidden; },
       clearSelection() { sel = null; edgeSel = null; connectFrom = null; render(); },
     };
   }
