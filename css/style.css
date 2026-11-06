@@ -102,13 +102,8 @@ code { font-family: var(--font-code); font-size: .9em; background: var(--surface
 body.has-lp .lp-pane { display: flex; }
 body.lp-wide .lp-pane { flex-basis: 52%; }
 /* eingeklappt: schmale Leiste rechts, der Lernpfad bleibt geladen (nur unsichtbar) */
-body.lp-collapsed .lp-pane { flex: 0 0 48px; min-width: 48px; cursor: pointer; }
-body.lp-collapsed .lp-head { flex-direction: column; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 0; flex: 1; }
-body.lp-collapsed .lp-head #btnLpWide { display: none; }
-body.lp-collapsed .lp-title { flex: 0 1 auto; flex-direction: column; writing-mode: vertical-rl; }
-body.lp-collapsed .lp-title .ic { writing-mode: horizontal-tb; }
-body.lp-collapsed .lp-head #btnLpCollapse { order: -1; }
-body.lp-collapsed .lp-host { position: absolute; width: 1px; height: 1px; overflow: hidden; visibility: hidden; }
+/* Lernpfad ausgeblendet: bleibt geladen (Stand, Scrollposition), ist aber unsichtbar */
+body.lp-collapsed[data-layout="wide"] .lp-pane { position: absolute; width: 1px; height: 1px; overflow: hidden; visibility: hidden; pointer-events: none; }
 .lp-head { display: flex; align-items: center; gap: 4px; padding: 2px 6px 2px 12px; background: var(--surface-2); border-bottom: 1px solid var(--line); min-height: 42px; }
 .lp-title { flex: 1; display: flex; align-items: center; gap: 8px; font-family: var(--title-font); font-weight: 700; min-width: 0; }
 .lp-title span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -517,3 +512,18 @@ button, [role=button] { -webkit-touch-callout: none; -webkit-user-select: none; 
 .taskbar .tb-more { display: none; flex: none; font-weight: 800; color: var(--ink-2); }
 .taskbar.more .tb-more { display: inline; }
 .taskbar.open .tb-more { transform: rotate(180deg); }
+
+/* ---------- Ansichten-Schalter in der Menüleiste ---------- */
+.viewtoggles { display: flex; gap: 3px; }
+.vt { display: inline-grid; place-items: center; min-width: 38px; min-height: 32px; border: 2px solid var(--next-edge); border-radius: 7px; background: transparent; color: var(--ink-2); cursor: pointer; padding: 0; }
+.vt .ic { width: 19px; height: 19px; }
+.vt[aria-pressed="true"] { background: var(--glow); color: var(--acc-ink, #000); }
+.vt:disabled { opacity: .3; cursor: default; }
+.topsep { width: 1px; align-self: stretch; margin: 6px 4px; background: var(--line); }
+body:not([data-layout="wide"]) .viewtoggles, body:not([data-layout="wide"]) .topsep { display: none; }
+/* Tabelle oder Diagramm ausgeblendet: der andere Bereich füllt die linke Seite */
+body.hide-grid[data-layout="wide"] #gridPane, body.hide-dfd[data-layout="wide"] #dfdPane,
+body.hide-grid[data-layout="wide"] #splitter, body.hide-dfd[data-layout="wide"] #splitter { display: none; }
+body.hide-grid[data-layout="wide"] .left, body.hide-dfd[data-layout="wide"] .left { grid-template-rows: 1fr !important; grid-template-columns: 1fr !important; }
+body.hide-left[data-layout="wide"] .left { display: none; }
+body.hide-left[data-layout="wide"] .lp-pane { flex: 1 1 auto; }

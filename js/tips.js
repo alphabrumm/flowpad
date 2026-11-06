@@ -76,7 +76,10 @@ const TIPS = [
 
     // ---------- Lernpfad, Ansicht ----------
     ['#btnLpWide', 'Lernpfad breiter/schmaler', 'Macht den Lernpfad breiter oder wieder schmaler.'],
-    ['#btnLpCollapse', 'Lernpfad einklappen', 'Klappt den Lernpfad zu einer schmalen Leiste ein. Dann steht das Diagramm rechts neben der Tabelle.'],
+    ['#btnLpCollapse', 'Lernpfad ausblenden', 'Blendet den Lernpfad aus. Dann steht das Diagramm rechts neben der Tabelle. Wieder einblenden: oben mit dem Lernpfad-Schalter.'],
+    ['#tgGrid', 'Tabelle ein/aus', 'Gefüllt: Die Tabelle ist zu sehen. Antippen blendet sie aus oder wieder ein.'],
+    ['#tgDfd', 'Diagramm ein/aus', 'Gefüllt: Das Datenflussdiagramm ist zu sehen. Antippen blendet es aus oder wieder ein.'],
+    ['#tgLp', 'Lernpfad ein/aus', 'Gefüllt: Der Lernpfad ist zu sehen. Ausgeblendet steht das Diagramm rechts neben der Tabelle. Dein Stand im Lernpfad bleibt erhalten.'],
     ['#bottomnav [data-view="lernpfad"]', 'Lernpfad', 'Zeigt den Lernpfad.'],
     ['#bottomnav [data-view="tabelle"]', 'Tabelle', 'Zeigt die Tabelle (und das Diagramm).'],
     ['#bottomnav [data-view="diagramm"]', 'Diagramm', 'Zeigt das Datenflussdiagramm der gewählten Zelle.'],
