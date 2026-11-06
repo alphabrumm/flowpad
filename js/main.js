@@ -311,12 +311,14 @@ function showTaskBar(t) {
     if (!t) { bar.hidden = true; bar.innerHTML = ''; return; }
     const tc = Object.keys(project.tasks || {}).find(k => project.tasks[k] === t) || cell;
     const key = tc + '|' + (t.mode || '') + '|' + (t.title || '');
+    if (t.done && t.closed) { bar.hidden = true; bar.innerHTML = ''; return; }
     if (key !== tbState.key) { tbState.key = key; tbState.moved = false; tbState.mini = false; }
     bar.hidden = false;
     bar.classList.toggle('done', !!t.done); bar.classList.toggle('mini', tbState.mini);
     const what = t.mode === 'formel' ? 'Formel' : t.mode === 'diagramm' ? 'Diagramm' : 'Aufgabe';
     bar.innerHTML = `<div class="tb-grip" title="Ziehen zum Verschieben" aria-hidden="true"><span></span></div>`
-        + `<button type="button" class="tb-fold" aria-label="${tbState.mini ? 'Auftrag aufklappen' : 'Auftrag zuklappen'}">${tbState.mini ? '▾' : '▴'}</button>`
+        + `<div class="tb-btns"><button type="button" class="tb-fold" aria-label="${tbState.mini ? 'Auftrag aufklappen' : 'Auftrag zuklappen'}">${tbState.mini ? '▾' : '▴'}</button>`
+        + `${t.done ? '<button type="button" class="tb-close" aria-label="Auftrag schließen" title="Schließen">✕</button>' : ''}</div>`
         + `<div class="tb-head"><span class="tb-ic" aria-hidden="true">${t.done ? '✓' : '🎯'}</span><b>${esc(t.title || 'Aufgabe')}</b></div>`
         + `<div class="tb-body"><div class="tb-kind">${what} für ${esc(tc)}${t.done ? ' · geschafft' : ''}</div>${t.prompt ? `<div class="tb-prompt">${t.prompt}</div>` : ''}${t.hint && !t.done ? `<div class="tb-hint">💡 ${t.hint}</div>` : ''}</div>`;
     requestAnimationFrame(placeTaskBar);
@@ -324,6 +326,11 @@ function showTaskBar(t) {
 (() => {
     const bar = $('#taskBar'); let drag = null;
     bar.addEventListener('click', ev => {
+        if (ev.target.closest('.tb-close')) {
+            const t = project.tasks?.[(tbState.key || '').split('|')[0]];
+            if (t && t.done) { t.closed = true; touch(); }
+            bar.hidden = true; bar.innerHTML = ''; return;
+        }
         if (!ev.target.closest('.tb-fold')) return;
         tbState.mini = !tbState.mini; const t = project.tasks?.[(tbState.key || '').split('|')[0]]; if (t) showTaskBar(t);
     });

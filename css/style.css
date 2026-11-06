@@ -509,7 +509,11 @@ button, [role=button] { -webkit-touch-callout: none; -webkit-user-select: none; 
 .taskbar .tb-grip { flex: none; display: grid; place-items: center; height: 18px; cursor: grab; touch-action: none; }
 .taskbar.dragging .tb-grip { cursor: grabbing; }
 .taskbar .tb-grip span { width: 42px; height: 5px; border-radius: 3px; background: var(--next-edge); opacity: .75; }
-.taskbar .tb-fold { position: absolute; top: 2px; right: 4px; width: 28px; height: 26px; border: 0; background: transparent; color: var(--ink-2); font-weight: 800; cursor: pointer; border-radius: 7px; }
+.taskbar .tb-btns { position: absolute; top: 2px; right: 4px; display: flex; gap: 2px; }
+.taskbar .tb-fold, .taskbar .tb-close { width: 28px; height: 26px; border: 0; background: transparent; color: var(--ink-2); font-weight: 800; cursor: pointer; border-radius: 7px; padding: 0; }
+.taskbar .tb-close { color: var(--good); font-size: 1.05em; }
+.taskbar .tb-close:hover, .taskbar .tb-fold:hover { background: color-mix(in srgb, var(--ink) 8%, transparent); }
+.taskbar.done .tb-head { padding-right: 62px; }
 .taskbar .tb-head { flex: none; display: flex; gap: 6px; align-items: flex-start; padding: 0 30px 4px 12px; touch-action: none; cursor: grab; font-family: var(--title-font); }
 .taskbar .tb-ic { flex: none; }
 .taskbar .tb-body { flex: 1 1 auto; overflow-y: auto; padding: 0 12px 10px; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }

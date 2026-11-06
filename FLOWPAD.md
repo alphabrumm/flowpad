@@ -46,7 +46,7 @@ Finger etwa eine Sekunde auf einen Knopf legen: Statt ihn auszulösen, erscheint
 
 ### Aufgaben aus dem Lernpfad
 Bei Formel-Aufgaben (`mode: "formel"`) ist die Zeile „Formel des Diagramms“ unter dem Diagramm ausgeblendet, bis die Aufgabe gelöst ist – sonst stünde bei „Diagramm gegeben, Formel gesucht“ die Lösung schon da.
-Hat die gewählte Zelle eine Aufgabe aus dem Lernpfad, erscheint der Arbeitsauftrag auf einer schwebenden goldenen Karte (schmal, hochkant) rechts oben in der passenden Ansicht – bei Formel-Aufgaben in der Tabelle, sonst im Diagramm. Am Griff oben (oder am Titel) lässt sie sich frei im Fenster verschieben, ▴ klappt sie auf den Titel zusammen. Nach dem Lösen wird sie grün mit „✓ geschafft“. Die Meldezeile unter dem Diagramm zeigt nur Rückmeldungen.
+Hat die gewählte Zelle eine Aufgabe aus dem Lernpfad, erscheint der Arbeitsauftrag auf einer schwebenden goldenen Karte (schmal, hochkant) rechts oben in der passenden Ansicht – bei Formel-Aufgaben in der Tabelle, sonst im Diagramm. Am Griff oben (oder am Titel) lässt sie sich frei im Fenster verschieben, ▴ klappt sie auf den Titel zusammen. Nach dem Lösen wird sie grün mit „✓ geschafft“ und bekommt ein ✕ zum Schließen (gelbe, ungelöste Karten lassen sich nicht schließen). Schickt der Lernpfad die Aufgabe erneut, erscheint die Karte wieder. Die Meldezeile unter dem Diagramm zeigt nur Rückmeldungen.
 
 ## Projekte und Dateien
 
