@@ -504,3 +504,16 @@ button, [role=button] { -webkit-touch-callout: none; -webkit-user-select: none; 
 /* Parameternummern nur an der angewählten Ellipse (und beim Verbinden an den freien Eingängen) */
 .dfd .node.k-fn:not(.is-sel) .slot:not(.target) text,
 .dfd .node.k-fn:not(.is-sel) .slot:not(.target) .slot-dot { display: none; }
+
+/* ---------- Arbeitsauftrag über dem Diagramm ---------- */
+.taskbar { flex: none; display: flex; align-items: flex-start; gap: 8px; padding: 6px 10px; background: var(--next); border-bottom: 2px solid var(--next-edge); font-size: .9em; line-height: 1.35; cursor: default; }
+.taskbar.more { cursor: pointer; }
+.taskbar.done { background: color-mix(in srgb, var(--good) 14%, var(--surface)); border-bottom-color: var(--good); }
+.taskbar .tb-ic { flex: none; font-size: 1.1em; line-height: 1.25; }
+.taskbar.done .tb-ic { color: var(--good); font-weight: 800; }
+.taskbar .tb-text { flex: 1; min-width: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.taskbar.open .tb-text { display: block; -webkit-line-clamp: unset; }
+.taskbar .tb-kind { font-size: .85em; color: var(--ink-2); }
+.taskbar .tb-more { display: none; flex: none; font-weight: 800; color: var(--ink-2); }
+.taskbar.more .tb-more { display: inline; }
+.taskbar.open .tb-more { transform: rotate(180deg); }

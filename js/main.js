@@ -193,7 +193,7 @@ function showCell(a, keepMsg) {
     });
     updateCellInfo();
     const t = project.tasks && project.tasks[a];
-    if (!keepMsg) editor.say(t ? `<b>${esc(t.title || 'Aufgabe')}</b>${t.prompt ? ': ' + t.prompt : ''}` : '');
+    if (!keepMsg) editor.say('');
     grid.setHot([]);
 }
 function updateCellInfo() {
@@ -201,7 +201,7 @@ function updateCellInfo() {
     $('#dfdCell').textContent = cell;
     const lab = labelOf(cell);
     $('#dfdCellName').textContent = lab ? lab : '';
-    $('#dfdTask').hidden = !t;
+    showTaskBar(t);
     const raw = project.sheet.cells[cell];
     $('#btnToDfd').disabled = !(typeof raw === 'string' && raw.trim().startsWith('='));
 }
@@ -274,7 +274,17 @@ $('#btnDfdClear').addEventListener('click', async () => {
     if (!await confirmBox('Diagramm löschen?', `Das Diagramm für <b>${esc(cell)}</b> wird gelöscht. (Rückgängig geht mit ↶.)`, 'Löschen', true)) return;
     pushUndo(); delete project.dfds[cell]; touch(); grid.setMarks(new Set(Object.keys(project.dfds))); showCell(cell);
 });
-$('#dfdTask').addEventListener('click', () => { const t = project.tasks?.[cell]; if (t) editor.say(`<b>${esc(t.title || 'Aufgabe')}</b>${t.prompt ? ': ' + t.prompt : ''}`); });
+/** Arbeitsauftrag aus dem Lernpfad fest über dem Diagramm, solange die Zelle gewählt ist (zweizeilig, Tippen klappt auf) */
+function showTaskBar(t) {
+    const bar = $('#taskBar');
+    if (!t) { bar.hidden = true; bar.innerHTML = ''; return; }
+    bar.hidden = false; bar.classList.remove('open');
+    bar.classList.toggle('done', !!t.done);
+    const what = t.mode === 'formel' ? 'Formel' : t.mode === 'diagramm' ? 'Diagramm' : 'Aufgabe';
+    bar.innerHTML = `<span class="tb-ic" aria-hidden="true">${t.done ? '✓' : '🎯'}</span><div class="tb-text"><b>${esc(t.title || 'Aufgabe')}</b> <span class="tb-kind">${what} für ${esc(cell)}${t.done ? ' · geschafft' : ''}</span>${t.prompt ? '<br>' + t.prompt : ''}</div><span class="tb-more" aria-hidden="true">▾</span>`;
+    requestAnimationFrame(() => { const tx = bar.querySelector('.tb-text'); bar.classList.toggle('more', !!tx && tx.scrollHeight > tx.clientHeight + 2); });
+}
+$('#taskBar').addEventListener('click', () => { const b = $('#taskBar'); if (b.classList.contains('more') || b.classList.contains('open')) b.classList.toggle('open'); });
 $('#btnFlow').addEventListener('click', () => editor.runFlow());
 // Diagrammkopf: Passt er nicht in eine Zeile, zeigen „fx → DFD“ und „DFD → Zelle“ nur ihre Symbole
 (() => {
@@ -298,7 +308,7 @@ function checkFormulaTask(a) {
     grid.say(res.ok ? `✓ Richtig! <code>${esc(raw)}</code> rechnet wie verlangt.` : `✗ <code>${esc(raw)}</code> rechnet noch nicht wie verlangt. ${testText(res)}: <b>${esc(E.display(res.a))}</b> statt <b>${esc(E.display(res.b))}</b>.`, res.ok ? 'good' : 'bad');
 }
 function report(a, ok, how, formula) {
-    const t = project.tasks?.[a]; if (t) { t.done = t.done || ok; touch(); }
+    const t = project.tasks?.[a]; if (t) { t.done = t.done || ok; touch(); if (a === cell) showTaskBar(t); }
     postToLernpfad({ type: 'flowpad-result', cell: a, ok, how, formula, task: t?.id });
 }
 
