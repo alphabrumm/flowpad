@@ -65,13 +65,15 @@ li::marker { color: var(--sky-d); }
 </div>
 
 <h2><span class="nr">2</span>Von der Formel zum Diagramm</h2>
-<p>Lade zuerst eine kleine Tabelle für den Pausenverkauf. Sie erscheint oben als eigener Reiter „Pausenverkauf“.</p>
+<p>Lade zuerst eine kleine Tabelle für den Pausenverkauf. Sie erscheint oben als eigener Reiter „Pausenverkauf“. Erst einmal geht es nur um die Formel – deshalb blendet FlowPad das Diagramm aus.</p>
 <button class="fp" id="btnSheet">Tabelle laden</button>
 <div class="card task" data-flowpad-cell="D2"><span class="state"></span>
   <b>Aufgabe:</b> Schreibe in <b>D2</b> die Formel für den Gesamtpreis der Brezeln: Preis mal Anzahl.
-  <br><button class="fp alt" data-flowpad='{"action":"task","cell":"D2","target":"=B2*C2","title":"Gesamtpreis","prompt":"Schreibe in D2 die Formel für den Gesamtpreis der Brezeln: Preis mal Anzahl. Tippe in die Eingabezeile <code>=</code>, dann die Zelle B2 antippen, <code>*</code> tippen, C2 antippen und mit ✓ übernehmen.","mode":"formel","ansichten":{"tabelle":true,"diagramm":true}}'>Aufgabe in FlowPad öffnen</button>
+  <br><button class="fp alt" data-flowpad='{"action":"task","cell":"D2","target":"=B2*C2","title":"Gesamtpreis","prompt":"Schreibe in D2 die Formel für den Gesamtpreis der Brezeln: Preis mal Anzahl. Tippe in die Eingabezeile <code>=</code>, dann die Zelle B2 antippen, <code>*</code> tippen, C2 antippen und mit ✓ übernehmen.","mode":"formel","ansichten":{"tabelle":true,"diagramm":false}}'>Aufgabe in FlowPad öffnen</button>
 </div>
-<p>Ist D2 richtig, tippe im Diagramm auf <b><i>fx</i> → DFD</b>. FlowPad zeichnet das Diagramm und beschriftet die Eingaben mit den Spaltenköpfen: <b>Preis (B2)</b>, <b>Anzahl (C2)</b>.</p>
+<p>Ist D2 richtig? Dann lass uns diese Formel nun in ein <b>Datenflussdiagramm</b> umwandeln.</p>
+<button class="fp alt" data-flowpad='{"action":"ansichten","tabelle":true,"diagramm":true}'>Diagramm-Ansicht öffnen</button>
+<p>Unter der Tabelle erscheint jetzt die Diagramm-Ansicht. Tippe in der Tabelle auf <b>D2</b> und dann im Diagramm auf <b><i>fx</i> → DFD</b>: FlowPad stellt die gewählte Formel als Diagramm dar und beschriftet die Eingaben mit den Spaltenköpfen – <b>Preis (B2)</b> und <b>Anzahl (C2)</b> fließen in die Ellipse <b>*</b>, das Ergebnis in die Ausgabe <b>Gesamt (D2)</b>.</p>
 <div class="debbie"><b>Debbie Debug:</b> Fülle D2 mit <b>Nach unten ausfüllen</b> aus und tippe D3 an. Das Diagramm von D3 ist noch leer – jede Zelle hat ihr eigenes. Mit <b><i>fx</i> → DFD</b> siehst du, dass jetzt <b>B3</b> und <b>C3</b> hineinfließen.</div>
 
 <h2><span class="nr">3</span>Vom Diagramm zur Formel</h2>
@@ -124,7 +126,7 @@ var PAUSE = { title: 'Pausenverkauf', cells: { A1: 'Artikel', B1: 'Preis', C1: '
   widths: { A: 110, D: 100, E: 110 }, styles: { 'A1:E1': 'head', B6: 'inp' }, fmt: { 'B2:B4': 'eur', 'D2:E4': 'eur', B6: 'pct' } };
 var KASSE = { A1: 'Name', B1: 'Beitrag', A2: 'Lena', B2: '4,5', A3: 'Paul', B3: '5', A4: 'Mia', B4: '3,5', A5: 'Tim', B5: '5', A6: 'Ali', B6: '4', A8: 'Durchschnitt' };
 function on(id, f) { var b = document.getElementById(id); if (b) b.addEventListener('click', function () { if (window.FlowPad) f(); }); }
-on('btnSheet', function () { FlowPad.sheet(Object.assign({ select: 'D2', ansichten: { tabelle: true, diagramm: true } }, PAUSE)); });
+on('btnSheet', function () { FlowPad.sheet(Object.assign({ select: 'D2', ansichten: { tabelle: true, diagramm: false } }, PAUSE)); });
 on('btnRead', function () {
   FlowPad.task({ cell: 'B8', id: 'demo:lesen', target: '=RUNDEN(MITTELWERT(B2:B6);2)', title: 'Durchschnitt', mode: 'formel',
     prompt: 'Links siehst du das Diagramm für B8. Lies es von oben nach unten: Welche Eingabe fließt in welche Funktion? Schreibe die passende Formel in B8 und übernimm sie mit ✓.',
