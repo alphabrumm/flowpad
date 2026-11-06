@@ -183,7 +183,7 @@ body[data-layout="wide"] .bottomnav { display: none; }
 .grid td.rf0 { box-shadow: inset 0 0 0 3px var(--r0); } .grid td.rf1 { box-shadow: inset 0 0 0 3px var(--r1); } .grid td.rf2 { box-shadow: inset 0 0 0 3px var(--r2); }
 .grid td.rf3 { box-shadow: inset 0 0 0 3px var(--r3); } .grid td.rf4 { box-shadow: inset 0 0 0 3px var(--r4); } .grid td.rf5 { box-shadow: inset 0 0 0 3px var(--r5); }
 .grid .c0 { color: var(--r0); } .grid .c1 { color: var(--r1); } .grid .c2 { color: var(--r2); } .grid .c3 { color: var(--r3); } .grid .c4 { color: var(--r4); } .grid .c5 { color: var(--r5); }
-.grid.picking .calc-scroll { touch-action: none; }
+.grid.picking .calc-scroll { touch-action: pan-x pan-y; }
 .grid.picking td { cursor: crosshair; }
 
 /* ---------- Diagramm ---------- */
@@ -389,7 +389,7 @@ button.taskbadge { cursor: pointer; font: inherit; font-size: .8em; font-weight:
 @media (max-width: 700px) { .workspace { padding: 5px; gap: 5px; } .left, .lp-pane { border-radius: 10px; } }
 /* Doppeltippen öffnet die Eingabe – Safari soll dabei nicht zoomen */
 .grid td { touch-action: manipulation; }
-.grid.picking td { touch-action: none; }
+.grid.picking td { touch-action: pan-x pan-y; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 
 /* ---------- Lehrkraft-Modus ---------- */
 .teach-code { font-family: var(--font-code); font-weight: 800; letter-spacing: .08em; padding: 2px 8px; border-radius: 6px; background: var(--glow); color: var(--acc-ink, #000); font-size: .9em; }

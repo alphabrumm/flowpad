@@ -159,20 +159,42 @@ export function Grid(root, host) {
     // Zeigen beim Formelschreiben: Erst beim Loslassen einsetzen – und nur, wenn der Finger nicht gescrollt hat
     let point = null;
     const dropPoint = () => { point = null; };
+    const dropTouchPick = () => { if (pick && pick.t) { clearTimeout(pick.t.timer); if (pick.t.drag) { pick.a = null; pick.b = null; render(); } pick.t = null; } };
+    // Während ein Bereich gezogen wird, darf die Tabelle nicht scrollen
+    scroller.addEventListener('touchmove', ev => { if (pick && pick.t && pick.t.drag) ev.preventDefault(); }, { passive: false });
     table.addEventListener('pointerdown', ev => {
         const td = ev.target.closest('td'); if (!td) return;
-        if (pick) { ev.preventDefault(); pick.a = td.dataset.a; pick.b = null; pick.pid = ev.pointerId; try { table.setPointerCapture(ev.pointerId); } catch (e) { } render(); return; }
+        if (pick) {
+            // Maus: sofort wählen und ziehen. Finger: Tippen erst beim Loslassen an derselben Stelle,
+            // Wischen scrollt, kurz Halten und dann Ziehen wählt einen Bereich.
+            if (ev.pointerType === 'mouse') { ev.preventDefault(); pick.a = td.dataset.a; pick.b = null; pick.pid = ev.pointerId; pick.t = null; try { table.setPointerCapture(ev.pointerId); } catch (e) { } render(); return; }
+            dropTouchPick();
+            const t = pick.t = { a: td.dataset.a, pid: ev.pointerId, x: ev.clientX, y: ev.clientY, st: scroller.scrollTop, sl: scroller.scrollLeft, drag: false };
+            t.timer = setTimeout(() => { if (pick && pick.t === t) { t.drag = true; pick.a = t.a; pick.b = null; pick.pid = t.pid; try { navigator.vibrate && navigator.vibrate(15); } catch (e) { } render(); } }, 380);
+            return;
+        }
         point = pointable() ? { a: td.dataset.a, pid: ev.pointerId, x: ev.clientX, y: ev.clientY, st: scroller.scrollTop, sl: scroller.scrollLeft,
             s: input.selectionStart, e: input.selectionEnd } : null;
     });
     table.addEventListener('pointermove', ev => {
         if (point && ev.pointerId === point.pid && Math.hypot(ev.clientX - point.x, ev.clientY - point.y) > 8) dropPoint();
+        if (pick && pick.t && ev.pointerId === pick.t.pid && !pick.t.drag) { if (Math.hypot(ev.clientX - pick.t.x, ev.clientY - pick.t.y) > 8) dropTouchPick(); return; }
         if (!pick || !pick.a || ev.pointerId !== pick.pid) return;
         const td = tdAt(ev); if (td && td.dataset.a !== (pick.b || pick.a)) { pick.b = td.dataset.a; render(); }
     });
-    scroller.addEventListener('scroll', () => { if (point && (Math.abs(scroller.scrollTop - point.st) > 2 || Math.abs(scroller.scrollLeft - point.sl) > 2)) dropPoint(); }, { passive: true });
-    table.addEventListener('pointercancel', dropPoint);
+    scroller.addEventListener('scroll', () => {
+        if (point && (Math.abs(scroller.scrollTop - point.st) > 2 || Math.abs(scroller.scrollLeft - point.sl) > 2)) dropPoint();
+        if (pick && pick.t && !pick.t.drag && (Math.abs(scroller.scrollTop - pick.t.st) > 2 || Math.abs(scroller.scrollLeft - pick.t.sl) > 2)) dropTouchPick();
+    }, { passive: true });
+    table.addEventListener('pointercancel', ev => { dropPoint(); if (pick && pick.t && ev.pointerId === pick.t.pid) dropTouchPick(); });
     table.addEventListener('pointerup', ev => {
+        if (pick && pick.t && ev.pointerId === pick.t.pid) {
+            const t = pick.t; clearTimeout(t.timer); pick.t = null; ev.preventDefault();
+            if (t.drag) { finishPick(); return; }
+            const td = tdAt(ev);
+            if (td && td.dataset.a === t.a && Math.hypot(ev.clientX - t.x, ev.clientY - t.y) <= 8) { pick.a = t.a; pick.b = null; finishPick(); }
+            return;
+        }
         if (pick && pick.a && ev.pointerId === pick.pid) { ev.preventDefault(); finishPick(); return; }
         if (!point || ev.pointerId !== point.pid) return;
         const p = point; point = null;
@@ -197,7 +219,7 @@ export function Grid(root, host) {
         if (editing) commit(false);
         select(td.dataset.a);
     });
-    root.querySelector('[data-act=pickcancel]').addEventListener('click', () => { pick = null; root.classList.remove('picking'); pickBar.hidden = true; render(); });
+    root.querySelector('[data-act=pickcancel]').addEventListener('click', () => { dropTouchPick(); pick = null; root.classList.remove('picking'); pickBar.hidden = true; render(); });
 
     root.querySelector('.calc-fxbtn').addEventListener('click', () => host.onFx && host.onFx());
     input.addEventListener('input', () => { editing = true; showRefs(input.value); });
@@ -264,7 +286,7 @@ export function Grid(root, host) {
             pickBar.querySelector('span').innerHTML = text || 'Zelle antippen';
             render();
         },
-        cancelPick() { if (pick) { pick = null; root.classList.remove('picking'); pickBar.hidden = true; render(); } },
+        cancelPick() { if (pick) { dropTouchPick(); pick = null; root.classList.remove('picking'); pickBar.hidden = true; render(); } },
         say,
         value: a => sheet.value(a),
         /** Text an der Schreibmarke einfügen (Handbuch); leere Zelle bekommt zuerst ein = */

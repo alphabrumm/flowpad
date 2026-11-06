@@ -58,7 +58,7 @@ const TIPS = [
     ['#btnZoomFit', 'Einpassen', 'Passt das Diagramm in die Fläche ein.'],
     ['#btnDfdClear', 'Diagramm löschen', 'Löscht das Diagramm der gewählten Zelle (Rückgängig geht mit ↶).'],
     ['.dfd-paltoggle', 'Bausteinleiste ein-/ausklappen', 'Macht die Leiste mit den Bausteinen schmal (nur Symbole) – so bleibt mehr Platz für das Diagramm. Nochmal antippen: wieder mit Namen.'],
-    ['[data-add="in"]', 'Eingabe', 'Ein Rechteck für eine Zelle oder einen Bereich der Tabelle. Danach die Zelle oben antippen oder über einen Bereich ziehen.'],
+    ['[data-add="in"]', 'Eingabe', 'Ein Rechteck für eine Zelle oder einen Bereich der Tabelle. Danach die Zelle oben antippen. Für einen Bereich den Finger kurz halten und dann ziehen; normales Wischen scrollt die Tabelle.'],
     ['[data-add="const"]', 'Konstante', 'Eine feste Zahl oder ein Text – ohne Rahmen, z. B. 2 oder 0,19.'],
     ['[data-add="fn"]', 'Funktion', 'Eine Ellipse für eine Funktion (SUMME, WENN …) oder ein Rechenzeichen (+, *, …).'],
     ['[data-add="split"]', 'Verteiler', 'Ein Punkt: ein Pfeil hinein, mehrere heraus. Nur nötig, wenn ein Datum an mehrere Funktionen geht.'],

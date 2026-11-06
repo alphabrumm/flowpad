@@ -526,7 +526,7 @@ export const DFD = (() => {
         const node = byId(n.id); if (!node) return;
         node.ref = ref; node.name = host.labelOf(ref) || undefined; node.label = labelFor(node.name, ref);
         sel = node.id; save(); render(); say(`Eingabe <b>${esc(node.label)}</b> gesetzt.`);
-      }, 'Tippe die Zelle der Eingabe an – oder ziehe über einen Bereich.');
+      }, 'Tippe die Zelle der Eingabe an – für einen Bereich kurz halten und ziehen.');
     }
     // ---------- Funktionsauswahl ----------
     function picker(done) {

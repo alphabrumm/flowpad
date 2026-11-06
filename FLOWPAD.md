@@ -36,7 +36,7 @@ wenn es keinen gibt, aus der Beschriftung links in derselben Zeile. `$`-Bezüge 
 Verglichen wird mit mehreren Testbelegungen: zuerst die Werte der Tabelle, dann andere Zahlen in den Eingabezellen und die Konstanten
 der Formeln selbst (Grenzfälle wie `>=100` gegen `>100`). Bei vertauschten Eingängen gibt es einen Tipp.
 
-Bausteine: Eingabe (danach Zelle oben antippen oder über einen Bereich ziehen), Konstante, Funktion (Katalog mit allen Funktionen der
+Bausteine: Eingabe (danach Zelle oben antippen; für einen Bereich kurz halten und ziehen), Konstante, Funktion (Katalog mit allen Funktionen der
 DFD-Werkstatt und Rechenzeichen), Verteiler, Ausgabe. Verbinden: Baustein antippen, am orangen Pfeil zum Ziel ziehen oder den Pfeil
 antippen und dann das Ziel. Ausgewählte Bausteine und Pfeile werden in der gelben Leiste bearbeitet und gelöscht.
 
