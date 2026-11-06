@@ -153,6 +153,7 @@ const editor = DFD.Editor($('#dfd'), {
     },
     labelOf,
     startPick(done, text) { ensureView('grid'); if (layoutMode() !== 'wide') showView('tabelle'); grid.startPick(ref => { done(ref); if (layoutMode() !== 'wide') showView('diagramm'); }, text); },
+    pickFunction(done) { openHandbuch(name => done(name), { choose: true }); },
     cancelPick: () => grid.cancelPick(),
     /** Teilformel mit den Werten der Tabelle ausrechnen (Ablauf) */
     evalTerm(t) {

@@ -530,6 +530,8 @@ export const DFD = (() => {
     }
     // ---------- Funktionsauswahl ----------
     function picker(done) {
+      // Gleiches Handbuch wie oben bei fx (zusammengeklappte Rubriken, Beispiele), nur zum Auswählen
+      if (host.pickFunction) { host.pickFunction(done); return; }
       const ov = document.createElement('div'); ov.className = 'dfd-picker';
       const groups = {};
       Object.keys(OPS).forEach(o => { const g = PREC[o] === 1 ? 'Vergleich' : 'Rechenzeichen'; (groups[g] = groups[g] || []).push(o); });

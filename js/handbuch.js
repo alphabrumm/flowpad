@@ -105,8 +105,10 @@ function target(l) {
     return E.addr(Object.keys(l.t).length ? 1 : 0, Object.keys(l.t).length ? mc + 1 : 0);
 }
 
-/** Handbuch öffnen. insert(text): Funktionsanfang in die Eingabezeile schreiben */
-export function openHandbuch(insert) {
+/** Handbuch öffnen. insert(text): Funktionsanfang in die Eingabezeile schreiben.
+ *  opts.choose: Auswahl für das Diagramm – insert(name) bekommt den Funktionsnamen, Titel „Funktion wählen“ */
+export function openHandbuch(insert, opts = {}) {
+    const choose = !!opts.choose;
     const groups = {};
     Object.keys(DFD.OPS).forEach(o => { const g = ['=', '<>', '<', '>', '<=', '>='].includes(o) ? 'Vergleich' : 'Rechenzeichen'; (groups[g] = groups[g] || []).push(o); });
     Object.entries(DFD.F).forEach(([k, v]) => (groups[v.g] = groups[v.g] || []).push(k));
@@ -121,8 +123,8 @@ export function openHandbuch(insert) {
             <div class="hb-more" hidden></div></li>`;
     };
     const ov = document.createElement('div'); ov.className = 'hb-backdrop';
-    ov.innerHTML = `<div class="hb" role="dialog" aria-modal="true" aria-label="Handbuch der Funktionen">
-        <div class="hb-top"><b>fx · Handbuch der Funktionen</b><input type="search" placeholder="suchen, z. B. runden" autocomplete="off" autocapitalize="off"><button type="button" class="fbtn" data-x aria-label="Schließen">✕</button></div>
+    ov.innerHTML = `<div class="hb" role="dialog" aria-modal="true" aria-label="${choose ? 'Funktion wählen' : 'Handbuch der Funktionen'}">
+        <div class="hb-top"><b>${choose ? 'Funktion wählen' : 'fx · Handbuch der Funktionen'}</b><input type="search" placeholder="suchen, z. B. runden" autocomplete="off" autocapitalize="off"><button type="button" class="fbtn" data-x aria-label="Schließen">✕</button></div>
         <div class="hb-list">${gl.map(g => `<section class="hb-group"><button type="button" class="hb-ghead" aria-expanded="false">${esc(g)} <span class="hb-count">${groups[g].length} ${groups[g].length === 1 ? 'Eintrag' : 'Einträge'}</span><span class="hb-chev" aria-hidden="true">▾</span></button><ul>${groups[g].map(entry).join('')}</ul></section>`).join('')}
         <p class="hb-foot">Parameter trennst du mit <code>;</code>, Dezimalzahlen schreibst du mit Komma: <code>1,5</code>. Text steht in Anführungszeichen: <code>"ja"</code>. Optionale Parameter stehen in [ ].</p></div></div>`;
     document.body.appendChild(ov);
@@ -144,7 +146,8 @@ export function openHandbuch(insert) {
                 const z = target(ex.lang);
                 h += `<div class="hb-ex">${table(ex.lang.t, ex.lang.f, z)}<div class="hb-f"><b>${z}</b>: <code>${esc(ex.lang.f)}</code> → <b>${esc(calc(ex.lang.t, ex.lang.f, z))}</b></div><p>${esc(ex.lang.x)}</p></div>`;
             }
-            h += `<button type="button" class="fbtn" data-insert="${esc(op ? name : name + '(')}">${op ? `„${esc(name)}“ einfügen` : `${esc(name)}( in die Formel einfügen`}</button>`;
+            h += choose ? `<button type="button" class="fbtn hb-choose" data-insert="${esc(name)}">${esc(name)} ins Diagramm nehmen</button>`
+                : `<button type="button" class="fbtn" data-insert="${esc(op ? name : name + '(')}">${op ? `„${esc(name)}“ einfügen` : `${esc(name)}( in die Formel einfügen`}</button>`;
             more.innerHTML = h;
         }
         more.hidden = !open; head.setAttribute('aria-expanded', String(open));
