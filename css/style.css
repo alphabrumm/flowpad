@@ -489,3 +489,14 @@ button, [role=button] { -webkit-touch-callout: none; -webkit-user-select: none; 
 .dfd-tools { margin-left: auto; }
 .dfd-head.compact #btnToDfd > span, .dfd-head.compact #btnToCell > span { display: none; }
 .dfd-head.compact #btnToDfd, .dfd-head.compact #btnToCell { padding: 0 9px; }
+
+/* ---------- Bausteinleiste einklappen ---------- */
+.dfd-paltoggle { flex: none; width: 16px; border: 0; border-right: 1px solid var(--line); background: var(--surface-2); color: var(--ink-2); cursor: pointer; padding: 0;
+  display: grid; place-items: center; font-weight: 800; font-size: 15px; }
+.dfd-paltoggle:hover { background: var(--next); color: var(--ink); }
+.dfd.pal-mini .dfd-palette { width: 54px; padding: 6px 5px; }
+.dfd.pal-mini .dfd-palette .dfd-pal { padding: 0; justify-content: center; }
+.dfd.pal-mini .pal-txt { display: none; }
+.dfd-palette .dfd-pal > span:first-child { flex: none; }
+@media (max-width: 700px) { .dfd-paltoggle { display: none; } .dfd.pal-mini .pal-txt { display: inline; } .dfd.pal-mini .dfd-palette { width: auto; } }
+.dfd.pal-mini .sym-const { font-size: 17px; }

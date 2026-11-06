@@ -189,7 +189,7 @@ function showCell(a, keepMsg) {
     editor.setModel(model, {
         outRef: a,
         emptyHtml: isF ? `In <b>${esc(a)}</b> steht eine Formel. Tippe auf <b><i>fx</i> → DFD</b>, dann entsteht das Datenflussdiagramm.`
-            : `Baue hier das Datenflussdiagramm für <b>${esc(a)}</b>: Bausteine oben antippen, verbinden, dann <b>DFD → Zelle</b>.`,
+            : `Baue hier das Datenflussdiagramm für <b>${esc(a)}</b>: Bausteine links antippen, verbinden, dann <b>DFD → Zelle</b>.`,
     });
     updateCellInfo();
     const t = project.tasks && project.tasks[a];

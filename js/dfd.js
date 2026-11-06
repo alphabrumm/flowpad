@@ -319,11 +319,11 @@ export const DFD = (() => {
     root.classList.add('dfd');
     root.innerHTML = `
       <div class="dfd-palette" role="toolbar" aria-label="Bausteine">
-        <button type="button" class="dfd-pal" data-add="in" title="Eingabe: eine Zelle oder ein Bereich der Tabelle"><span class="sym-rect"></span>Eingabe</button>
-        <button type="button" class="dfd-pal" data-add="const" title="Konstante: eine feste Zahl oder ein Text"><span class="sym-const">#</span>Konstante</button>
-        <button type="button" class="dfd-pal" data-add="fn" title="Funktion oder Rechenzeichen (Ellipse)"><span class="sym-ell"></span>Funktion</button>
-        <button type="button" class="dfd-pal" data-add="split" title="Verteiler: gibt ein Datum an mehrere Funktionen weiter"><span class="sym-dot"></span>Verteiler</button>
-        <button type="button" class="dfd-pal" data-add="out" title="Ausgabe: die Zelle, in der das Ergebnis steht"><span class="sym-rect out"></span>Ausgabe</button>
+        <button type="button" class="dfd-pal" data-add="in" title="Eingabe: eine Zelle oder ein Bereich der Tabelle"><span class="sym-rect"></span><span class="pal-txt">Eingabe</span></button>
+        <button type="button" class="dfd-pal" data-add="const" title="Konstante: eine feste Zahl oder ein Text"><span class="sym-const">#</span><span class="pal-txt">Konstante</span></button>
+        <button type="button" class="dfd-pal" data-add="fn" title="Funktion oder Rechenzeichen (Ellipse)"><span class="sym-ell"></span><span class="pal-txt">Funktion</span></button>
+        <button type="button" class="dfd-pal" data-add="split" title="Verteiler: gibt ein Datum an mehrere Funktionen weiter"><span class="sym-dot"></span><span class="pal-txt">Verteiler</span></button>
+        <button type="button" class="dfd-pal" data-add="out" title="Ausgabe: die Zelle, in der das Ergebnis steht"><span class="sym-rect out"></span><span class="pal-txt">Ausgabe</span></button>
       </div>
       <div class="dfd-body"><div class="dfd-stage"><div class="dfd-edit" hidden></div><div class="dfd-canvas"><svg xmlns="http://www.w3.org/2000/svg" role="application" aria-label="Zeichenfläche für das Datenflussdiagramm">
         <defs><marker id="dfdArrow-${uid}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="arrowhead"/></marker></defs>
@@ -332,6 +332,20 @@ export const DFD = (() => {
       <div class="dfd-formula"><span>Formel des Diagramms:</span> <code></code></div>
       <div class="dfd-msg" aria-live="polite"></div>`;
     root.querySelector('.dfd-body').prepend(root.querySelector('.dfd-palette'));
+    // Einklappleiste: Bausteinleiste schmal (nur Symbole) oder breit (mit Namen); wird gemerkt
+    const palToggle = document.createElement('button');
+    palToggle.type = 'button'; palToggle.className = 'dfd-paltoggle';
+    root.querySelector('.dfd-palette').after(palToggle);
+    const setMini = on => {
+      root.classList.toggle('pal-mini', on);
+      palToggle.innerHTML = `<span aria-hidden="true">${on ? '›' : '‹'}</span>`;
+      palToggle.title = on ? 'Bausteinleiste aufklappen' : 'Bausteinleiste einklappen (nur Symbole)';
+      palToggle.setAttribute('aria-label', palToggle.title);
+      try { localStorage.setItem('flowpad.palMini', on ? '1' : '0'); } catch (e) { }
+    };
+    let mini0 = false; try { mini0 = localStorage.getItem('flowpad.palMini') === '1'; } catch (e) { }
+    setMini(mini0);
+    palToggle.addEventListener('click', () => { setMini(!root.classList.contains('pal-mini')); setTimeout(() => applyZoom && applyZoom(), 30); });
     const canvas = root.querySelector('.dfd-canvas'), svg = root.querySelector('svg'), gE = root.querySelector('.edges'), gN = root.querySelector('.nodes'), rubber = root.querySelector('.rubber');
     const msg = root.querySelector('.dfd-msg'), fcode = root.querySelector('.dfd-formula code'), edit = root.querySelector('.dfd-edit'), empty = root.querySelector('.dfd-empty');
     // Statusleiste: eine Zeile; ist die Meldung länger, zeigt „▾“ das an und ein Tipp klappt sie auf
