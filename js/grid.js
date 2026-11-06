@@ -156,17 +156,33 @@ export function Grid(root, host) {
         if (p.b && p.b !== p.a) { const A = E.parseAddr(p.a), B = E.parseAddr(p.b); ref = E.addr(Math.min(A.r, B.r), Math.min(A.c, B.c)) + ':' + E.addr(Math.max(A.r, B.r), Math.max(A.c, B.c)); }
         render(); p.done(ref);
     }
+    // Zeigen beim Formelschreiben: Erst beim Loslassen einsetzen – und nur, wenn der Finger nicht gescrollt hat
+    let point = null;
+    const dropPoint = () => { point = null; };
     table.addEventListener('pointerdown', ev => {
         const td = ev.target.closest('td'); if (!td) return;
         if (pick) { ev.preventDefault(); pick.a = td.dataset.a; pick.b = null; pick.pid = ev.pointerId; try { table.setPointerCapture(ev.pointerId); } catch (e) { } render(); return; }
-        if (pointable()) { ev.preventDefault(); insertAt(td.dataset.a); justPointed = true; try { input.focus({ preventScroll: true }); } catch (e) { } }
+        point = pointable() ? { a: td.dataset.a, pid: ev.pointerId, x: ev.clientX, y: ev.clientY, st: scroller.scrollTop, sl: scroller.scrollLeft,
+            s: input.selectionStart, e: input.selectionEnd } : null;
     });
     table.addEventListener('pointermove', ev => {
+        if (point && ev.pointerId === point.pid && Math.hypot(ev.clientX - point.x, ev.clientY - point.y) > 8) dropPoint();
         if (!pick || !pick.a || ev.pointerId !== pick.pid) return;
         const td = tdAt(ev); if (td && td.dataset.a !== (pick.b || pick.a)) { pick.b = td.dataset.a; render(); }
     });
-    table.addEventListener('pointerup', ev => { if (pick && pick.a && ev.pointerId === pick.pid) { ev.preventDefault(); finishPick(); } });
-    table.addEventListener('mousedown', ev => { if (pointable() || pick) ev.preventDefault(); });
+    scroller.addEventListener('scroll', () => { if (point && (Math.abs(scroller.scrollTop - point.st) > 2 || Math.abs(scroller.scrollLeft - point.sl) > 2)) dropPoint(); }, { passive: true });
+    table.addEventListener('pointercancel', dropPoint);
+    table.addEventListener('pointerup', ev => {
+        if (pick && pick.a && ev.pointerId === pick.pid) { ev.preventDefault(); finishPick(); return; }
+        if (!point || ev.pointerId !== point.pid) return;
+        const p = point; point = null;
+        const td = ev.target.closest && ev.target.closest('td');
+        if (!td || td.dataset.a !== p.a) return;
+        ev.preventDefault();
+        try { input.focus({ preventScroll: true }); if (p.s != null) input.setSelectionRange(p.s, p.e); } catch (e) { }
+        insertAt(p.a); justPointed = true; setTimeout(() => { justPointed = false; }, 600);
+    });
+    table.addEventListener('mousedown', ev => { if (justPointed || point || pointable() || pick) ev.preventDefault(); });
     table.addEventListener('click', ev => {
         const td = ev.target.closest('td'); if (!td || pick) return;
         if (justPicked) { justPicked = false; return; }
