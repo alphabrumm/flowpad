@@ -278,6 +278,9 @@ $('#btnDfdClear').addEventListener('click', async () => {
 function showTaskBar(t) {
     const bar = $('#taskBar');
     if (!t) { bar.hidden = true; bar.innerHTML = ''; return; }
+    // Formel-Aufgaben stehen über der Tabelle, Diagramm-Aufgaben über dem Diagramm
+    const home = t.mode === 'formel' ? document.querySelector('#grid .calc-preview') : $('#dfd');
+    if (home && bar.nextElementSibling !== home) home.before(bar);
     bar.hidden = false; bar.classList.remove('open');
     bar.classList.toggle('done', !!t.done);
     const what = t.mode === 'formel' ? 'Formel' : t.mode === 'diagramm' ? 'Diagramm' : 'Aufgabe';
