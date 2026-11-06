@@ -123,7 +123,7 @@ export function openHandbuch(insert) {
     const ov = document.createElement('div'); ov.className = 'hb-backdrop';
     ov.innerHTML = `<div class="hb" role="dialog" aria-modal="true" aria-label="Handbuch der Funktionen">
         <div class="hb-top"><b>fx · Handbuch der Funktionen</b><input type="search" placeholder="suchen, z. B. runden" autocomplete="off" autocapitalize="off"><button type="button" class="fbtn" data-x aria-label="Schließen">✕</button></div>
-        <div class="hb-list">${gl.map(g => `<h4>${esc(g)}</h4><ul>${groups[g].map(entry).join('')}</ul>`).join('')}
+        <div class="hb-list">${gl.map(g => `<section class="hb-group"><button type="button" class="hb-ghead" aria-expanded="false">${esc(g)} <span class="hb-count">${groups[g].length} ${groups[g].length === 1 ? 'Eintrag' : 'Einträge'}</span><span class="hb-chev" aria-hidden="true">▾</span></button><ul>${groups[g].map(entry).join('')}</ul></section>`).join('')}
         <p class="hb-foot">Parameter trennst du mit <code>;</code>, Dezimalzahlen schreibst du mit Komma: <code>1,5</code>. Text steht in Anführungszeichen: <code>"ja"</code>. Optionale Parameter stehen in [ ].</p></div></div>`;
     document.body.appendChild(ov);
     const close = () => ov.remove();
@@ -132,6 +132,8 @@ export function openHandbuch(insert) {
         if (e.target === ov) return close();
         const ins = e.target.closest('[data-insert]');
         if (ins) { close(); insert(ins.dataset.insert); return; }
+        const gh = e.target.closest('.hb-ghead');
+        if (gh) { const sec = gh.parentElement, open = !sec.classList.contains('open'); sec.classList.toggle('open', open); gh.setAttribute('aria-expanded', String(open)); if (open) setTimeout(() => sec.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 30); return; }
         const head = e.target.closest('.hb-head'); if (!head) return;
         const li = head.parentElement, more = li.querySelector('.hb-more'), name = li.dataset.name;
         const open = more.hidden;
@@ -152,7 +154,8 @@ export function openHandbuch(insert) {
     s.addEventListener('input', () => {
         const q = s.value.trim().toUpperCase();
         ov.querySelectorAll('.hb-item').forEach(li => li.hidden = !!q && !li.textContent.toUpperCase().includes(q));
-        ov.querySelectorAll('.hb-list h4').forEach(h => { const ul = h.nextElementSibling; h.hidden = ![...ul.children].some(li => !li.hidden); });
+        // Suche: passende Rubriken aufklappen, leere ausblenden; ohne Suchtext alles wieder zu
+        ov.querySelectorAll('.hb-group').forEach(sec => { const any = [...sec.querySelectorAll('.hb-item')].some(li => !li.hidden); sec.hidden = !any; sec.classList.toggle('open', !!q && any); sec.querySelector('.hb-ghead').setAttribute('aria-expanded', String(!!q && any)); });
     });
 }
 export const _test = { EX, calc, target };

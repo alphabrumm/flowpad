@@ -506,7 +506,7 @@ button, [role=button] { -webkit-touch-callout: none; -webkit-user-select: none; 
 .taskbar.done { background: color-mix(in srgb, var(--good) 14%, var(--surface)); border-bottom-color: var(--good); }
 .taskbar .tb-ic { flex: none; font-size: 1.1em; line-height: 1.25; }
 .taskbar.done .tb-ic { color: var(--good); font-weight: 800; }
-.taskbar .tb-text { flex: 1; min-width: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.taskbar .tb-text { flex: 1; min-width: 0; }
 .taskbar.open .tb-text { display: block; -webkit-line-clamp: unset; }
 .taskbar .tb-kind { font-size: .85em; color: var(--ink-2); }
 .taskbar .tb-more { display: none; flex: none; font-weight: 800; color: var(--ink-2); }
@@ -528,3 +528,13 @@ body.hide-grid:not([data-layout="narrow"]) #splitter, body.hide-dfd:not([data-la
 body.hide-grid:not([data-layout="narrow"]) .left, body.hide-dfd:not([data-layout="narrow"]) .left { grid-template-rows: 1fr !important; grid-template-columns: 1fr !important; }
 body.hide-left[data-layout="wide"] .left { display: none; }
 body.hide-left[data-layout="wide"] .lp-pane { flex: 1 1 auto; }
+
+/* Handbuch: Rubriken zum Auf- und Zuklappen */
+.hb-group { border: 1px solid var(--line); border-radius: 10px; margin: 8px 0; background: var(--surface); overflow: hidden; }
+.hb-ghead { width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 0; background: var(--surface-2); cursor: pointer; text-align: left; font-family: var(--title-font); font-weight: 700; font-size: 1.05em; color: var(--ink); }
+.hb-ghead .hb-count { font-family: var(--font-body); font-weight: 400; font-size: .8em; color: var(--ink-2); }
+.hb-ghead .hb-chev { margin-left: auto; transition: transform .15s; }
+.hb-group.open .hb-ghead .hb-chev { transform: rotate(180deg); }
+.hb-group.open .hb-ghead { border-bottom: 1px solid var(--line); background: var(--next); }
+.hb-group > ul { padding: 8px; }
+.hb-group:not(.open) > ul { display: none; }

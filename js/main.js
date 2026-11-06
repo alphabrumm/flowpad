@@ -147,7 +147,7 @@ const editor = DFD.Editor($('#dfd'), {
         touch();
     },
     labelOf,
-    startPick(done, text) { if (layoutMode() !== 'wide') showView('tabelle'); grid.startPick(ref => { done(ref); if (layoutMode() !== 'wide') showView('diagramm'); }, text); },
+    startPick(done, text) { ensureView('grid'); if (layoutMode() !== 'wide') showView('tabelle'); grid.startPick(ref => { done(ref); if (layoutMode() !== 'wide') showView('diagramm'); }, text); },
     cancelPick: () => grid.cancelPick(),
     /** Teilformel mit den Werten der Tabelle ausrechnen (Ablauf) */
     evalTerm(t) {
