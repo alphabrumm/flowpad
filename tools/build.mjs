@@ -53,6 +53,8 @@ const files = [];
 (function walk(d, rel) { for (const f of fs.readdirSync(d)) { const p = path.join(d, f), r = rel ? rel + '/' + f : f; if (fs.statSync(p).isDirectory()) { if (r !== 'learn') walk(p, r); } else if (!/\.(php|md|txt)$/.test(f) && f !== 'sw.js') files.push(r); } })(out, '');
 const hash = crypto.createHash('sha256'); for (const f of files.sort()) hash.update(f).update(fs.readFileSync(path.join(out, f)));
 const version = hash.digest('hex').slice(0, 12);
+// index.html: CSS und Startskript mit Versionsnummer laden
+{ const ip = path.join(out, 'index.html'); fs.writeFileSync(ip, fs.readFileSync(ip, 'utf8').replace('href="css/style.css"', `href="css/style.css?v=${version}"`).replace('src="js/main.js"', `src="js/main.js?v=${version}"`)); }
 fs.writeFileSync(path.join(out, 'sw.js'), `// erzeugt von tools/build.mjs
 const CACHE = 'flowpad-${version}';
 const FILES = ${JSON.stringify(['./', ...files])};
@@ -61,9 +63,12 @@ self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Pr
 self.addEventListener('fetch', e => {
   const u = new URL(e.request.url);
   if (e.request.method !== 'GET' || u.origin !== location.origin) return;
-  // Lernpfade und Listen: zuerst das Netz, offline der zuletzt geladene Stand
-  if (u.pathname.includes('/learn/')) { e.respondWith(fetch(e.request).then(r => { const c = r.clone(); caches.open(CACHE).then(x => x.put(e.request, c)); return r; }).catch(() => caches.match(e.request))); return; }
-  e.respondWith(caches.match(e.request, { ignoreSearch: true }).then(r => r || fetch(e.request)));
+  // Immer zuerst das Netz (beim Server nachfragen, ob es Neues gibt) – so zeigt jedes Neuladen die aktuelle Version.
+  // Nur offline kommt der zuletzt geladene Stand aus dem Speicher.
+  e.respondWith(fetch(e.request, { cache: 'no-cache' }).then(r => {
+    if (r.ok) { const c = r.clone(); caches.open(CACHE).then(x => x.put(e.request, c)); }
+    return r;
+  }).catch(() => caches.match(e.request, { ignoreSearch: true }).then(r => r || caches.match('./'))));
 });
 `);
 console.log(`FlowPad gebaut nach ${out} (Version ${version}, ${files.length} Dateien).`);

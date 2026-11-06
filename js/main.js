@@ -702,6 +702,6 @@ async function start() {
     const c = project && codeOfUrl(project.source); if (c) $('#projectName').title = 'FlowCode ' + c;
     showTeacherCode();
     if (teacherStart) teacherList();
-    if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => { });
+    if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(r => r.update()).catch(() => { });
 }
 start();
