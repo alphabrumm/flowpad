@@ -39,15 +39,22 @@ export function evalRule(r, cells) {
     return true;
   });
 }
-function miniTable(cells) {
+function fmtOf(fmt, a) { if (!fmt) return undefined; if (fmt[a]) return fmt[a]; for (const k in fmt) { try { if (k.includes(':') && CE.rangeCells(k).includes(a)) return fmt[k]; } catch (e) { } } return undefined; }
+function miniTable(cells, fmt) {
   const keys = Object.keys(cells || {}); if (!keys.length) return '';
   let R = 0, C = 0; keys.forEach(a => { const p = CE.parseAddr(a); if (p) { R = Math.max(R, p.r + 1); C = Math.max(C, p.c + 1); } });
   R = Math.min(R, 12); C = Math.min(C, 8);
   const sh = sheetOf(cells);
   let h = '<table class="lp-mini"><tr><th></th>'; for (let c = 0; c < C; c++) h += `<th>${CE.colName(c)}</th>`; h += '</tr>';
-  for (let r = 0; r < R; r++) { h += `<tr><th>${r + 1}</th>`; for (let c = 0; c < C; c++) { let v = ''; try { v = CE.display(sh.value(CE.addr(r, c))); } catch (e) { } h += `<td>${esc(v)}</td>`; } h += '</tr>'; }
+  for (let r = 0; r < R; r++) { h += `<tr><th>${r + 1}</th>`; for (let c = 0; c < C; c++) { let v = ''; try { const a = CE.addr(r, c); v = CE.display(sh.value(a), fmtOf(fmt, a)); } catch (e) { } h += `<td>${esc(v)}</td>`; } h += '</tr>'; }
   return h + '</table>';
 }
+
+/* Für den Export ohne FlowPad: Aufgaben werden zur Selbstkontrolle – das Ergebnis wird hier vorher ausgerechnet */
+function resultOf(cells, cell, target) {
+  try { const v = sheetOf({ ...cells, [cell]: target }).value(cell); if (CE.isErr(v)) return null; return typeof v === 'number' ? String(Math.round(v * 1e6) / 1e6) : CE.display(v); } catch (e) { return null; }
+}
+const legendHtml = () => `<div class="lp-card lp-legend"><span class="sym r"></span><span>Eingabe (eine Zelle oder ein Bereich), z. B. <b>Preis (B2)</b></span><span class="sym e"></span><span>Funktion – auch Rechenzeichen wie <code>*</code> stehen in einer Ellipse</span><span class="k">2</span><span>Konstante: einfach die Zahl, ohne Rahmen</span><span><span class="sym d"></span></span><span>Verteiler: gibt ein Datum an mehrere Funktionen weiter</span><span class="sym o"></span><span>Ausgabe: die Zelle mit dem Ergebnis</span></div>`;
 
 const RULE_KINDS = [['formel', 'Formel steht in'], ['wert', 'Wert ist gleich'], ['text', 'Text/Anzeige ist gleich'], ['enthaelt', 'Formel enthält'], ['nicht', 'Formel enthält nicht'], ['keinfehler', 'kein Fehler in'], ['test', 'Test: Werte setzen, dann ist'], ['wie', 'rechnet wie Formel']];
 const XP = { k: 'xp', l: 'XP (Challenge)', t: 'number' };
@@ -68,10 +75,15 @@ export const flowpadPlugin = {
       label: b => 'das Rechenblatt „' + (b.title || '') + '“',
       render(b, x) {
         const cells = b.sheet?.cells || {}, n = Object.keys(cells).length, rules = b.rules || [], res = x.prog.quiz[b.id], ok = x.prog.solved[b.id];
-        return `<div class="lp-card lp-sheet${ok ? ' ok' : ''}"><div class="hd">${x.ce('title', b.title, 'Tabelle laden', { tag: 'b', cls: 'lp-ctitle' })}${x.xpTag(b)}<span class="lp-state">${ok ? '✓ geschafft' : ''}</span></div>${x.ce('html', b.html, 'Auftrag oder Beschreibung (optional)', { rich: true })}${miniTable(cells)}`
+        return `<div class="lp-card lp-sheet${ok ? ' ok' : ''}"><div class="hd">${x.ce('title', b.title, 'Tabelle laden', { tag: 'b', cls: 'lp-ctitle' })}${x.xpTag(b)}<span class="lp-state">${ok ? '✓ geschafft' : ''}</span></div>${x.ce('html', b.html, 'Auftrag oder Beschreibung (optional)', { rich: true })}${miniTable(cells, b.sheet?.fmt)}`
           + `<div><button class="lp-btn" data-run="sheet">▦ Tabelle in FlowPad laden</button>${rules.length ? '<button class="lp-btn alt" data-run="check">✓ Prüfen</button>' : ''}</div>`
           + (res && !x.E() ? `<div class="fb" style="color:var(${res.ok ? '--good' : '--bad'})">${res.ok ? '✓ ' : '✗ '}${res.msg}</div>` : '')
           + (x.E() ? `<div class="ed-hint">${n ? `${n} Zellen` : 'Noch keine Tabelle'} · ${rules.length ? `${rules.length} Prüfregel${rules.length > 1 ? 'n' : ''}` : 'ohne Prüfung'} · ⚙ → <b>aus FlowPad übernehmen</b>, Prüfregeln</div>` : '') + '</div>';
+      },
+      exportAs(b) {
+        const tab = miniTable(b.sheet?.cells || {}, b.sheet?.fmt);
+        if ((b.rules || []).length) return { type: 'task', title: b.title, html: `${b.html || ''}${tab}<i>Bearbeite die Tabelle in einer Tabellenkalkulation und hake danach ab.</i>`, xp: b.xp || 10, tips: [], solution: '', img: '' };
+        return { type: 'html', html: `<div class="lp-card lp-sheet"><b class="lp-ctitle">${esc(b.title)}</b>${b.html ? `<div>${b.html}</div>` : ''}${tab}</div>` };
       },
       form: [{ k: 'title', l: 'Titel (auch Name des Reiters in FlowPad)', t: 'text' }, { k: 'sheet', l: 'Tabelle', t: 'fp-sheet' }, { k: 'rules', l: 'Prüfregeln (der Reihe nach – die erste, die nicht passt, wird gemeldet)', t: 'fp-rules' }, { k: 'ok', l: 'Meldung, wenn alles stimmt', t: 'text', show: b => (b.rules || []).length > 0 }, XP],
       run(a, b, x) {
@@ -96,6 +108,13 @@ export const flowpadPlugin = {
           + (!x.E() && a.kind === 'diagramm' && (x.prog.tries[b.id] || 0) >= 2 && !ok ? '<button class="lp-btn alt" data-run="solve">Lösung zeigen</button>' : '');
         const hint = `FlowPad prüft <b>${esc(a.cell || '?')}</b> gegen <b>${esc(a.target || '?')}</b> · ${a.kind === 'diagramm' ? 'als Diagramm' : 'als Formel'}${a.dfd === 'vorgegeben' ? ' · Diagramm wird gezeigt' : ''}${b.sheet?.cells ? ' · mit eigener Tabelle' : ''} <span style="opacity:.7">(⚙ zum Ändern)</span>`;
         return x.taskCard(b, { buttons, hint, where: a.tabelle ? '▦ ' + a.tabelle : '' });
+      },
+      exportAs(b, env) {
+        const a = b.app || {}, sheet = b.sheet?.cells ? b.sheet : env.sheetBefore(env.station, env.index), cells = sheet?.cells || {};
+        const res = a.cell && a.target ? resultOf(cells, a.cell, a.target) : null;
+        const tab = miniTable(cells, sheet?.fmt);
+        const ask = res != null ? `<p><b>Selbstkontrolle:</b> Rechne mit den Werten der Tabelle. Welches Ergebnis steht in <b>${esc(a.cell)}</b>?</p>` : '';
+        return { type: 'task', title: b.title, html: `${b.html || ''}${tab}${ask}`, answer: res ?? '', answerPh: a.cell ? 'Ergebnis in ' + a.cell : 'Ergebnis', xp: b.xp, tips: b.tips || [], solution: b.solution || (a.target ? `<code>${esc(a.target)}</code>` : ''), img: b.img || '' };
       },
       form: [
         { k: 'title', l: 'Titel', t: 'text' },
@@ -125,15 +144,17 @@ export const flowpadPlugin = {
       render: (b, x) => `<div class="lp-action"><button class="lp-btn alt" data-run="action">${esc(b.label || 'Knopf')}</button>${x.E() ? `<span class="ed-hint" style="margin-left:6px">${b.act === 'dfd' ? `zeigt das Diagramm von ${esc(b.cell || '?')}` : `Ansichten: ${b.tabelle ? 'Tabelle' : ''}${b.tabelle && b.diagramm ? ' + ' : ''}${b.diagramm ? 'Diagramm' : ''}`}</span>` : ''}</div>`,
       form: [{ k: 'label', l: 'Beschriftung', t: 'text' }, { k: 'act', l: 'Was passiert?', t: 'select', o: [['ansichten', 'Ansichten in FlowPad schalten'], ['dfd', 'Diagramm einer Zelle zeigen']] }, { k: 'tabelle', l: 'Tabelle zeigen', t: 'check', show: b => b.act === 'ansichten' }, { k: 'diagramm', l: 'Diagramm zeigen', t: 'check', show: b => b.act === 'ansichten' }, { k: 'cell', l: 'Zelle', t: 'cell', show: b => b.act === 'dfd' }, { k: 'term', l: 'Formel (falls die Zelle noch leer ist)', t: 'formula', show: b => b.act === 'dfd' }, { k: 'sheet', l: 'Vorher diese Tabelle laden (optional)', t: 'fp-sheet', show: b => b.act === 'dfd' }],
       run(a, b, x) { x.host.action?.(b) ?? x.toast('Aktion in FlowPad ausgeführt'); },
+      exportAs: () => null, // ohne FlowPad gibt es nichts umzuschalten
     },
     legend: {
       n: 'DFD-Legende', ic: '⬭', g: 'FlowPad', h: 'Symbole der Datenflussdiagramme', make: () => ({}),
+      exportAs: () => ({ type: 'html', html: legendHtml() }),
       render: () => `<div class="lp-card lp-legend"><span class="sym r"></span><span>Eingabe (eine Zelle oder ein Bereich), z. B. <b>Preis (B2)</b></span><span class="sym e"></span><span>Funktion – auch Rechenzeichen wie <code>*</code> stehen in einer Ellipse</span><span class="k">2</span><span>Konstante: einfach die Zahl, ohne Rahmen</span><span><span class="sym d"></span></span><span>Verteiler: gibt ein Datum an mehrere Funktionen weiter</span><span class="sym o"></span><span>Ausgabe: die Zelle mit dem Ergebnis</span></div>`,
     },
   },
   fields: {
     'fp-sheet': {
-      html(f, v, b, x) { const n = Object.keys(v?.cells || {}).length; return `<label>${esc(f.l)}</label><div class="row"><span class="help" style="align-self:center">${n ? `${n} Zellen` : 'noch leer'}</span>${x.host.cells ? `<button class="take" data-fptake="${f.k}">▦ aus FlowPad übernehmen</button>` : ''}${n ? `<button class="add" data-fpclear="${f.k}">leeren</button>` : ''}</div>${n ? miniTable(v.cells) : ''}`; },
+      html(f, v, b, x) { const n = Object.keys(v?.cells || {}).length; return `<label>${esc(f.l)}</label><div class="row"><span class="help" style="align-self:center">${n ? `${n} Zellen` : 'noch leer'}</span>${x.host.cells ? `<button class="take" data-fptake="${f.k}">▦ aus FlowPad übernehmen</button>` : ''}${n ? `<button class="add" data-fpclear="${f.k}">leeren</button>` : ''}</div>${n ? miniTable(v.cells, v.fmt) : ''}`; },
       click(d, b, draw, x) {
         if (d.fptake) { b[d.fptake] = { ...(b[d.fptake] || {}), cells: { ...x.host.cells() }, title: x.host.tab?.() }; draw(); x.toast('Tabelle übernommen'); }
         if (d.fpclear) { b[d.fpclear] = null; draw(); }
