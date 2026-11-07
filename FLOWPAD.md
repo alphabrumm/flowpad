@@ -164,7 +164,7 @@ Die Seiten werden aus einer Aufgabenliste erzeugt; dabei werden alle Musterlösu
 Ein Lernpfad ist ein JSON-Dokument aus Stationen mit Bausteinen (Text, Infokasten inkl. „Figur sagt“/Regel/Abschluss,
 Bild, Tabelle, Aufdecken, Datei, HTML, Aufgabe, Quiz mit mehreren Fragen, Lückentext mit Begriffen/Hefteintrag,
 Zuordnen, Sperre, Rechenblatt mit Prüfregeln, Formel-/Diagramm-Aufgabe, Aktionsknopf, DFD-Legende, Code, UML-Klasse).
-Gespeichert wird lokal im Browser; Export (HTML, SCORM) folgt.
+Titel, Untertitel, Stationstitel, Texte und Infokästen können eine Textanimation bekommen (Schreibmaschine, Einblenden, Glitch, Leuchten), beim großen Kopfbild zusätzlich Tipp-Zeilen wie ein Terminal. Gespeichert wird lokal im Browser; Export (HTML, SCORM) folgt.
 
 `python3 tools/lp2json.py` wandelt bestehende Lernpfade (FlowPad-Demo, LP1-1) in dieses Format um
 (`editor/beispiele/`); im Editor über 📂 Öffnen → „Umgewandelte Lernpfade“.

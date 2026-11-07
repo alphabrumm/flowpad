@@ -185,6 +185,9 @@ def convert_lp(path, pal=0):
     d['goals'] = [inline(li) for li in hero.select('.goals li')]
     rank = hero.select_one('.rank')
     if rank: d['rank'] = re.sub(r'\s+', ' ', ' '.join(rank.stripped_strings)).replace('Rang: ', 'Rang: <b>', 1).replace(' →', '</b> →', 1) if '→' in rank.get_text() else inline(rank)
+    ty = hero.select_one('.typing')
+    if ty and ty.get('data-lines'):
+        d['typeLines'] = json.loads(ty['data-lines'])
     img = hero.select_one('.hero-art img')
     if img and img.get('src', '').startswith('data:'):
         d['design']['hero'] = 'gross'; d['design']['heroImg'] = img['src']

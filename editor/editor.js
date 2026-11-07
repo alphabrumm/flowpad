@@ -166,9 +166,44 @@ function clean(html) {
 
 /* ---------- Rendern ---------- */
 const E = () => mode === 'edit';
-function ce(path, val, ph, { rich = false, tag = 'div', cls = '' } = {}) {
-  if (!E()) return `<${tag}${cls ? ` class="${cls}"` : ''}>${rich ? (val || '') : esc(val)}</${tag}>`;
-  return `<${tag} class="${cls}" contenteditable="true" data-f="${path}"${rich ? ' data-rich="1"' : ''} data-ph="${esc(ph)}" spellcheck="true">${rich ? (val || '') : esc(val)}</${tag}>`;
+function ce(path, val, ph, { rich = false, tag = 'div', cls = '', anim = '', key = '' } = {}) {
+  if (!E()) return `<${tag}${cls ? ` class="${cls}"` : ''}${anim ? ` data-anim="${anim}" data-ak="${esc(key || path)}"` : ''}>${rich ? (val || '') : esc(val)}</${tag}>`;
+  return `<${tag} class="${cls}" contenteditable="true" data-f="${path}"${rich ? ' data-rich="1"' : ''}${anim ? ` data-anim-ed="${ANIMS[anim] || anim}"` : ''} data-ph="${esc(ph)}" spellcheck="true">${rich ? (val || '') : esc(val)}</${tag}>`;
+}
+/* ---------- Textanimationen (nur Vorschau/Export, einmal beim Hineinscrollen) ---------- */
+const ANIMS = { tippen: 'Schreibmaschine', einblenden: 'Einblenden', glitch: 'Glitch', leuchten: 'Leuchten' };
+const ANIM_OPTS = [['', 'keine'], ...Object.entries(ANIMS)];
+const animDone = new Set();
+const reduceMotion = () => window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+let animObs = null;
+function runAnims() {
+  animObs?.disconnect();
+  if (E()) return;
+  const els = $$('[data-anim]', lp).filter(e => !animDone.has(e.dataset.ak));
+  if (reduceMotion()) { els.forEach(e => animDone.add(e.dataset.ak)); return; }
+  els.forEach(e => { if (e.dataset.anim === 'tippen' || e.dataset.anim === 'einblenden') e.classList.add('an-wait'); });
+  animObs = new IntersectionObserver(ents => ents.forEach(en => { if (!en.isIntersecting) return; animObs.unobserve(en.target); playAnim(en.target); }), { root: scroller, threshold: .3 });
+  els.forEach(e => animObs.observe(e));
+  typeHeroLines();
+}
+function playAnim(el) {
+  animDone.add(el.dataset.ak);
+  const a = el.dataset.anim; el.classList.remove('an-wait');
+  if (a === 'tippen') typeInto(el);
+  else { el.classList.add('an-' + a); if (a !== 'leuchten') setTimeout(() => el.classList.remove('an-' + a), 1600); }
+}
+function typeInto(el) { // tippt den Text Zeichen für Zeichen, am Ende kommt die Auszeichnung zurück
+  const html = el.innerHTML, txt = el.textContent; let i = 0;
+  el.textContent = ''; el.classList.add('an-typing');
+  const speed = Math.max(12, Math.min(45, 1800 / Math.max(1, txt.length)));
+  (function step() { if (!el.isConnected) return; if (i < txt.length) { el.textContent = txt.slice(0, ++i); setTimeout(step, speed); } else { el.innerHTML = html; el.classList.remove('an-typing'); } })();
+}
+function typeHeroLines() {
+  const ty = $('.lp-typing', lp); if (!ty || animDone.has('$lines')) return;
+  animDone.add('$lines');
+  const lines = doc.typeLines || []; if (reduceMotion()) { ty.textContent = lines.join('\n'); return; }
+  let li = 0, ci = 0, txt = ''; ty.textContent = '';
+  (function step() { if (!ty.isConnected || li >= lines.length) return; if (ci < lines[li].length) { txt += lines[li][ci++]; ty.textContent = txt; setTimeout(step, 45); } else { txt += '\n'; li++; ci = 0; setTimeout(step, 500); } })();
 }
 function applyDesign() {
   const p = PALETTES[doc.design.pal] || PALETTES[0], f = FONTS[doc.design.font] || FONTS.pixel, st = lp.style;
@@ -183,12 +218,13 @@ function render() {
   lp.classList.toggle('editing', E());
   lp.classList.toggle('single-station', single);
   if (!curSid || !doc.stations.some(s => s.id === curSid)) curSid = doc.stations[0]?.id;
-  const d = doc.design, logo = (d.hero === 'bild' || d.hero === 'gross') && d.heroImg ? `<img src="${d.heroImg}" alt="">` : 'F';
+  const d = doc.design, lines = doc.typeLines || [];
+  const logo = ((d.hero === 'bild' || d.hero === 'gross') && d.heroImg ? `<img src="${d.heroImg}" alt="">` : 'F') + (d.hero === 'gross' && lines.length ? `<div class="lp-typing">${E() ? esc(lines.join('\n')) : ''}</div>` : '');
   let h = `<div class="fontsize"><button data-fz="-" aria-label="Schrift kleiner">A−</button><button data-fz="+" aria-label="Schrift größer">A+</button></div>`;
   const goals = doc.goals || [];
   h += `<header class="lp-hero${d.hero === 'hintergrund' && d.heroImg ? ' has-bg' : ''}${d.hero === 'gross' && d.heroImg ? ' big' : ''}"${d.hero === 'hintergrund' && d.heroImg ? ` style="background-image:url(${d.heroImg})"` : ''}>`
     + (d.hero !== 'hintergrund' ? `<div class="lp-logo"${E() ? ' title="Antippen: eigenes Bild oder GIF setzen"' : ''}>${logo}</div>` : '')
-    + `<div style="min-width:0">${ce('$kicker', doc.kicker, 'Kopfzeile', { tag: 'small' })}${ce('$title', doc.title, 'Titel des Lernpfads', { tag: 'h1' })}${ce('$subtitle', doc.subtitle, 'Untertitel', { tag: 'p', rich: true })}`
+    + `<div style="min-width:0">${ce('$kicker', doc.kicker, 'Kopfzeile', { tag: 'small' })}${ce('$title', doc.title, 'Titel des Lernpfads', { tag: 'h1', anim: doc.anim?.title })}${ce('$subtitle', doc.subtitle, 'Untertitel', { tag: 'p', rich: true, anim: doc.anim?.subtitle })}`
     + (goals.length ? `<ul class="lp-goals">${goals.map((g, i) => ce('$goals.' + i, g, 'Lernziel', { tag: 'li', rich: true })).join('')}</ul>` : '')
     + (doc.rank ? `<div class="lp-rank">${ce('$rank', doc.rank, 'Rang', { tag: 'span', rich: true })}</div>` : '')
     + (E() && (!goals.length || !doc.rank) ? `<div class="ed-hint" style="display:inline-block">Lernziele und Rang: 🎨 Design → Kopf</div>` : '')
@@ -198,7 +234,7 @@ function render() {
   if (doc.form === 'challenge') { const x = xpNow(), mx = xpMax() || 1; h += `<div class="lp-hud"><span>⚡ ${x} XP</span><span class="bar"><i style="width:${Math.round(100 * x / mx)}%"></i></span><span>von ${mx}</span></div>`; }
   doc.stations.forEach((s, si) => {
     h += `<section class="lp-station${s.id === curSid ? ' cur' : ''}" id="st-${s.id}" data-sid="${s.id}">`;
-    h += `<div class="lp-sh"><span class="lp-nr">${esc(s.nr || si + 1)}</span><div style="flex:1;min-width:0">${ce('$st.sub', s.sub, 'Untertitel der Station', { tag: 'small' })}${ce('$st.title', s.title, 'Titel der Station', { tag: 'h2' })}</div>`
+    h += `<div class="lp-sh"><span class="lp-nr">${esc(s.nr || si + 1)}</span><div style="flex:1;min-width:0">${ce('$st.sub', s.sub, 'Untertitel der Station', { tag: 'small' })}${ce('$st.title', s.title, 'Titel der Station', { tag: 'h2', anim: s.anim, key: 'st:' + s.id })}</div>`
       + `<span class="ed-station-tools"><button data-sact="cfg" title="Station einstellen">⚙</button><button data-sact="up" title="Station nach oben">↑</button><button data-sact="down" title="Station nach unten">↓</button><button data-sact="del" title="Station löschen">🗑</button></span></div>`;
     let open = false;
     s.blocks.forEach((b, i) => {
@@ -220,6 +256,7 @@ function render() {
   if (doc.cert.on || E()) h += certHtml();
   h += `</main><footer class="lp-foot">${doc.form === 'challenge' ? 'Challenge' : 'Lernpfad'} · erstellt mit dem Lernpfad-Editor · läuft komplett im Browser</footer>`;
   lp.innerHTML = h;
+  runAnims();
   scroller.scrollTop = sc;
   if (selId && !findBlock(selId)) selId = null;
   markSel();
@@ -253,12 +290,12 @@ function miniTable(cells) {
 function blockHtml(b) {
   const ok = !!prog.solved[b.id];
   switch (b.type) {
-    case 'text': return wrap(b, ce('html', b.html, 'Text schreiben … ( / für Bausteine)', { rich: true, cls: 'lp-text' }));
+    case 'text': return wrap(b, ce('html', b.html, 'Text schreiben … ( / für Bausteine)', { rich: true, cls: 'lp-text', anim: b.anim, key: b.id }));
     case 'info': {
       const [ic, def] = INFO_KINDS[b.kind] || INFO_KINDS.merke;
-      if (b.kind === 'figur') return wrap(b, `<div class="lp-figur">${b.img ? `<img src="${b.img}" alt="">` : `<span class="noimg">${E() ? '🖼' : '🙂'}</span>`}<div class="bubble">${ce('name', b.name, 'Name der Figur', { tag: 'b', cls: 'who' })}${ce('html', b.html, 'Was sagt die Figur?', { rich: true })}</div></div>`);
+      if (b.kind === 'figur') return wrap(b, `<div class="lp-figur">${b.img ? `<img src="${b.img}" alt="">` : `<span class="noimg">${E() ? '🖼' : '🙂'}</span>`}<div class="bubble">${ce('name', b.name, 'Name der Figur', { tag: 'b', cls: 'who' })}${ce('html', b.html, 'Was sagt die Figur?', { rich: true, anim: b.anim, key: b.id })}</div></div>`);
       if (b.kind === 'abschluss') return wrap(b, `<div class="lp-abschluss">${b.img ? `<img src="${b.img}" alt="">` : ''}<div>${ce('title', b.title || (E() ? '' : 'Geschafft!'), 'Geschafft!', { tag: 'h3' })}${ce('html', b.html, 'Wie geht es weiter?', { rich: true })}</div></div>`);
-      return wrap(b, `<div class="lp-info ${b.kind}"><span class="ic">${ic}</span><div style="flex:1;min-width:0">${ce('title', b.title || (E() ? '' : def), def, { tag: 'b', cls: 't' })}${ce('html', b.html, 'Inhalt', { rich: true })}</div></div>`);
+      return wrap(b, `<div class="lp-info ${b.kind}"><span class="ic">${ic}</span><div style="flex:1;min-width:0">${ce('title', b.title || (E() ? '' : def), def, { tag: 'b', cls: 't' })}${ce('html', b.html, 'Inhalt', { rich: true, anim: b.anim, key: b.id })}</div></div>`);
     }
     case 'image': return wrap(b, b.src ? imgHtml(b.src, b.caption, b.size) : (E() ? `<div class="lp-card" style="text-align:center"><button class="lp-btn alt" data-bact="cfg">🖼 Bild oder GIF wählen</button></div>` : ''));
     case 'table': {
@@ -628,8 +665,8 @@ scroller.addEventListener('scroll', () => {
 const XP = { k: 'xp', l: 'XP (Challenge)', t: 'number', show: () => doc.form === 'challenge' };
 const RULE_KINDS = [['formel', 'Formel steht in'], ['wert', 'Wert ist gleich'], ['text', 'Text/Anzeige ist gleich'], ['enthaelt', 'Formel enthält'], ['nicht', 'Formel enthält nicht'], ['keinfehler', 'kein Fehler in'], ['test', 'Test: Werte setzen, dann ist'], ['wie', 'rechnet wie Formel']];
 const FORMS = {
-  text: null,
-  info: [{ k: 'kind', l: 'Art', t: 'select', o: Object.entries(INFO_KINDS).map(([k, v]) => [k, v[0] + ' ' + v[1]]) }, { k: 'title', l: 'Überschrift', t: 'text', help: 'leer = Name der Art', show: b => b.kind !== 'figur' }, { k: 'name', l: 'Name der Figur', t: 'text', show: b => b.kind === 'figur' }, { k: 'img', l: 'Bild (Figur, Abschluss)', t: 'image', show: b => b.kind === 'figur' || b.kind === 'abschluss' }],
+  text: [{ k: 'anim', l: 'Textanimation', t: 'select', o: ANIM_OPTS, help: 'Läuft einmal, sobald der Text ins Bild scrollt (nur in Vorschau und für Schüler).' }],
+  info: [{ k: 'kind', l: 'Art', t: 'select', o: Object.entries(INFO_KINDS).map(([k, v]) => [k, v[0] + ' ' + v[1]]) }, { k: 'title', l: 'Überschrift', t: 'text', help: 'leer = Name der Art', show: b => b.kind !== 'figur' }, { k: 'name', l: 'Name der Figur', t: 'text', show: b => b.kind === 'figur' }, { k: 'img', l: 'Bild (Figur, Abschluss)', t: 'image', show: b => b.kind === 'figur' || b.kind === 'abschluss' }, { k: 'anim', l: 'Textanimation', t: 'select', o: ANIM_OPTS }],
   image: [{ k: 'src', l: 'Bild oder GIF', t: 'image' }, { k: 'caption', l: 'Bildunterschrift', t: 'text' }, { k: 'alt', l: 'Alternativtext (für Vorlese-Programme)', t: 'text' }, { k: 'size', l: 'Größe', t: 'select', o: [['voll', 'volle Breite'], ['klein', 'klein']] }],
   table: [{ k: 'head', l: 'Erste Zeile ist Kopfzeile', t: 'check' }, { k: 'rows', l: 'Größe', t: 'grid' }],
   reveal: [{ k: 'summary', l: 'Überschrift der Klappbox', t: 'text' }],
@@ -671,8 +708,8 @@ function openForm(id) {
       { k: 'show.quiz', l: 'Ergebnis je Station zeigen', t: 'check' }, { k: 'show.xp', l: 'XP zeigen (Challenge)', t: 'check' }];
     apply = () => { doc.cert = b; commit(); render(); };
   } else if (id.startsWith('st:')) {
-    const s = doc.stations.find(x => x.id === id.slice(3)); b = { title: s.title, sub: s.sub, nr: s.nr || '', check: s.check }; title = '⚙ Station';
-    fields = [{ k: 'title', l: 'Titel', t: 'text' }, { k: 'sub', l: 'Untertitel', t: 'text' }, { k: 'nr', l: 'Eigenes Zeichen statt Nummer (z. B. ✂)', t: 'text', help: 'leer = automatische Nummer' }, { k: 'check', l: 'Haken „Station erledigt“ am Ende', t: 'check' }];
+    const s = doc.stations.find(x => x.id === id.slice(3)); b = { title: s.title, sub: s.sub, nr: s.nr || '', check: s.check, anim: s.anim || '' }; title = '⚙ Station';
+    fields = [{ k: 'title', l: 'Titel', t: 'text' }, { k: 'sub', l: 'Untertitel', t: 'text' }, { k: 'nr', l: 'Eigenes Zeichen statt Nummer (z. B. ✂)', t: 'text', help: 'leer = automatische Nummer' }, { k: 'check', l: 'Haken „Station erledigt“ am Ende', t: 'check' }, { k: 'anim', l: 'Animation des Stationstitels', t: 'select', o: ANIM_OPTS }];
     apply = () => { Object.assign(s, b); commit(); render(); };
   } else {
     const r = findBlock(id); b = clone(r.b); fields = FORMS[b.type]; title = (b.type === 'info' ? (INFO_KINDS[b.kind]?.[0] + ' ' + INFO_KINDS[b.kind]?.[1]) : (T[b.type]?.ic || '') + ' ' + (T[b.type]?.n || b.type));
@@ -774,7 +811,9 @@ function openDesign() {
       <fieldset><legend>Kopf</legend>${seg('hero', [['logo', 'App-Logo'], ['bild', 'eigenes Bild'], ['gross', 'großes Bild rechts'], ['hintergrund', 'Bild als Hintergrund']], d.hero)}
       ${d.hero !== 'logo' ? `<div class="imgprev">${d.heroImg ? `<img src="${d.heroImg}" alt="">` : ''}<label class="take" style="display:inline-flex;align-items:center;cursor:pointer">🖼 ${d.heroImg ? 'Anderes Bild' : 'Bild/GIF wählen'}<input type="file" accept="image/*" id="heroFile" hidden></label></div>` : ''}
       <label>Lernziele</label><div class="list">${(doc.goals || []).map((g, i) => `<div class="it"><input type="text" data-goal="${i}" value="${esc(plain(g))}" placeholder="Lernziel ${i + 1}"><button data-gdel="${i}" aria-label="entfernen">✕</button></div>`).join('')}<button class="add" data-gadd="1">＋ Lernziel</button></div>
-      <label>Rang / Abzeichen (optional)<input type="text" id="rankIn" value="${esc(plain(doc.rank))}" placeholder="z. B. Dein Rang: HACKER NEWBIE"></label></fieldset>
+      <label>Rang / Abzeichen (optional)<input type="text" id="rankIn" value="${esc(plain(doc.rank))}" placeholder="z. B. Dein Rang: HACKER NEWBIE"></label>
+      <div class="row"><label>Animation Titel<select data-anim-k="title">${ANIM_OPTS.map(([k, n]) => `<option value="${k}"${(doc.anim?.title || '') === k ? ' selected' : ''}>${n}</option>`).join('')}</select></label><label>Animation Untertitel<select data-anim-k="subtitle">${ANIM_OPTS.map(([k, n]) => `<option value="${k}"${(doc.anim?.subtitle || '') === k ? ' selected' : ''}>${n}</option>`).join('')}</select></label></div>
+      ${d.hero === 'gross' ? `<label>Tipp-Zeilen auf dem großen Bild (wie ein Terminal)<textarea id="linesIn" class="mono" placeholder="&gt; login crew&#10;&gt; lade tabellen.exe">${esc((doc.typeLines || []).join('\n'))}</textarea><span class="help">Jede Zeile wird nacheinander getippt.</span></label>` : ''}</fieldset>
     </div>`;
   };
   draw();
@@ -790,6 +829,8 @@ function openDesign() {
   el.addEventListener('input', e => {
     if (e.target.dataset.goal != null) { doc.goals[+e.target.dataset.goal] = esc(e.target.value); render(); }
     if (e.target.id === 'rankIn') { doc.rank = esc(e.target.value); render(); }
+    if (e.target.dataset.animK) { doc.anim = { ...(doc.anim || {}), [e.target.dataset.animK]: e.target.value }; animDone.clear(); render(); }
+    if (e.target.id === 'linesIn') { doc.typeLines = e.target.value.split('\n').filter(x => x.trim()); animDone.delete('$lines'); render(); }
   });
   el.addEventListener('change', async e => { if (e.target.id === 'heroFile' && e.target.files[0]) { doc.design.heroImg = await loadImage(e.target.files[0]); draw(); render(); } });
 }
@@ -927,7 +968,7 @@ function setMode(m) {
   if (pending) commit();
   mode = m; selId = null; closePop();
   $$('#modeSeg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === m)));
-  if (m === 'preview') prog.visited[curSid] = 1;
+  if (m === 'preview') { prog.visited[curSid] = 1; animDone.clear(); }
   render();
   toast(m === 'preview' ? '▶ Vorschau – so sehen es die Schüler. Fortschritt wird hier nur probeweise gezählt.' : '✎ Bearbeiten');
 }
