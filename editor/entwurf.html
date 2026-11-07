@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lernpfad-Editor · Entwurf</title>
+<link rel="icon" href="../icon.svg">
+<link rel="stylesheet" href="editor.css">
+</head>
+<body>
+<div class="app" id="app">
+  <!-- Attrappe von FlowPad: nur damit man Übernehmen und Ausprobieren erleben kann -->
+  <section class="mock" aria-label="FlowPad (Attrappe)">
+    <div class="mock-head"><span class="logo">F</span>FlowPad <small>Attrappe für den Entwurf</small></div>
+    <div class="mock-fx"><span class="addr" id="mAddr">D2</span><b>fx</b><input id="mFx" autocomplete="off" spellcheck="false" aria-label="Formel"></div>
+    <div class="mock-grid"><table id="mGrid"></table></div>
+    <div id="mTask"></div>
+    <div class="mock-note">Zelle antippen, Formel oben eintragen, Return. Im Editor holt „aus FlowPad übernehmen“ die gewählte Zelle, ihre Formel oder die ganze Tabelle.</div>
+  </section>
+
+  <section class="lpwrap" aria-label="Lernpfad">
+    <div class="ed-bar" id="edBar">
+      <span class="ed-seg" id="modeSeg"><button data-mode="edit" aria-pressed="true">✎ Bearbeiten</button><button data-mode="preview">▶ Vorschau</button></span>
+      <button class="ed-btn" id="bUndo" title="Rückgängig (⌘Z)" aria-label="Rückgängig">↶</button>
+      <button class="ed-btn" id="bRedo" title="Wiederholen (⇧⌘Z)" aria-label="Wiederholen">↷</button>
+      <button class="ed-btn" id="bSingle" title="Nur aktuelle Station zeigen" aria-pressed="false">◧<span class="t"> Station</span></button>
+      <button class="ed-btn" id="bDesign" title="Design">🎨<span class="t"> Design</span></button>
+      <button class="ed-btn" id="bWide" title="Lernpfad breit / neben FlowPad">⇔</button>
+      <span class="sp"></span>
+      <span class="ed-saved" id="saved"></span>
+      <button class="ed-btn" id="bMore" title="Mehr">⋯</button>
+    </div>
+    <div class="lp-scroll" id="scroll"><div class="lp" id="lp"></div></div>
+  </section>
+</div>
+<script type="module" src="editor.js"></script>
+</body></html>
