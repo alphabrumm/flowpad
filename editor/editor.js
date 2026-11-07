@@ -151,7 +151,7 @@ function render() {
   const d = doc.design, logo = d.hero === 'bild' && d.heroImg ? `<img src="${d.heroImg}" alt="">` : 'F';
   let h = `<div class="fontsize"><button data-fz="-" aria-label="Schrift kleiner">A−</button><button data-fz="+" aria-label="Schrift größer">A+</button></div>`;
   h += `<header class="lp-hero${d.hero === 'hintergrund' && d.heroImg ? ' has-bg' : ''}"${d.hero === 'hintergrund' && d.heroImg ? ` style="background-image:url(${d.heroImg})"` : ''}>`
-    + (d.hero !== 'hintergrund' ? `<div class="lp-logo">${logo}</div>` : '')
+    + (d.hero !== 'hintergrund' ? `<div class="lp-logo"${E() ? ' title="Antippen: eigenes Bild oder GIF setzen"' : ''}>${logo}</div>` : '')
     + `<div>${ce('$kicker', doc.kicker, 'Kopfzeile', { tag: 'small' })}${ce('$title', doc.title, 'Titel des Lernpfads', { tag: 'h1' })}${ce('$subtitle', doc.subtitle, 'Untertitel', { tag: 'p' })}</div></header>`;
   h += `<nav class="lp-trail"><div class="lp-trail-in"><div class="lp-stops" id="stops">${doc.stations.map((s, i) => `<a data-sid="${s.id}" class="${stationDone(s) ? 'done' : ''}${s.id === curSid ? ' cur' : ''}" title="${esc(s.title)}">${stationDone(s) ? '✓' : i + 1}</a>`).join('')}${doc.cert.on ? '<a data-sid="cert" title="Abschluss">🏁</a>' : ''}</div><span class="lp-count">${doc.stations.filter(stationDone).length} / ${doc.stations.length}</span></div></nav>`;
   h += `<main class="lp-main">`;
@@ -292,6 +292,7 @@ function refreshTrail() { $$('#stops a[data-sid]', lp).forEach(a => { const s = 
 /* ---------- Klicks ---------- */
 lp.addEventListener('click', ev => {
   const t = ev.target;
+  if (E() && t.closest('.lp-logo, .lp-hero.has-bg') && !t.closest('[data-f]')) { openDesign(); return; } // Kopfbild direkt ändern
   const fzb = t.closest('[data-fz]'); if (fzb) { fz = Math.min(1.5, Math.max(.8, +(fz + (fzb.dataset.fz === '+' ? .1 : -.1)).toFixed(2))); lp.style.setProperty('--fz', fz); return; }
   const stop = t.closest('#stops a'); if (stop) { if (stop.dataset.sid === 'cert') { $('#st-cert')?.scrollIntoView({ behavior: 'smooth' }); return; } goStation(stop.dataset.sid, true); return; }
   const act = t.closest('[data-act]');

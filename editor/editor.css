@@ -239,3 +239,7 @@ button { font: inherit; color: inherit; }
 /* Design-Fenster links andocken, damit man die Wirkung rechts sieht */
 .ed-backdrop.clear { background: transparent; }
 @media (min-width: 900px) { .ed-dlg.dock { left: 12px; transform: translateY(-50%); width: min(440px, 40vw); } }
+
+/* Kopfbild im Bearbeiten-Modus antippbar */
+.editing .lp-logo { cursor: pointer; position: relative; }
+.editing .lp-logo::after { content: "🖼"; position: absolute; right: -6px; bottom: -6px; width: 28px; height: 28px; display: grid; place-items: center; font-size: 15px; background: var(--ed-bg); border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,.3); }
