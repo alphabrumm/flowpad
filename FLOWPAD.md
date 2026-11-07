@@ -157,3 +157,14 @@ Aufgabentypen: Formel in eine Zelle schreiben, Diagramm bauen (nur im Diagramm l
 Ausfüllen (eine Formel, ausgefüllt; der Lernpfad holt sich die Tabelle mit `getSheet`, prüft, dass alle Zellen aus derselben Formel stammen,
 und rechnet mit MiniCalc und acht anderen Testbelegungen nach) und Kopf-Hacks ohne FlowPad. Fortschritt und XP merkt sich der Lernpfad.
 Die Seiten werden aus einer Aufgabenliste erzeugt; dabei werden alle Musterlösungen und typische falsche Lösungen mit FlowPads Engine gegengeprüft.
+
+## Lernpfad-Editor (Entwurf)
+
+`editor/entwurf.html` ist ein klickbarer Entwurf des Lernpfad-Editors (gemeinsam für FlowPad, JPad, QPad geplant).
+Ein Lernpfad ist ein JSON-Dokument aus Stationen mit Bausteinen (Text, Infokasten inkl. „Figur sagt“/Regel/Abschluss,
+Bild, Tabelle, Aufdecken, Datei, HTML, Aufgabe, Quiz mit mehreren Fragen, Lückentext mit Begriffen/Hefteintrag,
+Zuordnen, Sperre, Rechenblatt mit Prüfregeln, Formel-/Diagramm-Aufgabe, Aktionsknopf, DFD-Legende, Code, UML-Klasse).
+Gespeichert wird lokal im Browser; Export (HTML, SCORM) folgt.
+
+`python3 tools/lp2json.py` wandelt bestehende Lernpfade (FlowPad-Demo, LP1-1) in dieses Format um
+(`editor/beispiele/`); im Editor über 📂 Öffnen → „Umgewandelte Lernpfade“.

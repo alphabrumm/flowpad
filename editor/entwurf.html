@@ -9,7 +9,7 @@
 <div class="app" id="app">
   <!-- Attrappe von FlowPad: nur damit man Übernehmen und Ausprobieren erleben kann -->
   <section class="mock" aria-label="FlowPad (Attrappe)">
-    <div class="mock-head"><span class="logo">F</span>FlowPad <small>Attrappe für den Entwurf</small></div>
+    <div class="mock-head"><span class="logo">F</span>FlowPad <span class="mock-tab" id="mTab">Tabelle 1</span><small>Attrappe für den Entwurf</small></div>
     <div class="mock-fx"><span class="addr" id="mAddr">D2</span><b>fx</b><input id="mFx" autocomplete="off" spellcheck="false" aria-label="Formel"></div>
     <div class="mock-grid"><table id="mGrid"></table></div>
     <div id="mTask"></div>
@@ -26,6 +26,7 @@
       <button class="ed-btn" id="bWide" title="Lernpfad breit / neben FlowPad">⇔</button>
       <span class="sp"></span>
       <span class="ed-saved" id="saved"></span>
+      <button class="ed-btn" id="bOpen" title="Lernpfad öffnen oder neu anlegen">📂<span class="t"> Öffnen</span></button>
       <button class="ed-btn" id="bMore" title="Mehr">⋯</button>
     </div>
     <div class="lp-scroll" id="scroll"><div class="lp" id="lp"></div></div>
