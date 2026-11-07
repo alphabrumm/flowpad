@@ -401,6 +401,20 @@ function report(a, ok, how, formula) {
 let frame = null, editorOpen = false;
 /** Lernpfad-Bereich belegt? (eingebetteter Lernpfad oder der Lernpfad-Editor PathFinder) */
 const hasLp = () => !!project?.lernpfadHtml || editorOpen;
+/** Lehrkraft: schwebender gelber Stift im Lernpfad – schaltet den geöffneten Lernpfad in den Bearbeiten-Modus */
+function editPencil() {
+    const b = document.createElement('button');
+    b.className = 'lp-edit-fab'; b.title = 'Lernpfad bearbeiten (nur Lehrkraft)'; b.setAttribute('aria-label', 'Lernpfad bearbeiten');
+    b.innerHTML = '<svg class="ic" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>';
+    b.onclick = () => openLernpfadEditor();
+    return b;
+}
+async function openLernpfadEditor() {
+    if (project.lernpfadHtml && !pathfinderDoc(project.lernpfadHtml)
+        && !await confirmBox('Lernpfad bearbeiten', 'Dieser Lernpfad wurde nicht mit PathFinder erstellt und lässt sich (noch) nicht direkt bearbeiten. Den Editor trotzdem öffnen, z. B. um einen neuen Lernpfad zu bauen oder einen umgewandelten zu öffnen? Erst „Fertig“ ersetzt den Lernpfad des Projekts.', 'Editor öffnen')) return;
+    editorOpen = true; showLernpfad();
+    setViews({ lernpfad: true }); if (layoutMode() !== 'wide') showView('lernpfad');
+}
 /** PathFinder-Dokument aus einem eingebetteten Lernpfad holen (zum Weiterbearbeiten im Editor) */
 function pathfinderDoc(html) {
     const m = String(html || '').match(/<script type="application\/json" id="pf-doc-app">([\s\S]*?)<\/script>/) || String(html || '').match(/<script type="application\/json" id="pf-doc">([\s\S]*?)<\/script>/);
@@ -424,6 +438,7 @@ function showLernpfad() {
         frame.setAttribute('title', 'Lernpfad');
         frame.srcdoc = withBridge(project.lernpfadHtml, project.lernpfadState || '{}');
         host.appendChild(frame);
+        if (isTeacher()) host.appendChild(editPencil());
         $('#lpTitle').textContent = project.lernpfadTitle || titleOf(project.lernpfadHtml) || 'Lernpfad';
     }
     $('#drawerLpRemove').hidden = !project.lernpfadHtml;
@@ -741,8 +756,9 @@ on('#drawerLpAdd', async () => {
     touch(); showLernpfad(); closeDrawer(); toast('Lernpfad eingebettet');
 });
 on('#drawerLpEdit', () => {
-    editorOpen = !editorOpen; closeDrawer(); showLernpfad();
-    if (editorOpen) { setViews({ lernpfad: true }); if (layoutMode() !== 'wide') showView('lernpfad'); }
+    if (!isTeacher()) return;
+    closeDrawer();
+    if (editorOpen) { editorOpen = false; showLernpfad(); } else openLernpfadEditor();
 });
 on('#drawerLpRemove', async () => {
     if (!await confirmBox('Lernpfad entfernen?', 'Der Lernpfad wird aus diesem Projekt entfernt. Tabelle und Diagramme bleiben.', 'Entfernen', true)) return;
@@ -794,6 +810,7 @@ function showTeacherCode() {
     const c = isTeacher() && project && codeOfUrl(project.source);
     $('#teachCode').hidden = !c; $('#teachCode').textContent = c || '';
     $('#drawerTeacher').hidden = !isTeacher();
+    $('#drawerLpEdit').hidden = !isTeacher();
 }
 async function teacherList() {
     let list;
