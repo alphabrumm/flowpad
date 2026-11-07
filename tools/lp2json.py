@@ -25,6 +25,8 @@ def inline(el):
     soup = BeautifulSoup(str(el), 'html.parser')
     root = soup.find()
     for t in list(root.find_all(True)):
+        if getattr(t, 'decomposed', False) or t.parent is None:
+            continue
         if t.name in ('script', 'style', 'svg', 'img', 'button'):
             t.decompose(); continue
         if t.name in ('p', 'div') and t is not root:
@@ -265,11 +267,76 @@ def convert_lp(path, pal=0):
     return d
 
 
+def convert_challenge(path, pal=8):
+    """Hacker-Challenges (C1-x): Karten mit var T = [...] → Challenge mit FlowPad-Aufgaben."""
+    s = open(path, encoding='utf-8').read()
+    i = s.index('var T = ') + len('var T = ')
+    T, _ = json.JSONDecoder().raw_decode(s[i:])
+    soup = BeautifulSoup(s, 'html.parser')
+    hero = soup.select_one('.hero')
+    d = base_doc(hero.h1.get_text(strip=True), hero.small.get_text(' ', strip=True) if hero.small else 'Challenge', inline(hero.find('p')), pal=pal)
+    d['form'] = 'challenge'
+    d['id'] = 'inf9-' + os.path.basename(path).split('_')[0].lower()
+    d['cert']['text'] = 'hat die Challenge gemeistert.'
+    rules = soup.select_one('.rules')
+    if rules:
+        leg = rules.select_one('.leg')
+        if leg: leg.decompose()
+    intro = {'id': uid(), 'title': 'Start', 'sub': 'Regeln', 'check': False, 'blocks': []}
+    if rules:
+        intro['blocks'].append({'id': uid(), 'type': 'info', 'kind': 'regel', 'title': 'Regeln', 'html': inline(rules).replace('<b>Regeln:</b>', '').strip(), 'img': '', 'name': ''})
+    intro['blocks'].append({'id': uid(), 'type': 'legend'})
+    d['stations'].append(intro)
+    st, cur = None, None
+    for k, t in enumerate(T):
+        card = soup.select_one(f'#t{k}')
+        where = card.select_one('.where')
+        group = where.get_text(' ', strip=True) if where else ('Kopf-Hacks' if t['type'] == 'quiz' else 'Weitere Hacks')
+        if group != cur:
+            cur = group
+            name = re.sub(r'^Tabelle\s*', '', group).strip('„“"')
+            st = {'id': uid(), 'title': name, 'sub': 'Tabelle' if group.startswith('Tabelle') else 'ohne FlowPad', 'check': False, 'blocks': []}
+            d['stations'].append(st)
+        add = lambda b: st['blocks'].append({'id': uid(), **b})
+        title = card.h3.get_text(strip=True) if card.h3 else ''
+        html = ' '.join(inline(p) for p in card.find_all('p', recursive=False))
+        fig = card.select_one('figure svg')
+        if fig is not None:
+            add({'type': 'image', 'src': svg_data(fig), 'alt': 'Datenflussdiagramm', 'caption': '', 'size': 'voll'})
+        o = (t.get('open') or [{}])[0]
+        sheet = {kk: o.get(kk) for kk in ('cells', 'widths', 'fmt', 'styles') if o.get(kk) is not None}
+        if t['type'] in ('formel', 'lesen', 'dfd'):
+            kind = 'diagramm' if t['type'] == 'dfd' else 'formel'
+            sheet['title'] = o.get('sheetTitle') or o.get('title')
+            add({'type': 'fptask', 'title': title, 'html': html, 'xp': t.get('xp', 10),
+                 'app': {'kind': kind, 'cell': o.get('cell', t.get('cell', '')), 'target': o.get('target', ''), 'tabelle': sheet['title'] or '', 'dfd': o.get('dfd', 'leer') if kind == 'diagramm' else ''},
+                 'sheet': sheet, 'tips': [], 'solution': '', 'img': ''})
+        elif t['type'] == 'fill':
+            say = next((x.get('text') for x in t['open'] if x.get('action') == 'say'), '')
+            sheet['title'] = o.get('title')
+            rl = [{'kind': 'fuell', 'ref': e['range'], 'val': e['formula'], 'set': '', 'msg': f'Prüfe deine Formel in {e["from"]} und das Ausfüllen bis {e["range"].split(":")[1]} – denk an die $-Zeichen.'} for e in t.get('expect', [])]
+            add({'type': 'sheet', 'title': o.get('title', title), 'html': say or html, 'sheet': sheet, 'rules': rl, 'ok': 'Gehackt! Alle Zellen rechnen richtig.', 'xp': t.get('xp', 15)})
+        elif t['type'] == 'quiz':
+            add({'type': 'task', 'title': title, 'html': html, 'xp': t.get('xp', 5), 'answer': '|'.join(map(str, t.get('answers', []))), 'tips': [], 'solution': '', 'img': ''})
+        else:
+            add({'type': 'html', 'html': str(card)})
+    win = soup.select_one('#win')
+    if win:
+        st['blocks'].append({'id': uid(), 'type': 'info', 'kind': 'abschluss', 'title': win.h2.get_text(strip=True) if win.h2 else 'Geschafft!', 'html': inline(win.find('p')), 'img': '', 'name': ''})
+    return d
+
+
 def main():
     os.makedirs(OUT, exist_ok=True)
     jobs = [
         ('FlowPad-Willkommen.html', 'flowpad-demo.json', convert_demo, 'FlowPad-Demo · umgewandelt'),
         ('LP1-1_Zellen_und_Formeln.html', 'lp1-1.json', convert_lp, 'Informatik 9 · Level 1.1 · umgewandelt'),
+        ('LP1-3_Funktionen_und_Datenfluesse.html', 'lp1-3.json', convert_lp, 'Informatik 9 · Level 1.3 · umgewandelt'),
+        ('LP1-4_Die_WENN-Funktion.html', 'lp1-4.json', convert_lp, 'Informatik 9 · Level 1.4 · umgewandelt'),
+        ('C1-1_Challenge_Formel-Hacks.html', 'c1-1.json', convert_challenge, 'Informatik 9 · Challenge 1.1 · umgewandelt'),
+        ('C1-2_Challenge_Bezugs-Hacks.html', 'c1-2.json', convert_challenge, 'Informatik 9 · Challenge 1.2 · umgewandelt'),
+        ('C1-3_Challenge_Funktions-Hacks.html', 'c1-3.json', convert_challenge, 'Informatik 9 · Challenge 1.3 · umgewandelt'),
+        ('C1-4_Challenge_WENN-Hacks.html', 'c1-4.json', convert_challenge, 'Informatik 9 · Challenge 1.4 · umgewandelt'),
     ]
     index = []
     for src, out, fn, note in jobs:

@@ -25,6 +25,7 @@ export function evalRule(r, cells) {
   const refs = r.ref ? (r.ref.includes(':') ? CE.rangeCells(r.ref) : [r.ref]) : [];
   if (r.kind === 'test') { const sh = sheetOf({ ...cells, ...parseSet(r.set) }); return refs.every(a => { const v = sh.value(a); return numEq(v, r.val) || CE.display(v).toLowerCase() === String(r.val).toLowerCase(); }); }
   if (r.kind === 'wie') return refs.every(a => sameResults(cells, a, r.val));
+  if (r.kind === 'fuell') { const p0 = CE.parseAddr(refs[0]); return refs.every(a => { const p = CE.parseAddr(a); return sameResults(cells, a, CE.shiftFormula(r.val, p.r - p0.r, p.c - p0.c)); }); }
   const sh = sheetOf(cells);
   return refs.every(a => {
     const raw = cells[a], v = sh.value(a);
@@ -56,7 +57,7 @@ function resultOf(cells, cell, target) {
 }
 const legendHtml = () => `<div class="lp-card lp-legend"><span class="sym r"></span><span>Eingabe (eine Zelle oder ein Bereich), z. B. <b>Preis (B2)</b></span><span class="sym e"></span><span>Funktion – auch Rechenzeichen wie <code>*</code> stehen in einer Ellipse</span><span class="k">2</span><span>Konstante: einfach die Zahl, ohne Rahmen</span><span><span class="sym d"></span></span><span>Verteiler: gibt ein Datum an mehrere Funktionen weiter</span><span class="sym o"></span><span>Ausgabe: die Zelle mit dem Ergebnis</span></div>`;
 
-const RULE_KINDS = [['formel', 'Formel steht in'], ['wert', 'Wert ist gleich'], ['text', 'Text/Anzeige ist gleich'], ['enthaelt', 'Formel enthält'], ['nicht', 'Formel enthält nicht'], ['keinfehler', 'kein Fehler in'], ['test', 'Test: Werte setzen, dann ist'], ['wie', 'rechnet wie Formel']];
+const RULE_KINDS = [['formel', 'Formel steht in'], ['wert', 'Wert ist gleich'], ['text', 'Text/Anzeige ist gleich'], ['enthaelt', 'Formel enthält'], ['nicht', 'Formel enthält nicht'], ['keinfehler', 'kein Fehler in'], ['test', 'Test: Werte setzen, dann ist'], ['wie', 'rechnet wie Formel'], ['fuell', 'ausgefüllt wie Formel (ab erster Zelle)']];
 const XP = { k: 'xp', l: 'XP (Challenge)', t: 'number' };
 const taskMake = kind => () => ({ title: '', html: '', xp: 20, app: { kind, cell: '', target: '', tabelle: '', dfd: kind === 'diagramm' ? 'leer' : '' }, tips: [], solution: '', img: '' });
 
