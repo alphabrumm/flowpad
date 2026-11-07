@@ -67,6 +67,50 @@ export const flowpadPlugin = {
     if (b.type === 'fptask') b.app = { tabelle: '', dfd: '', ...b.app };
     if (b.type === 'sheet') { if (b.sheet && !b.sheet.cells) b.sheet = { cells: b.sheet }; b.rules = b.rules || []; }
   },
+  // Textformat („Vorlage für KI“): so schreibt eine KI FlowPad-Bausteine
+  text: {
+    rechenblatt: {
+      n: 'Rechenblatt', type: 'sheet', alias: ['tabelle laden', 'tabelle'], keys: [],
+      help: `### Rechenblatt: Name der Tabelle
+Kurzer Text, was in der Tabelle steht.
+| Artikel | Preis | Anzahl |
+| Brezel | 0,9 | 14 |
+(die erste Tabellenzeile landet in Zeile 1 ab Spalte A; Zahlen mit Komma; Formeln mit =)`,
+      make(S, H) {
+        const cells = {}; S.table.forEach((r, i) => r.forEach((v, c) => { v = v.replace(/<[^>]+>/g, '').trim(); if (v) cells[CE.addr(i, c)] = v; }));
+        if (!S.table.length) H.warn(S.line, `Rechenblatt „${S.title}“ ohne Tabelle (Zeilen mit | … |).`);
+        return { type: 'sheet', title: S.title || 'Tabelle', html: H.md(S.body), sheet: S.table.length ? { cells } : null, rules: [], ok: '', xp: 10 };
+      },
+      toText(b, { md }) {
+        const cells = b.sheet?.cells || {}; let R = 0, C = 0; for (const a in cells) { const p = CE.parseAddr(a); if (p) { R = Math.max(R, p.r + 1); C = Math.max(C, p.c + 1); } }
+        const rows = []; for (let r = 0; r < R; r++) { const row = []; for (let c = 0; c < C; c++) row.push(cells[CE.addr(r, c)] ?? ''); rows.push('| ' + row.join(' | ') + ' |'); }
+        return [`### Rechenblatt: ${b.title}`, md(b.html || ''), ...rows].filter(Boolean).join('\n') + ((b.rules || []).length ? '\n%% (Prüfregeln bleiben nur im Editor)' : '');
+      },
+    },
+    'formel-aufgabe': {
+      n: 'Formel-Aufgabe', type: 'fptask', alias: ['formelaufgabe', 'diagramm-aufgabe', 'diagrammaufgabe'], keys: ['zelle', 'formel', 'tipp', 'loesung', 'xp', 'punkte', 'als'],
+      help: `### Formel-Aufgabe: Titel
+Schreibe in D2 die Formel für den Gesamtpreis.
+Zelle: D2              (Zielzelle)
+Formel: =B2*C2         (Musterformel – FlowPad prüft das Ergebnis, andere richtige Formeln zählen auch)
+Als: Formel            (oder: Diagramm – dann baut man die Formel als Datenflussdiagramm)
+Tipp: …
+Lösung: …
+XP: 30
+(Die Formel-Aufgabe rechnet mit dem Rechenblatt, das in der Station davor geladen wird.)`,
+      make(S, H) {
+        const cell = (S.one('zelle') || '').toUpperCase().replace(/\s/g, ''), target = (S.one('formel') || '').replace(/^`|`$/g, '');
+        if (!/^[A-Z]{1,2}\d{1,4}$/.test(cell)) H.err(S.line, `Formel-Aufgabe „${S.title}“: „Zelle: D2“ fehlt oder ist ungültig.`);
+        if (!target.startsWith('=')) H.err(S.line, `Formel-Aufgabe „${S.title}“: „Formel: =…“ fehlt.`);
+        const kind = /diagramm/i.test(S.one('als') || S.head) ? 'diagramm' : 'formel';
+        return { type: 'fptask', title: S.title, html: H.md(S.body), xp: S.num('xp', 20), app: { kind, cell, target, tabelle: '', dfd: kind === 'diagramm' ? 'leer' : '' }, tips: S.all('tipp').map(H.inline || (x => x)), solution: S.one('loesung') || `<code>${target}</code>`, img: '' };
+      },
+      toText(b, { md }) {
+        const a = b.app || {};
+        return [`### Formel-Aufgabe: ${md(b.title || '')}`, md(b.html || ''), `Zelle: ${a.cell}`, `Formel: ${a.target}`, `Als: ${a.kind === 'diagramm' ? 'Diagramm' : 'Formel'}`, ...(b.tips || []).map(t => 'Tipp: ' + md(t)), b.solution ? 'Lösung: ' + md(b.solution).replace(/\n+/g, ' ') : '', `XP: ${b.xp ?? 20}`].filter(Boolean).join('\n');
+      },
+    },
+  },
   blocks: {
     sheet: {
       n: 'Rechenblatt', ic: '▦', g: 'FlowPad', h: 'Tabelle laden, optional mit Prüfregeln', openForm: true,
