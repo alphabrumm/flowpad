@@ -461,7 +461,9 @@ export const DFD = (() => {
     function field(label, value, attrs) {
       return `<label class="dfd-field">${label ? `<span>${label}</span>` : ''}<input type="text" value="${esc(value || '')}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" ${attrs || ''}></label>`;
     }
-    const delBtn = '<button type="button" class="fbtn danger" data-act="del" title="Löschen">✕<span class="hide-narrow"> Löschen</span></button>';
+    const delBtn = '<button type="button" class="fbtn icon danger" data-act="del" title="Baustein löschen" aria-label="Löschen"><svg class="ic" viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg></button>';
+    // ▦ wählt die Zelle in der Tabelle; läuft die Auswahl schon, bricht ein zweiter Tipp sie ab
+    const picking = () => !!document.querySelector('.grid.picking');
     function renderEdit() {
       const n = sel && byId(sel);
       if (!n && edgeSel === null) { edit.hidden = true; return; }
@@ -478,7 +480,7 @@ export const DFD = (() => {
       if (n.kind === 'in') {
         edit.innerHTML = `<span class="sig-l">Eingabe</span>` + field('', n.ref, 'data-f="ref" class="f-cell" placeholder="B2:B6" autocapitalize="characters"')
           + field('Name', n.name, 'data-f="name" class="f-name" placeholder="z. B. Preis"')
-          + `<button type="button" class="fbtn icon" data-act="pickcell" title="Zelle in der Tabelle antippen" aria-label="Zelle antippen">▦</button><button type="button" class="fbtn icon" data-act="ok" aria-label="Übernehmen">✓</button>${delBtn}`; bindDel();
+          + `<button type="button" class="fbtn icon" data-act="pickcell" title="Zelle in der Tabelle wählen" aria-label="Zelle in der Tabelle wählen">▦</button><button type="button" class="fbtn icon" data-act="ok" aria-label="Übernehmen">✓</button>${delBtn}`; bindDel();
         const fr = edit.querySelector('[data-f=ref]'), fname = edit.querySelector('[data-f=name]');
         const apply = () => {
           const r = fr.value.trim().toUpperCase().replace(/\s+/g, '');
@@ -489,7 +491,7 @@ export const DFD = (() => {
           n.label = labelFor(n.name, n.ref); save(); render();
         };
         edit.querySelector('[data-act=ok]').onclick = apply;
-        edit.querySelector('[data-act=pickcell]').onclick = () => pickFor(n);
+        edit.querySelector('[data-act=pickcell]').onclick = () => { if (picking()) { host.cancelPick && host.cancelPick(); say('Zellauswahl abgebrochen.'); } else pickFor(n); };
         [fr, fname].forEach(i => i.addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); apply(); } }));
         return;
       }
@@ -509,7 +511,7 @@ export const DFD = (() => {
           }
         };
         edit.querySelector('[data-act=ok]').onclick = apply;
-        edit.querySelector('[data-act=pickcell]').onclick = () => host.startPick(ref => { const r = ref.split(':')[0]; fref.value = r; apply(); }, 'Tippe die Zelle an, in die das Ergebnis soll.');
+        edit.querySelector('[data-act=pickcell]').onclick = () => picking() ? (host.cancelPick && host.cancelPick()) : host.startPick(ref => { const r = ref.split(':')[0]; fref.value = r; apply(); }, 'Tippe die Zelle an, in die das Ergebnis soll.');
         [fname, fref].forEach(i => i.addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); apply(); } }));
         return;
       }

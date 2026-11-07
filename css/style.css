@@ -551,3 +551,9 @@ body.hide-left[data-layout="wide"] .lp-pane { flex: 1 1 auto; }
 .hb-group.open .hb-ghead { border-bottom: 1px solid var(--line); background: var(--next); }
 .hb-group > ul { padding: 8px; }
 .hb-group:not(.open) > ul { display: none; }
+
+/* ▦ leuchtet, solange oben in der Tabelle eine Zelle gewählt werden soll */
+body:has(.grid.picking) .dfd-edit [data-act="pickcell"] { background: var(--glow); border-color: var(--next-edge); color: var(--acc-ink, #000); animation: pickpulse 1.2s ease-in-out infinite; }
+@keyframes pickpulse { 50% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--glow) 45%, transparent); } }
+.dfd-edit .fbtn.danger .ic { width: 20px; height: 20px; }
+.dfd-edit .fbtn.danger { color: var(--bad); }
