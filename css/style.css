@@ -558,7 +558,11 @@ body.hide-left[data-layout="wide"] .lp-pane { flex: 1 1 auto; }
 .dfd-edit .f-combo:focus-within { border-color: var(--blue); }
 .dfd-edit .f-combo input { border: 0; border-radius: 0; width: 5.2em; outline: none; }
 .dfd-edit .f-pick { display: grid; place-items: center; width: 38px; border: 0; border-left: 1px solid var(--line); background: var(--surface-2); color: var(--ink); cursor: pointer; padding: 0; }
-.dfd-edit .f-pick .ic { width: 21px; height: 21px; }
+.dfd-edit .f-pick .ic { width: 23px; height: 23px; stroke-width: 1.6; }
+.dfd-edit .f-pick .hl { fill: var(--glow); stroke: none; }
+.dfd-edit .f-pick .bg { fill: var(--surface-2); stroke: none; }
+body:has(.grid.picking) .dfd-edit .f-pick .bg { fill: var(--glow); }
+body:has(.grid.picking) .dfd-edit .f-pick .hl { fill: var(--surface); }
 body:has(.grid.picking) .dfd-edit .f-pick { background: var(--glow); color: var(--acc-ink, #000); animation: pickpulse 1.2s ease-in-out infinite; }
 @keyframes pickpulse { 50% { background: color-mix(in srgb, var(--glow) 45%, var(--surface)); } }
 .dfd-edit .fbtn.danger .ic { width: 20px; height: 20px; }

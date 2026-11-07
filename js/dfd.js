@@ -462,7 +462,7 @@ export const DFD = (() => {
       return `<label class="dfd-field">${label ? `<span>${label}</span>` : ''}<input type="text" value="${esc(value || '')}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" ${attrs || ''}></label>`;
     }
     // Zelle in der Tabelle antippen: Knopf sitzt rechts im Zellenfeld
-    const PICK_ICON = '<svg class="ic" viewBox="0 0 24 24"><rect x="2.5" y="2.5" width="13" height="9" rx="1.5"/><path d="M11 18.5V8.6a1.6 1.6 0 0 1 3.2 0v5.2"/><path d="M14.2 12.6a1.6 1.6 0 0 1 3.2 0v1.6"/><path d="M17.4 13.4a1.6 1.6 0 0 1 3.2 0V17a5.4 5.4 0 0 1-5.4 5.4h-1.4a5 5 0 0 1-4-2l-2.5-3.3a1.5 1.5 0 0 1 2.4-1.8L11 17"/></svg>';
+    const PICK_ICON = '<svg class="ic" viewBox="0 0 24 24"><rect class="hl" x="8" y="7" width="6" height="4.5"/><path d="M2.5 2.5h17v13.5h-17zM2.5 7h17M2.5 11.5h17M8 2.5v13.5M14 2.5v13.5"/><g transform="translate(6 7.4) scale(.62)" stroke-width="2.6"><path class="bg" d="M6 4a2 2 0 0 1 4 0v4h8a4 4 0 0 1 4 4v2a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-6-2.3l-3.6-3.6a2 2 0 0 1 2.8-2.8L6 14z"/><path d="M22 14a8 8 0 0 1-8 8"/><path d="M18 11v-1a2 2 0 0 0-2-2a2 2 0 0 0-2 2"/><path d="M14 10V9a2 2 0 0 0-2-2a2 2 0 0 0-2 2v1"/><path d="M10 9.5V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v10"/><path d="M18 11a2 2 0 1 1 4 0v3a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></g></svg>';
     function cellField(value, attrs, title) {
       return `<span class="f-combo"><input type="text" value="${esc(value || '')}" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" ${attrs || ''}>`
         + `<button type="button" class="f-pick" data-act="pickcell" title="${title}" aria-label="${title}">${PICK_ICON}</button></span>`;
