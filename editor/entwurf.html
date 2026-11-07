@@ -35,8 +35,10 @@
 </div>
 <script type="module">
 import { startPathFinder } from '../vendor/pathfinder/core/pathfinder.js';
-import { flowpadPlugin } from './flowpad-plugin.js';
-import { createMock } from './mock.js';
+import { flowpadPlugin, createBridgeHost, makeBridge } from './flowpad-plugin.js';
+
+// In FlowPad geöffnet (Menü → Lernpfad-Editor)? Dann spricht der Editor direkt mit FlowPad statt mit der Attrappe.
+const inFlowPad = new URLSearchParams(location.search).get('in') === 'flowpad' && parent !== window;
 
 const sheet = { A1: 'Artikel', B1: 'Preis', C1: 'Anzahl', D1: 'Gesamt', A2: 'Brezel', B2: '0,9', C2: '14', A3: 'Semmel', B3: '0,45', C3: '20', A4: 'Kakao', B4: '1,2', C4: '9' };
 const sample = () => ({
@@ -55,9 +57,21 @@ const sample = () => ({
   cert: { on: true, need: 'alle', pct: 80, text: 'hat den Lernpfad erfolgreich bearbeitet.', show: { zeit: true, tipps: true, quiz: true, xp: true } },
 });
 
-const host = createMock();
+let host;
+if (inFlowPad) {
+  document.getElementById('app').classList.remove('with-side');
+  document.querySelector('.mock')?.remove(); document.getElementById('bWide')?.remove();
+  document.body.classList.add('in-flowpad');
+  const bridge = makeBridge();
+  host = createBridgeHost(bridge, { editor: true });
+  addEventListener('message', e => { if (e.source === parent && e.data?.type === 'pf-open' && e.data.doc) { api.openDoc(e.data.doc); api.toast('Lernpfad aus dem Projekt geöffnet'); } });
+  const bar = document.getElementById('edBar'), x = document.createElement('button');
+  x.className = 'ed-btn'; x.title = 'Editor schließen (zurück zum Lernpfad des Projekts)'; x.setAttribute('aria-label', 'Editor schließen'); x.textContent = '✕';
+  x.onclick = () => bridge.post({ type: 'pf-editor-close' }); bar.appendChild(x);
+  setTimeout(() => bridge.post({ type: 'pf-editor-ready' }), 50);
+} else host = (await import('./mock.js')).createMock();
 const api = startPathFinder({
-  appName: 'FlowPad', storage: 'lpeditor', plugins: [flowpadPlugin], host, sample,
+  appName: 'FlowPad', logo: '../icon.svg', storage: 'lpeditor', plugins: [flowpadPlugin], host, sample,
   examples: 'beispiele/index.json', examplesTitle: 'Umgewandelte Lernpfade',
   // ältere Entwurfsfassung (vor PathFinder) übernehmen
   legacy: () => { try { const d = JSON.parse(localStorage.getItem('lpeditor.entwurf.v1')); if (d) d.id = 'entwurf'; return d; } catch (e) { return null; } },

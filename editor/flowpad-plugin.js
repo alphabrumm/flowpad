@@ -63,6 +63,13 @@ const taskMake = kind => () => ({ title: '', html: '', xp: 20, app: { kind, cell
 
 export const flowpadPlugin = {
   id: 'flowpad', name: 'FlowPad',
+  get bundle() {
+    try {
+      if (!/^https?:/.test(import.meta.url)) return null;
+      return { icon: '▦', entry: 'plugin', exportName: 'flowpadPlugin', hostExport: 'createBridgeHost', inside: '!!(window.FlowPad && window.FlowPad.inside)',
+        modules: [{ name: 'engine', url: new URL('../js/engine.js', import.meta.url).href }, { name: 'plugin', url: import.meta.url, map: { '../js/engine.js': 'engine' } }] };
+    } catch (e) { return null; }
+  },
   migrate(b) {
     if (b.type === 'task' && b.app) { if (b.app.kind === 'formel' || b.app.kind === 'diagramm') b.type = 'fptask'; else delete b.app; }
     if (b.type === 'fptask') b.app = { tabelle: '', dfd: '', ...b.app };
@@ -131,11 +138,12 @@ XP: 30
         return { type: 'html', html: `<div class="lp-card lp-sheet"><b class="lp-ctitle">${esc(b.title)}</b>${b.html ? `<div>${b.html}</div>` : ''}${tab}</div>` };
       },
       form: [{ k: 'title', l: 'Titel (auch Name des Reiters in FlowPad)', t: 'text' }, { k: 'sheet', l: 'Tabelle', t: 'fp-sheet' }, { k: 'rules', l: 'Prüfregeln (der Reihe nach – die erste, die nicht passt, wird gemeldet)', t: 'fp-rules' }, { k: 'ok', l: 'Meldung, wenn alles stimmt', t: 'text', show: b => (b.rules || []).length > 0 }, XP],
-      run(a, b, x) {
+      async run(a, b, x) {
         const h = x.host;
         if (a === 'sheet') { if (!b.sheet?.cells) { x.toast('Noch keine Tabelle – ⚙ → „aus FlowPad übernehmen“'); return; } h.loadSheet?.(b.sheet, b.title); x.toast('▦ Tabelle „' + esc(b.title) + '“ in FlowPad geladen'); return; }
         if (a === 'check') {
           if (x.E()) { x.toast('In der <b>Vorschau</b> (⌘P) ausprobieren'); return; }
+          if (h.fresh) await h.fresh();
           if (h.tab?.() !== b.title) { x.prog.quiz[b.id] = { ok: false, msg: `Lade zuerst die Tabelle „${esc(b.title)}“.` }; x.render(); return; }
           const bad = (b.rules || []).find(r => !evalRule(r, h.cells()));
           x.prog.quiz[b.id] = bad ? { ok: false, msg: bad.msg || 'Noch nicht ganz. Prüfe deine Formeln.' } : { ok: true, msg: b.ok || 'Stark! Alles richtig.' };
@@ -234,3 +242,66 @@ XP: 30
 .lp-legend .d { width: 12px; height: 12px; border-radius: 50%; background: var(--ink); margin: 0 14px; } .lp-legend .k { font: 700 18px ui-monospace, monospace; text-align: center; }
 .lp-action { margin: 8px 0; }`,
 };
+
+/* ---------- Brücke zu FlowPad ----------
+ * Läuft PathFinder in FlowPad (Editor im Lernpfad-Bereich oder exportierter Lernpfad im Projekt),
+ * spricht dieser „host“ per postMessage mit FlowPad – dieselbe Schnittstelle wie bei klassischen Lernpfaden (FLOWPAD.md). */
+export function makeBridge(target = window.parent) {
+  const L = [], W = {};
+  addEventListener('message', e => {
+    if (e.source !== target) return; const m = e.data; if (!m || typeof m !== 'object') return;
+    if (m.type === 'flowpad-sheet' && W[m.req]) { const f = W[m.req]; delete W[m.req]; f(m); return; }
+    if (m.type === 'flowpad-result') L.forEach(f => { try { f(m); } catch (x) { } });
+  });
+  return {
+    inside: true,
+    send(action, data) { target.postMessage({ type: 'flowpad', action, ...data }, '*'); },
+    post(m) { target.postMessage(m, '*'); },
+    getSheet(id) { const r = String(Math.random()).slice(2); return new Promise((ok, no) => { const t = setTimeout(() => { delete W[r]; no(new Error('FlowPad antwortet nicht')); }, 4000); W[r] = m => { clearTimeout(t); ok(m); }; this.send('getSheet', { req: r, id }); }); },
+    onResult(f) { L.push(f); },
+  };
+}
+const sheetId = title => 'pf:' + String(title || 'Tabelle');
+export function createBridgeHost(bridge, { editor = false } = {}) {
+  bridge = bridge || window.FlowPad || makeBridge();
+  let api = null; const waiting = {}; // Zelle → Baustein der laufenden Aufgabe
+  let last = { cells: {}, sel: 'A1', name: '' };
+  const fresh = async () => { try { const r = await bridge.getSheet(); last = { cells: r.cells || {}, sel: r.sel || last.sel, name: r.name || '' }; } catch (e) { } return last; };
+  if (editor) { setInterval(() => { if (document.visibilityState === 'visible') fresh(); }, 900); fresh(); }
+  bridge.onResult(m => {
+    const id = waiting[m.cell]; if (!id || !api) return;
+    if (m.ok) { if (api.mode === 'preview') api.solve(id); else api.toast('✓ FlowPad meldet: richtig (in der Vorschau zählt es)'); }
+    else { api.prog.tries[id] = (api.prog.tries[id] || 0) + 1; if (api.mode === 'preview') api.render(); }
+  });
+  const loadSheet = (sheet, title) => {
+    const t = title || sheet.title || 'Tabelle';
+    bridge.send('sheet', { id: sheetId(t), title: t, cells: sheet.cells || {}, widths: sheet.widths, fmt: sheet.fmt, styles: sheet.styles, rows: sheet.rows, cols: sheet.cols, show: true });
+  };
+  const host = {
+    name: 'FlowPad', copyLabel: 'Kopieren', fresh,
+    attach(a) { api = a; },
+    selectedCell: () => last.sel,
+    cellFormula: a => last.cells[a],
+    cells: () => last.cells,
+    tab: () => last.name,
+    reset() { },
+    loadSheet,
+    task(t) {
+      const s = t.sheet && t.sheet.cells ? t.sheet : null, title = s ? (s.title || t.tabelle || t.title) : null;
+      waiting[String(t.cell).toUpperCase()] = t.id;
+      bridge.send('task', { id: s ? sheetId(title) : undefined, cell: t.cell, target: t.target, title: t.title, prompt: t.html, mode: t.kind === 'diagramm' ? 'diagramm' : 'formel', dfd: t.dfd,
+        ...(s ? { cells: s.cells, widths: s.widths, fmt: s.fmt, styles: s.styles, rows: s.rows, cols: s.cols, sheetTitle: title } : {}) });
+    },
+    action(b) {
+      if (b.sheet?.cells) loadSheet(b.sheet, b.sheet.title);
+      if (b.act === 'dfd') bridge.send('dfd', { cell: b.cell, term: b.term || undefined });
+      else bridge.send('views', { tabelle: !!b.tabelle, diagramm: !!b.diagramm });
+      return true;
+    },
+    showSolution(b) { const a = b.app || {}; bridge.send('dfd', { cell: a.cell, term: a.target }); return true; },
+    fileButton: b => /\.xlsx$/i.test(b.name || '') && b.data ? '<button class="lp-btn alt" data-run="file:xlsx">▦ In FlowPad öffnen</button>' : '',
+    runFile(b) { bridge.send('xlsx', { data: String(b.data || '').split(',').pop(), name: b.name, id: sheetId(b.name) }); },
+  };
+  if (editor && bridge.post) host.adopt = async (html, title) => { bridge.post({ type: 'flowpad-set-lernpfad', html, title }); };
+  return host;
+}

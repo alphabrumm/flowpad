@@ -166,5 +166,16 @@ und den Submodul-Stand committen). FlowPad steuert nur seine eigenen Bausteine b
 Rechenblatt mit Prüfregeln, Formel-/Diagramm-Aufgabe, Aktionsknopf, DFD-Legende. `editor/entwurf.html` zeigt den Editor
 neben einer FlowPad-Attrappe (`editor/mock.js`, rechnet mit der echten Engine); im fertigen Einbau übernimmt FlowPad selbst die Rolle des „host“.
 
-`python3 tools/lp2json.py` wandelt bestehende Lernpfade (FlowPad-Demo, LP1-1) ins PathFinder-Format um
-(`editor/beispiele/`); im Editor über 📂 Öffnen → „Umgewandelte Lernpfade“.
+**Einbau in FlowPad:** Menü → „Lernpfad-Editor (PathFinder)“ öffnet `editor/entwurf.html?in=flowpad` im Lernpfad-Bereich
+(gleiche Herkunft, kein Sandbox-iframe). Dann ersetzt `createBridgeHost()` die Attrappe und spricht über die bekannte
+Nachrichten-Schnittstelle (`sheet`, `task`, `getSheet` – Antwort jetzt mit `name` und `sel` –, `dfd`, `views`, `xlsx`) mit FlowPad.
+Zusätzliche Nachrichten: `pf-editor-ready` (FlowPad schickt darauf `pf-open` mit dem PathFinder-Dokument des eingebetteten
+Lernpfads), `pf-editor-close`, `flowpad-set-lernpfad` (Export „für FlowPad“ wird Lernpfad des Projekts).
+
+**Export „für FlowPad“:** eine HTML-Datei, die zusätzlich `flowpad-plugin.js` und `js/engine.js` enthält (`#pf-mods`, werden
+als Blob-Module geladen) und beide Fassungen des Dokuments (`#pf-doc-app` mit FlowPad-Bausteinen, `#pf-doc` umgewandelt).
+In FlowPad (`window.FlowPad.inside`) prüft FlowPad selbst; im normalen Browser läuft die Selbstkontroll-Fassung.
+
+`python3 tools/lp2json.py` wandelt bestehende Lernpfade (FlowPad-Demo, LP1-1, LP1-3, LP1-4, Challenges C1-1 bis C1-4) ins
+PathFinder-Format um (`editor/beispiele/`); im Editor über 📂 Öffnen → „Umgewandelte Lernpfade“. Ausfüll-Aufgaben der
+Challenges werden zur Prüfregel „ausgefüllt wie Formel“ (`fuell`: jede Zelle des Bereichs rechnet wie die verschobene Formel).

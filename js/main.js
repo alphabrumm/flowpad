@@ -398,13 +398,27 @@ function report(a, ok, how, formula) {
 }
 
 // ================= Lernpfad =================
-let frame = null;
+let frame = null, editorOpen = false;
+/** Lernpfad-Bereich belegt? (eingebetteter Lernpfad oder der Lernpfad-Editor PathFinder) */
+const hasLp = () => !!project?.lernpfadHtml || editorOpen;
+/** PathFinder-Dokument aus einem eingebetteten Lernpfad holen (zum Weiterbearbeiten im Editor) */
+function pathfinderDoc(html) {
+    const m = String(html || '').match(/<script type="application\/json" id="pf-doc-app">([\s\S]*?)<\/script>/) || String(html || '').match(/<script type="application\/json" id="pf-doc">([\s\S]*?)<\/script>/);
+    try { return m ? JSON.parse(m[1]) : null; } catch (e) { return null; }
+}
 function showLernpfad() {
-    const has = !!project.lernpfadHtml;
+    const has = hasLp();
     document.body.classList.toggle('has-lp', has);
     const host = $('#lernpfad'); host.innerHTML = '';
     frame = null;
-    if (has) {
+    if (editorOpen) {
+        // Der Editor kommt vom selben Server wie FlowPad und speichert seine Entwürfe selbst im Browser
+        frame = document.createElement('iframe');
+        frame.setAttribute('title', 'Lernpfad-Editor');
+        frame.src = 'editor/entwurf.html?in=flowpad';
+        host.appendChild(frame);
+        $('#lpTitle').textContent = 'Lernpfad-Editor';
+    } else if (has) {
         frame = document.createElement('iframe');
         frame.setAttribute('sandbox', 'allow-scripts allow-popups allow-popups-to-escape-sandbox allow-forms allow-modals');
         frame.setAttribute('title', 'Lernpfad');
@@ -412,7 +426,8 @@ function showLernpfad() {
         host.appendChild(frame);
         $('#lpTitle').textContent = project.lernpfadTitle || titleOf(project.lernpfadHtml) || 'Lernpfad';
     }
-    $('#drawerLpRemove').hidden = !has;
+    $('#drawerLpRemove').hidden = !project.lernpfadHtml;
+    $('#drawerLpEdit span').textContent = editorOpen ? 'Lernpfad-Editor schließen' : (pathfinderDoc(project.lernpfadHtml) ? 'Lernpfad bearbeiten (PathFinder)' : 'Lernpfad-Editor (PathFinder)');
     applyLayout();
 }
 function postToLernpfad(msg) { try { frame && frame.contentWindow && frame.contentWindow.postMessage(msg, '*'); } catch (e) { } }
@@ -420,6 +435,12 @@ window.addEventListener('message', async ev => {
     if (!frame || ev.source !== frame.contentWindow) return;
     const m = ev.data; if (!m || typeof m !== 'object') return;
     if (m.type === 'flowpad-lernpfad-storage') { project.lernpfadState = JSON.stringify(m.state || {}); touch(); return; }
+    if (editorOpen && m.type === 'pf-editor-ready') { const d = pathfinderDoc(project.lernpfadHtml); if (d) postToLernpfad({ type: 'pf-open', doc: d }); return; }
+    if (editorOpen && m.type === 'pf-editor-close') { editorOpen = false; showLernpfad(); return; }
+    if (editorOpen && m.type === 'flowpad-set-lernpfad' && typeof m.html === 'string') {
+        project.lernpfadHtml = m.html; project.lernpfadTitle = String(m.title || titleOf(m.html) || 'Lernpfad').slice(0, 80); project.lernpfadState = '{}';
+        editorOpen = false; touch(); showLernpfad(); toast('Lernpfad ins Projekt übernommen – so sehen ihn die Schüler'); return;
+    }
     if (m.type !== 'flowpad') return;
     try { await lernpfadAction(m); } catch (e) { console.error(e); toast('Lernpfad: ' + esc(e.message || e)); }
 });
@@ -466,7 +487,7 @@ async function lernpfadAction(m) {
         // Der Lernpfad prüft selbst (z. B. die Regeln seiner Mini-Tabellen) und bekommt dafür die Zellen
         syncTab();
         const t = m.id ? project.tabs.find(x => x.sheet.id === m.id) : project.tabs[project.tab];
-        postToLernpfad({ type: 'flowpad-sheet', req: m.req, id: t ? t.sheet.id || null : null, cells: t ? Object.assign({}, t.sheet.cells) : {}, rows: t ? t.sheet.rows : 0, cols: t ? t.sheet.cols : 0 });
+        postToLernpfad({ type: 'flowpad-sheet', req: m.req, id: t ? t.sheet.id || null : null, name: t ? t.name : '', sel: t === project.tabs[project.tab] ? cell : null, cells: t ? Object.assign({}, t.sheet.cells) : {}, rows: t ? t.sheet.rows : 0, cols: t ? t.sheet.cols : 0 });
         return;
     }
     if (m.action === 'say') {
@@ -511,7 +532,7 @@ const layoutMode = () => innerWidth >= 900 ? 'wide' : innerWidth >= 600 ? 'mediu
 let view = 'tabelle';
 function showView(v) { view = v; applyLayout(); }
 function applyLayout() {
-    const mode = layoutMode(), has = !!project?.lernpfadHtml;
+    const mode = layoutMode(), has = hasLp();
     document.body.dataset.layout = mode;
     if (!has && view === 'lernpfad') view = 'tabelle';
     // medium: Tabelle+Diagramm zusammen, Lernpfad als eigene Ansicht
@@ -550,7 +571,7 @@ $('#btnLpCollapse').addEventListener('click', e => { e.stopPropagation(); toggle
  * Im Hochformat wird zur passenden Ansicht gewechselt.
  */
 function setViews(v) {
-    const has = !!project?.lernpfadHtml, pick = (...k) => { for (const x of k) if (typeof v[x] === 'boolean') return v[x]; return undefined; };
+    const has = hasLp(), pick = (...k) => { for (const x of k) if (typeof v[x] === 'boolean') return v[x]; return undefined; };
     const g = pick('tabelle', 'grid'), d = pick('diagramm', 'dfd'), l = pick('lernpfad', 'lp');
     if (g !== undefined) pref.set('showGrid', g ? '1' : '0');
     if (d !== undefined) pref.set('showDfd', d ? '1' : '0');
@@ -568,7 +589,7 @@ function ensureView(which) {
 }
 /** Ansicht umschalten; mindestens eine bleibt sichtbar */
 function toggleView(which) {
-    const has = !!project?.lernpfadHtml;
+    const has = hasLp();
     const st = { grid: pref.get('showGrid', '1') === '1', dfd: pref.get('showDfd', '1') === '1', lp: has && pref.get('lpCollapsed', '0') !== '1' };
     st[which] = !st[which];
     if (!st.grid && !st.dfd && (!st.lp || layoutMode() !== 'wide')) { toast(layoutMode() === 'wide' ? 'Eine Ansicht bleibt immer sichtbar.' : 'Tabelle oder Diagramm bleibt immer sichtbar.'); return; }
@@ -608,6 +629,7 @@ async function openProject(p, opts) {
     $('#projectName').textContent = project.name;
     document.title = project.name + ' · FlowPad';
     showTab(project.tabs[project.tab].sel);
+    editorOpen = false;
     view = project.lernpfadHtml && layoutMode() !== 'wide' ? 'lernpfad' : 'tabelle';
     showLernpfad();
     if (!opts || !opts.noSave) await Store.putProject(project).catch(() => { });
@@ -717,6 +739,10 @@ on('#drawerLpAdd', async () => {
     const html = await readLernpfadFile(f);
     project.lernpfadHtml = html; project.lernpfadTitle = titleOf(html) || f.name.replace(/\.(html?|zip)$/i, ''); project.lernpfadState = '{}';
     touch(); showLernpfad(); closeDrawer(); toast('Lernpfad eingebettet');
+});
+on('#drawerLpEdit', () => {
+    editorOpen = !editorOpen; closeDrawer(); showLernpfad();
+    if (editorOpen) { setViews({ lernpfad: true }); if (layoutMode() !== 'wide') showView('lernpfad'); }
 });
 on('#drawerLpRemove', async () => {
     if (!await confirmBox('Lernpfad entfernen?', 'Der Lernpfad wird aus diesem Projekt entfernt. Tabelle und Diagramme bleiben.', 'Entfernen', true)) return;
