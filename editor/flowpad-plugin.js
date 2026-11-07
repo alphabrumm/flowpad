@@ -111,11 +111,11 @@ XP: 30
         if (!/^[A-Z]{1,2}\d{1,4}$/.test(cell)) H.err(S.line, `Formel-Aufgabe „${S.title}“: „Zelle: D2“ fehlt oder ist ungültig.`);
         if (!target.startsWith('=')) H.err(S.line, `Formel-Aufgabe „${S.title}“: „Formel: =…“ fehlt.`);
         const kind = /diagramm/i.test(S.one('als') || S.head) ? 'diagramm' : 'formel';
-        return { type: 'fptask', title: S.title, html: H.md(S.body), xp: S.num('xp', 20), app: { kind, cell, target, tabelle: '', dfd: kind === 'diagramm' ? 'leer' : '' }, tips: S.all('tipp').map(H.inline || (x => x)), solution: S.one('loesung') || `<code>${target}</code>`, img: '' };
+        return { type: 'fptask', title: S.title, html: H.md(S.body), xp: S.num('xp', 20), app: { kind, cell, target, tabelle: '', dfd: kind === 'diagramm' ? 'leer' : '' }, tips: S.all('tipp').map(H.inline || (x => x)), solution: S.one('loesung') || `<code>${target}</code>`, img: '', ...(S.hid?.('tipp').some(Boolean) ? { tipsHide: S.hid('tipp') } : {}), ...(S.hid?.('loesung')[0] ? { solHide: true } : {}) };
       },
       toText(b, { md }) {
         const a = b.app || {};
-        return [`### Formel-Aufgabe: ${md(b.title || '')}`, md(b.html || ''), `Zelle: ${a.cell}`, `Formel: ${a.target}`, `Als: ${a.kind === 'diagramm' ? 'Diagramm' : 'Formel'}`, ...(b.tips || []).map(t => 'Tipp: ' + md(t)), b.solution ? 'Lösung: ' + md(b.solution).replace(/\n+/g, ' ') : '', `XP: ${b.xp ?? 20}`].filter(Boolean).join('\n');
+        return [`### Formel-Aufgabe: ${md(b.title || '')}`, md(b.html || ''), `Zelle: ${a.cell}`, `Formel: ${a.target}`, `Als: ${a.kind === 'diagramm' ? 'Diagramm' : 'Formel'}`, ...(b.tips || []).map((t, i) => `Tipp${b.tipsHide?.[i] ? ' (verborgen)' : ''}: ` + md(t)), b.solution ? `Lösung${b.solHide ? ' (verborgen)' : ''}: ` + md(b.solution).replace(/\n+/g, ' ') : '', `XP: ${b.xp ?? 20}`].filter(Boolean).join('\n');
       },
     },
   },
@@ -177,8 +177,9 @@ XP: 30
         { k: 'app.dfd', l: 'Diagramm dazu', t: 'select', o: [['', 'keins'], ['leer', 'leer – selbst bauen'], ['vorgegeben', 'Lösung als Diagramm zeigen (Diagramm lesen)']] },
         { k: 'app.tabelle', l: 'Tabelle (Reiter in FlowPad)', t: 'text', help: 'optional, z. B. „LAN-Party“ – wird an der Aufgabe angezeigt' },
         { k: 'sheet', l: 'Eigene Tabelle für diese Aufgabe (optional)', t: 'fp-sheet' },
-        { k: 'tips', l: 'Tipps (werden nacheinander aufgedeckt)', t: 'list', ph: 'Tipp' },
+        { k: 'tips', l: 'Tipps (werden nacheinander aufgedeckt)', t: 'list', ph: 'Tipp', vis: 'tipsHide' },
         { k: 'solution', l: 'Lösung zum Aufdecken (leer = keine)', t: 'text' },
+        { k: 'solHide', l: 'Lösung für Schüler sichtbar', t: 'shown', show: b => !!b.solution },
         { k: 'img', l: 'Bild oder GIF zur Aufgabe', t: 'image' }, XP,
       ],
       run(a, b, x) {
