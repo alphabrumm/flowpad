@@ -417,8 +417,16 @@ async function openLernpfadEditor() {
 }
 /** PathFinder-Dokument aus einem eingebetteten Lernpfad holen (zum Weiterbearbeiten im Editor) */
 function pathfinderDoc(html) {
-    const m = String(html || '').match(/<script type="application\/json" id="pf-doc-app">([\s\S]*?)<\/script>/) || String(html || '').match(/<script type="application\/json" id="pf-doc">([\s\S]*?)<\/script>/);
-    try { return m ? JSON.parse(m[1]) : null; } catch (e) { return null; }
+    // ohne regulären Ausdruck über die ganze Seite: Lernpfade können mehrere MB groß sein (Safari bricht dann ab)
+    const s = String(html || "");
+    for (const id of ["pf-doc-app", "pf-doc"]) {
+        const tag = `<script type="application/json" id="${id}">`, a = s.indexOf(tag);
+        if (a < 0) continue;
+        const b = s.indexOf("</script>", a + tag.length);
+        if (b < 0) continue;
+        try { return JSON.parse(s.slice(a + tag.length, b)); } catch (e) { }
+    }
+    return null;
 }
 function showLernpfad() {
     const has = hasLp();
