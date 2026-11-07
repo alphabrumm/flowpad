@@ -115,11 +115,11 @@ def convert_demo(path):
             html = inline(body)
             if btn and btn.get('data-flowpad'):
                 cfg = json.loads(btn['data-flowpad'])
-                b = add({'type': 'task', 'title': cfg.get('title', 'Aufgabe'), 'html': html, 'xp': 20,
+                b = add({'type': 'fptask', 'title': cfg.get('title', 'Aufgabe'), 'html': html, 'xp': 20,
                          'app': {'kind': 'diagramm' if cfg.get('mode') == 'diagramm' else 'formel', 'cell': cfg['cell'], 'target': cfg['target'], 'tabelle': pause['title'], 'dfd': 'leer' if cfg.get('dfd') == 'leer' else ''},
                          'tips': [], 'solution': '', 'img': ''})
             else:  # „Diagramme lesen“ (btnRead im Skript)
-                b = add({'type': 'task', 'title': 'Durchschnitt', 'html': html, 'xp': 20,
+                b = add({'type': 'fptask', 'title': 'Durchschnitt', 'html': html, 'xp': 20,
                          'app': {'kind': 'formel', 'cell': 'B8', 'target': '=RUNDEN(MITTELWERT(B2:B6);2)', 'tabelle': 'Klassenkasse', 'dfd': 'vorgegeben'},
                          'sheet': {'cells': kasse, 'title': 'Klassenkasse', 'widths': {'A': 110}, 'styles': {'A1:B1': 'head'}, 'fmt': {'B2:B8': 'eur'}},
                          'tips': [], 'solution': '', 'img': ''})
@@ -216,7 +216,7 @@ def convert_lp(path, pal=0):
                      'rules': rules_from(c.get('check')), 'ok': c.get('ok', ''), 'xp': 10}); continue
             if el.has_attr('data-dfd'):
                 t = LP['dfd'][el['data-dfd']]
-                add({'type': 'task', 'title': t.get('title', 'Diagramm'), 'html': t.get('prompt', ''), 'xp': 20,
+                add({'type': 'fptask', 'title': t.get('title', 'Diagramm'), 'html': t.get('prompt', ''), 'xp': 20,
                      'app': {'kind': 'diagramm', 'cell': t.get('output') if re.match(r'^\$?[A-Z]+\$?\d+$', str(t.get('output', ''))) else '', 'target': t['term'], 'tabelle': '', 'dfd': 'leer'},
                      'dfdInputs': t.get('inputs'), 'tests': t.get('tests'), 'tips': [], 'solution': '', 'img': ''}); continue
             if 'duck' in cls:

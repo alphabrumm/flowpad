@@ -158,13 +158,13 @@ Ausfüllen (eine Formel, ausgefüllt; der Lernpfad holt sich die Tabelle mit `ge
 und rechnet mit MiniCalc und acht anderen Testbelegungen nach) und Kopf-Hacks ohne FlowPad. Fortschritt und XP merkt sich der Lernpfad.
 Die Seiten werden aus einer Aufgabenliste erzeugt; dabei werden alle Musterlösungen und typische falsche Lösungen mit FlowPads Engine gegengeprüft.
 
-## Lernpfad-Editor (Entwurf)
+## Lernpfad-Editor (PathFinder)
 
-`editor/entwurf.html` ist ein klickbarer Entwurf des Lernpfad-Editors (gemeinsam für FlowPad, JPad, QPad geplant).
-Ein Lernpfad ist ein JSON-Dokument aus Stationen mit Bausteinen (Text, Infokasten inkl. „Figur sagt“/Regel/Abschluss,
-Bild, Tabelle, Aufdecken, Datei, HTML, Aufgabe, Quiz mit mehreren Fragen, Lückentext mit Begriffen/Hefteintrag,
-Zuordnen, Sperre, Rechenblatt mit Prüfregeln, Formel-/Diagramm-Aufgabe, Aktionsknopf, DFD-Legende, Code, UML-Klasse).
-Titel, Untertitel, Stationstitel, Texte und Infokästen können eine Textanimation bekommen (Schreibmaschine, Einblenden, Glitch, Leuchten), beim großen Kopfbild zusätzlich Tipp-Zeilen wie ein Terminal. Gespeichert wird lokal im Browser; Export (HTML, SCORM) folgt.
+Der Lernpfad-Editor ist jetzt **PathFinder** (eigenes Repo `alphabrumm/pathfinder`), hier als Git-Submodul unter
+`vendor/pathfinder` eingebunden (`git submodule update --init`; neuen Stand holen: `git -C vendor/pathfinder pull origin main`
+und den Submodul-Stand committen). FlowPad steuert nur seine eigenen Bausteine bei – `editor/flowpad-plugin.js`:
+Rechenblatt mit Prüfregeln, Formel-/Diagramm-Aufgabe, Aktionsknopf, DFD-Legende. `editor/entwurf.html` zeigt den Editor
+neben einer FlowPad-Attrappe (`editor/mock.js`, rechnet mit der echten Engine); im fertigen Einbau übernimmt FlowPad selbst die Rolle des „host“.
 
-`python3 tools/lp2json.py` wandelt bestehende Lernpfade (FlowPad-Demo, LP1-1) in dieses Format um
+`python3 tools/lp2json.py` wandelt bestehende Lernpfade (FlowPad-Demo, LP1-1) ins PathFinder-Format um
 (`editor/beispiele/`); im Editor über 📂 Öffnen → „Umgewandelte Lernpfade“.

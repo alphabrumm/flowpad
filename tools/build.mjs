@@ -23,6 +23,8 @@ const copy = (a, b) => { fs.mkdirSync(b, { recursive: true }); for (const f of f
 fs.rmSync(out, { recursive: true, force: true });
 fs.mkdirSync(out, { recursive: true });
 for (const f of APP) { const s = path.join(root, f), d = path.join(out, f); if (fs.statSync(s).isDirectory()) copy(s, d); else fs.copyFileSync(s, d); }
+// PathFinder (Lernpfad-Editor, Git-Submodul): nur Kern und Schriften
+for (const f of ['core', 'fonts']) { const s = path.join(root, 'vendor', 'pathfinder', f); if (fs.existsSync(s)) copy(s, path.join(out, 'vendor', 'pathfinder', f)); else console.warn('Achtung: vendor/pathfinder fehlt – git submodule update --init'); }
 
 // Lernpfade und FlowCodes
 const codes = {}, index = [], seen = {};

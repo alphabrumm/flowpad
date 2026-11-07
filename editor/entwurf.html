@@ -1,14 +1,15 @@
 <!doctype html>
 <html lang="de"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Lernpfad-Editor · Entwurf</title>
+<title>Lernpfad-Editor (PathFinder) · FlowPad</title>
 <link rel="icon" href="../icon.svg">
-<link rel="stylesheet" href="editor.css">
+<link rel="stylesheet" href="../vendor/pathfinder/core/pathfinder.css">
+<link rel="stylesheet" href="mock.css">
 </head>
 <body>
-<div class="app" id="app">
+<div class="app with-side" id="app">
   <!-- Attrappe von FlowPad: nur damit man Übernehmen und Ausprobieren erleben kann -->
-  <section class="mock" aria-label="FlowPad (Attrappe)">
+  <section class="mock pf-side" aria-label="FlowPad (Attrappe)">
     <div class="mock-head"><span class="logo">F</span>FlowPad <span class="mock-tab" id="mTab">Tabelle 1</span><small>Attrappe für den Entwurf</small></div>
     <div class="mock-fx"><span class="addr" id="mAddr">D2</span><b>fx</b><input id="mFx" autocomplete="off" spellcheck="false" aria-label="Formel"></div>
     <div class="mock-grid"><table id="mGrid"></table></div>
@@ -32,5 +33,35 @@
     <div class="lp-scroll" id="scroll"><div class="lp" id="lp"></div></div>
   </section>
 </div>
-<script type="module" src="editor.js"></script>
+<script type="module">
+import { startPathFinder } from '../vendor/pathfinder/core/pathfinder.js';
+import { flowpadPlugin } from './flowpad-plugin.js';
+import { createMock } from './mock.js';
+
+const sheet = { A1: 'Artikel', B1: 'Preis', C1: 'Anzahl', D1: 'Gesamt', A2: 'Brezel', B2: '0,9', C2: '14', A3: 'Semmel', B3: '0,45', C3: '20', A4: 'Kakao', B4: '1,2', C4: '9' };
+const sample = () => ({
+  v: 2, id: 'entwurf', form: 'lernpfad', design: { pal: 0, font: 'pixel', shape: 'eckig', hero: 'logo', heroImg: '' },
+  kicker: 'FlowPad · Lernpfad', title: 'Zellen und Formeln', subtitle: 'Jahrgangsstufe 9 · Tabellenkalkulation', goals: [], rank: '',
+  stations: [
+    { title: 'Willkommen', sub: 'Rundgang', blocks: [
+      { type: 'text', html: 'In diesem Lernpfad rechnest du mit <b>Formeln</b> statt mit dem Taschenrechner. Links siehst du FlowPad, rechts diesen Lernpfad.' },
+      { type: 'info', kind: 'merke', title: 'Merke', html: 'Eine Formel beginnt immer mit <code>=</code>.' } ] },
+    { title: 'Rechnen mit Zellbezügen', sub: 'Baustein „Formel“', blocks: [
+      { type: 'sheet', title: 'Pausenverkauf', html: 'Die Preisliste des Pausenverkaufs.', sheet: { cells: sheet }, rules: [], ok: '' },
+      { type: 'fptask', id: 'auf21', title: 'Aufgabe 2.1', html: 'Schreibe in <b>D2</b> die Formel für den Gesamtpreis: Preis mal Anzahl.', xp: 30, app: { kind: 'formel', cell: 'D2', target: '=B2*C2', tabelle: '', dfd: '' }, tips: ['Tippe zuerst <code>=</code>, dann die Zelle B2 an.', 'Mal heißt in Formeln <code>*</code>.'], solution: '<code>=B2*C2</code>', img: '' },
+      { type: 'lock', after: 'auf21' },
+      { type: 'text', html: 'Stark! Jetzt kannst du die Formel nach unten ausfüllen – D3 und D4 rechnen dann automatisch mit.' } ] },
+  ].map((s, i) => ({ id: 's' + i, check: false, ...s, blocks: s.blocks.map((b, j) => ({ id: b.id || `b${i}${j}`, ...b })) })),
+  cert: { on: true, need: 'alle', pct: 80, text: 'hat den Lernpfad erfolgreich bearbeitet.', show: { zeit: true, tipps: true, quiz: true, xp: true } },
+});
+
+const host = createMock();
+const api = startPathFinder({
+  appName: 'FlowPad', storage: 'lpeditor', plugins: [flowpadPlugin], host, sample,
+  examples: 'beispiele/index.json', examplesTitle: 'Umgewandelte Lernpfade',
+  // ältere Entwurfsfassung (vor PathFinder) übernehmen
+  legacy: () => { try { const d = JSON.parse(localStorage.getItem('lpeditor.entwurf.v1')); if (d) d.id = 'entwurf'; return d; } catch (e) { return null; } },
+});
+host.attach(api);
+</script>
 </body></html>
