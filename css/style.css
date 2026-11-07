@@ -561,6 +561,9 @@ body.hide-left[data-layout="wide"] .lp-pane { flex: 1 1 auto; }
 .dfd-edit .f-pick .ic { width: 23px; height: 23px; stroke-width: 1.6; }
 .dfd-edit .f-pick .hl { fill: var(--glow); stroke: none; }
 .dfd-edit .f-pick .bg { fill: var(--surface-2); stroke: none; }
+/* Lücke zwischen Hand und Tabellenlinien: breiter Rand in Knopffarbe unter dem Handumriss */
+.dfd-edit .f-pick .halo { stroke: var(--surface-2); stroke-width: 6; }
+body:has(.grid.picking) .dfd-edit .f-pick .halo { stroke: var(--glow); }
 body:has(.grid.picking) .dfd-edit .f-pick .bg { fill: var(--glow); }
 body:has(.grid.picking) .dfd-edit .f-pick .hl { fill: var(--surface); }
 body:has(.grid.picking) .dfd-edit .f-pick { background: var(--glow); color: var(--acc-ink, #000); animation: pickpulse 1.2s ease-in-out infinite; }
