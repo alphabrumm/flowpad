@@ -461,6 +461,12 @@ export const DFD = (() => {
     function field(label, value, attrs) {
       return `<label class="dfd-field">${label ? `<span>${label}</span>` : ''}<input type="text" value="${esc(value || '')}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" ${attrs || ''}></label>`;
     }
+    // Zelle in der Tabelle antippen: Knopf sitzt rechts im Zellenfeld
+    const PICK_ICON = '<svg class="ic" viewBox="0 0 24 24"><rect x="2.5" y="2.5" width="13" height="9" rx="1.5"/><path d="M11 18.5V8.6a1.6 1.6 0 0 1 3.2 0v5.2"/><path d="M14.2 12.6a1.6 1.6 0 0 1 3.2 0v1.6"/><path d="M17.4 13.4a1.6 1.6 0 0 1 3.2 0V17a5.4 5.4 0 0 1-5.4 5.4h-1.4a5 5 0 0 1-4-2l-2.5-3.3a1.5 1.5 0 0 1 2.4-1.8L11 17"/></svg>';
+    function cellField(value, attrs, title) {
+      return `<span class="f-combo"><input type="text" value="${esc(value || '')}" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" ${attrs || ''}>`
+        + `<button type="button" class="f-pick" data-act="pickcell" title="${title}" aria-label="${title}">${PICK_ICON}</button></span>`;
+    }
     const delBtn = '<button type="button" class="fbtn icon danger" data-act="del" title="Baustein löschen" aria-label="Löschen"><svg class="ic" viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg></button>';
     // ▦ wählt die Zelle in der Tabelle; läuft die Auswahl schon, bricht ein zweiter Tipp sie ab
     const picking = () => !!document.querySelector('.grid.picking');
@@ -478,9 +484,9 @@ export const DFD = (() => {
         return;
       }
       if (n.kind === 'in') {
-        edit.innerHTML = `<span class="sig-l">Eingabe</span>` + field('', n.ref, 'data-f="ref" class="f-cell" placeholder="B2:B6" autocapitalize="characters"')
-          + field('Name', n.name, 'data-f="name" class="f-name" placeholder="z. B. Preis"')
-          + `<button type="button" class="fbtn icon" data-act="pickcell" title="Zelle in der Tabelle wählen" aria-label="Zelle in der Tabelle wählen">▦</button><button type="button" class="fbtn icon" data-act="ok" aria-label="Übernehmen">✓</button>${delBtn}`; bindDel();
+        edit.innerHTML = `<span class="sig-l">Eingabe</span>` + cellField(n.ref, 'data-f="ref" class="f-cell" placeholder="B2:B6"', 'Zelle in der Tabelle antippen')
+          + field('Name', n.name, 'data-f="name" class="f-name" placeholder="Preis" maxlength="10"')
+          + `<button type="button" class="fbtn icon" data-act="ok" aria-label="Übernehmen">✓</button>${delBtn}`; bindDel();
         const fr = edit.querySelector('[data-f=ref]'), fname = edit.querySelector('[data-f=name]');
         const apply = () => {
           const r = fr.value.trim().toUpperCase().replace(/\s+/g, '');
@@ -497,9 +503,8 @@ export const DFD = (() => {
       }
       if (n.kind === 'out') {
         // Ausgabe in [Zelle] ▦ · Name · ✓ · ✕ – eine Zeile
-        edit.innerHTML = `<span class="sig-l">Ausgabe in</span>` + field('', n.ref, 'data-f="ref" class="f-cell" placeholder="D2" autocapitalize="characters"')
-          + `<button type="button" class="fbtn icon" data-act="pickcell" title="Zielzelle in der Tabelle antippen" aria-label="Zielzelle antippen">▦</button>`
-          + field('Name', n.name, 'data-f="name" class="f-name" placeholder="z. B. Endpreis"') + `<button type="button" class="fbtn icon" data-act="ok" aria-label="Übernehmen">✓</button>${delBtn}`; bindDel();
+        edit.innerHTML = `<span class="sig-l">Ausgabe in</span>` + cellField(n.ref, 'data-f="ref" class="f-cell" placeholder="D2"', 'Zielzelle in der Tabelle antippen')
+          + field('Name', n.name, 'data-f="name" class="f-name" placeholder="Endpreis" maxlength="10"') + `<button type="button" class="fbtn icon" data-act="ok" aria-label="Übernehmen">✓</button>${delBtn}`; bindDel();
         const fname = edit.querySelector('[data-f=name]'), fref = edit.querySelector('[data-f=ref]');
         const apply = () => {
           n.name = fname.value.trim() || undefined;
