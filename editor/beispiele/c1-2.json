@@ -6,8 +6,8 @@
   "pal": 8,
   "font": "pixel",
   "shape": "eckig",
-  "hero": "bild",
-  "heroImg": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAxNiIgc2hhcGUtcmVuZGVyaW5nPSJjcmlzcEVkZ2VzIj48cGF0aCBmaWxsPSIjNWZlMDhhIiBkPSJNNCAyaDh2MWgxdjFoMXY1aC0xdjJoLTJ2Mkg1di0ySDNWOUgyVjRoMVYzaDF6TTUgNnYyaDJWNnptNCAwdjJoMlY2ek03IDl2MWgyVjl6TTYgMTJoMXYxSDZ6bTMgMGgxdjFIOXoiLz48L3N2Zz4=",
+  "hero": "logo",
+  "heroImg": "",
   "theme": "grid",
   "divider": "linie"
  },
