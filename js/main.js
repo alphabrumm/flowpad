@@ -9,6 +9,7 @@ import { openHandbuch } from './handbuch.js';
 import { initTips } from './tips.js';
 import * as Store from './store.js';
 import { readLernpfadFile, loadLernpfadUrl, withBridge, titleOf, nameFromUrl } from './lernpfad.js';
+import { scormStart, scormStub, scormMessage } from './scorm.js';
 import { normalizeCode, codeFormatError, resolveCode, codeOfUrl, loadLearnIndex } from './flowcode.js';
 import { sheetToXlsx, xlsxToSheet, isZip } from './zip.js';
 
@@ -444,7 +445,7 @@ function showLernpfad() {
         frame = document.createElement('iframe');
         frame.setAttribute('sandbox', 'allow-scripts allow-popups allow-popups-to-escape-sandbox allow-forms allow-modals');
         frame.setAttribute('title', 'Lernpfad');
-        frame.srcdoc = withBridge(project.lernpfadHtml, project.lernpfadState || '{}');
+        frame.srcdoc = withBridge(project.lernpfadHtml, project.lernpfadState || '{}', scormStub());
         host.appendChild(frame);
         if (isTeacher()) host.appendChild(editPencil());
         $('#lpTitle').textContent = project.lernpfadTitle || titleOf(project.lernpfadHtml) || 'Lernpfad';
@@ -457,6 +458,7 @@ function postToLernpfad(msg) { try { frame && frame.contentWindow && frame.conte
 window.addEventListener('message', async ev => {
     if (!frame || ev.source !== frame.contentWindow) return;
     const m = ev.data; if (!m || typeof m !== 'object') return;
+    if (m.type === 'flowpad-scorm') { scormMessage(m); return; }
     if (m.type === 'flowpad-lernpfad-storage') { project.lernpfadState = JSON.stringify(m.state || {}); touch(); return; }
     if (editorOpen && m.type === 'pf-editor-ready') { const d = pathfinderDoc(project.lernpfadHtml); if (d) postToLernpfad({ type: 'pf-open', doc: d }); return; }
     if (editorOpen && m.type === 'pf-editor-close') { editorOpen = false; showLernpfad(); return; }
@@ -829,10 +831,10 @@ async function teacherList() {
     const kind = k => ({ html: 'Lernpfad', htm: 'Lernpfad', zip: 'Lernpfad (ZIP)', json: 'Projekt' })[k] || k;
     const ov = document.createElement('div'); ov.className = 'fp-dialog-backdrop';
     ov.innerHTML = `<div class="fp-dialog wide teach" role="dialog" aria-modal="true"><h3>Lernpfade und Projekte</h3>
-        <p class="teach-intro">Lehrkraft-Modus: Schüler öffnen einen Lernpfad über den <b>FlowCode</b> (Menü → „Projekt über FlowCode öffnen“) oder über den Link. „Öffnen“ lädt eine frische Kopie.</p>
+        <p class="teach-intro">Lehrkraft-Modus: Schüler öffnen einen Lernpfad über den <b>FlowCode</b> (Menü → „Projekt über FlowCode öffnen“) oder über den Link. „Öffnen“ lädt eine frische Kopie. <b>⇩ SCORM</b> lädt ein Lernpaket für die ByCS-Lernplattform: FlowPad mit diesem Lernpfad, Punkte landen in den Bewertungen (Aktivität „Lernpaket“, Anzeige „Neues Fenster“).</p>
         <div class="teach-list">${folders.map(f => `<h4>Klasse ${esc(f)}</h4>` + list.filter(e => e.folder === f).map(e => `
           <div class="teach-row"><div class="teach-head"><div><b>${esc(e.title)}</b><span>${esc(kind(e.kind))} · ${esc(e.path.split('/').pop())}</span></div><div class="teach-code-big" title="FlowCode">${esc(e.code || '–')}</div></div>
-          <div class="teach-actions"><input type="text" readonly value="${esc(link(e))}" aria-label="Link"><button type="button" class="btn" data-copy="${esc(link(e))}">Kopieren</button><button type="button" class="btn primary" data-open="${esc(e.path)}">Öffnen</button></div></div>`).join('')).join('') || '<p>Noch keine Lernpfade unter learn/9 … learn/13.</p>'}</div>
+          <div class="teach-actions"><input type="text" readonly value="${esc(link(e))}" aria-label="Link"><button type="button" class="btn" data-copy="${esc(link(e))}">Kopieren</button><button type="button" class="btn primary" data-open="${esc(e.path)}">Öffnen</button>${e.scorm ? `<a class="btn" href="${esc(e.scorm)}" download title="SCORM-Lernpaket für Moodle/ByCS: FlowPad mit diesem Lernpfad, meldet die Punkte an die Bewertungen">⇩ SCORM</a>` : ''}</div></div>`).join('')).join('') || '<p>Noch keine Lernpfade unter learn/9 … learn/13.</p>'}</div>
         <div class="fp-dialog-buttons"><button type="button" class="btn" data-close>Schließen</button></div></div>`;
     document.body.appendChild(ov);
     const close = () => ov.remove();
@@ -861,6 +863,9 @@ async function start() {
     const q = new URLSearchParams(location.search);
     const teacherStart = q.has('lehrkraft');
     if (teacherStart) { try { sessionStorage.setItem('flowpad.lehrkraft', '1'); } catch (e) { } }
+    // Als SCORM-Lernpaket (Moodle): FlowPad öffnet nur die Challenge des Pakets und meldet den Fortschritt an Moodle
+    const scorm = q.has('scorm');
+    if (scorm) { scormStart(); document.body.classList.add('scorm'); }
     const lp = q.get('lernpfad'), pj = q.get('projekt'), code = q.get('code') || q.get('flowcode');
     try {
         if (code) {
@@ -884,11 +889,11 @@ async function start() {
         if (!project) await createProject('Mein erstes Projekt');
         alertBox('Das Projekt ließ sich nicht öffnen', esc(e.message || String(e)));
     }
-    if (lp || pj || code || teacherStart) history.replaceState(null, '', location.pathname);
+    if ((lp || pj || code || teacherStart) && !scorm) history.replaceState(null, '', location.pathname);
     $('#loading').hidden = true;
     const c = project && codeOfUrl(project.source); if (c) $('#projectName').title = 'FlowCode ' + c;
     showTeacherCode();
     if (teacherStart) teacherList();
-    if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(r => r.update()).catch(() => { });
+    if (!scorm && 'serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(r => r.update()).catch(() => { });
 }
 start();

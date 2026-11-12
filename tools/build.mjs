@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import { buildScorm, canScorm } from './scorm-paket.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 // Was zur App gehört (alles andere – tools/, .github/, Doku – bleibt draußen)
@@ -50,9 +51,22 @@ for (const base of [out, root]) {
 }
 for (const e of index) console.log(`${e.code}  ${e.path}`);
 
+// SCORM-Lernpakete: jeder PathFinder-Lernpfad zusätzlich als Paket mit eingebautem FlowPad (für Moodle / ByCS)
+// → dist/scorm/<Name>_FlowPad_SCORM.zip, abrufbar über die Lehrkraft-Ansicht bzw. direkt per Adresse
+for (const e of index) {
+    if (e.kind !== 'html') continue;
+    const src = path.join(root, e.path);
+    if (!fs.existsSync(src) || !canScorm(fs.readFileSync(src, 'utf8'))) continue;
+    const zipName = path.basename(e.path).replace(/\.html?$/i, '') + '_FlowPad_SCORM.zip';
+    buildScorm(src, path.join(out, 'scorm', zipName), root);
+    e.scorm = 'scorm/' + zipName;
+    console.log(`SCORM  scorm/${zipName}`);
+}
+fs.writeFileSync(path.join(out, 'learn', 'index.json'), JSON.stringify(index, null, 1) + '\n');
+
 // Service Worker: App-Dateien für die Offline-Nutzung (Lernpfade unter learn/ werden immer frisch geladen)
 const files = [];
-(function walk(d, rel) { for (const f of fs.readdirSync(d)) { const p = path.join(d, f), r = rel ? rel + '/' + f : f; if (fs.statSync(p).isDirectory()) { if (r !== 'learn') walk(p, r); } else if (!/\.(php|md|txt)$/.test(f) && f !== 'sw.js') files.push(r); } })(out, '');
+(function walk(d, rel) { for (const f of fs.readdirSync(d)) { const p = path.join(d, f), r = rel ? rel + '/' + f : f; if (fs.statSync(p).isDirectory()) { if (r !== 'learn' && r !== 'scorm') walk(p, r); } else if (!/\.(php|md|txt)$/.test(f) && f !== 'sw.js') files.push(r); } })(out, '');
 const hash = crypto.createHash('sha256'); for (const f of files.sort()) hash.update(f).update(fs.readFileSync(path.join(out, f)));
 const version = hash.digest('hex').slice(0, 12);
 // index.html: CSS und Startskript mit Versionsnummer laden

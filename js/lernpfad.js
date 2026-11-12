@@ -21,6 +21,14 @@ export const looksLikeHtml = t => /<(html|body|div|p|h1|h2|section|main)\b/i.tes
 function b64(bytes) { let s = ''; for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode(...bytes.subarray(i, i + 0x8000)); return btoa(s); }
 
 async function inlineResources(html, resolve, link) {
+    // Inhalt von <script>-Blöcken nie anfassen: Code wie url(…) oder src = … ist dort keine Adresse
+    // (PathFinder-Lernpfade bringen ihr ganzes Programm im Skript mit und gingen sonst kaputt)
+    const kept = [];
+    html = html.replace(/(<script\b[^>]*>)([\s\S]*?)(<\/script\s*>)/gi, (all, a, body, z) => { kept.push(body); return a + '\u0000' + (kept.length - 1) + '\u0000' + z; });
+    const restore = h => h.replace(/\u0000(\d+)\u0000/g, (m, i) => kept[+i]);
+    return restore(await inlineRefs(html, resolve, link));
+}
+async function inlineRefs(html, resolve, link) {
     const pattern = /(\s(src|href|poster)\s*=\s*)(["'])([^"']*)\3|url\(\s*(["']?)([^"')]+)\5\s*\)/gi;
     const isPage = (attr, ref) => attr && attr.toLowerCase() == 'href' && /\.html?([?#]|$)/i.test(ref);
     const refs = new Set();
@@ -91,7 +99,7 @@ export async function loadLernpfadUrl(url) {
  *  2. Sprunglinks scrollen selbst, externe Links öffnen in einem neuen Tab.
  *  3. window.FlowPad: Aufgaben an FlowPad schicken, Ergebnisse empfangen. Knöpfe mit data-flowpad='{"action":…}' funktionieren ohne eigenes Skript.
  */
-export function withBridge(html, state) {
+export function withBridge(html, state, extra = '') {
     const st = (state || '{}').replace(/</g, '\\u003c');
     const shim = `<script>(function(){var ok=false;try{ok=!!window.localStorage;}catch(e){}if(ok)return;`
         + `var d=${st};function save(){parent.postMessage({type:"flowpad-lernpfad-storage",state:d},"*");}`
@@ -122,6 +130,6 @@ export function withBridge(html, state) {
         + `document.addEventListener("DOMContentLoaded",function(){document.head.appendChild(st);lock();});`
         + `document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("[data-flowpad]");if(!b)return;e.preventDefault();`
         + `try{var d=JSON.parse(b.getAttribute("data-flowpad"));var a=d.action;delete d.action;window.FlowPad.send(a,d);}catch(x){console.error("data-flowpad: kein gültiges JSON",x);}});})();<\/script>`;
-    const m = html.match(/<head[^>]*>/i) || html.match(/<html[^>]*>/i);
-    return m ? html.replace(m[0], m[0] + shim) : shim + html;
+    const all = extra + shim, m = html.match(/<head[^>]*>/i) || html.match(/<html[^>]*>/i);
+    return m ? html.replace(m[0], () => m[0] + all) : all + html;
 }

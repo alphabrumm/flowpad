@@ -110,6 +110,30 @@ gemeldet bei **Prüfen**, **DFD → Zelle** und wenn eine Formel direkt in eine 
 
 `…/flowpad/?lehrkraft` zeigt beim Start alle Lernpfade unter `learn/9` … `learn/13` mit FlowCode, kopierbarem Link und „Öffnen“ (frische Kopie).
 Gilt für diesen Tab: Im Menü steht dann „Lehrkraft: alle Lernpfade“, und neben dem Projektnamen steht der FlowCode des geöffneten Lernpfads. Schüler sehen davon nichts.
+Bei PathFinder-Lernpfaden steht dort zusätzlich **⇩ SCORM** (siehe nächster Abschnitt).
+
+## FlowPad als SCORM-Lernpaket (ByCS-Lernplattform / Moodle)
+
+Jeder PathFinder-Lernpfad unter `learn/` wird beim Bauen zusätzlich als SCORM-1.2-Lernpaket gepackt:
+`dist/scorm/<Name>_FlowPad_SCORM.zip` (auf GitHub Pages z. B. `…/flowpad/scorm/C1-2_Challenge_Bezugs-Hacks-PathFinder_FlowPad_SCORM.zip`,
+im Lehrkraft-Modus über „⇩ SCORM“). Von Hand: `node tools/scorm-paket.mjs learn/9/<Lernpfad>.html [ziel.zip]`.
+
+- **Inhalt:** die ganze App (index.html, css, js, Schriften, Icons, ca. 1,3 MB) plus der Lernpfad – ohne Lernpfad-Editor,
+  andere Lernpfade und Service Worker. Moodle startet `scorm.html`, das öffnet `index.html?scorm&lernpfad=…`.
+  FlowPad zeigt dann nur diese Challenge: Menüpunkte für andere Projekte, FlowCodes, Lernpfade und Lehrkraft-Werkzeuge sind ausgeblendet.
+- **Ergebnisse:** FlowPad sucht das SCORM-API der Lernplattform (`js/scorm.js`). Der Lernpfad steckt in einem abgeschotteten
+  iframe und bekommt einen Stellvertreter (`window.API`), dessen Änderungen FlowPad per postMessage ins echte API schreibt.
+  Gemeldet werden Punkte in % (bei Challenges nach XP gewichtet), Status (`passed` ab der Bestehensgrenze des Lernpfads, sonst
+  `incomplete`/`failed`), je gelöster Aufgabe eine Interaktion und der Fortschritt (`cmi.suspend_data`, höchstens 4096 Zeichen).
+  Dadurch ist der Fortschritt im Lernpfad auch auf einem anderen iPad wieder da; die Tabellen selbst bleiben im Browser des Geräts
+  (lassen sich aber jederzeit aus dem Lernpfad neu laden).
+- **Datenschutz:** Es gehen keine Daten an andere Server als die Lernplattform selbst.
+- **Moodle-Einstellungen:** Aktivität „Lernpaket“, Paketdatei hochladen. *Darstellung → Anzeigen:* „Neues Fenster“, Breite und Höhe
+  100 %, Navigation und Inhaltsverzeichnis ausblenden. *Bewertung:* Bewertungsmethode „Höchste Bewertung“, Maximale Bewertung 100,
+  Bewertung der Versuche „Höchster Versuch“. *Versuchsverwaltung:* Versuche unbegrenzt, „Neuen Versuch erzwingen“: Nein (sonst
+  beginnt jeder Start bei null). Abschluss z. B. „Bewertung erforderlich“ oder Status „bestanden“.
+- **Nach Änderungen an FlowPad oder am Lernpfad** muss das Paket neu hochgeladen werden (es enthält eine feste Fassung der App).
+- Lernpfade im Originaldesign (umgewandelte HTML-Seiten) melden keine Ergebnisse und werden nicht gepackt.
 
 ## FlowCodes
 
