@@ -62,6 +62,8 @@ for (const e of index) {
     e.scorm = 'scorm/' + zipName;
     console.log(`SCORM  scorm/${zipName}`);
 }
+// Ursprüngliche Fassung mit PathFinder-Zwilling (<Name>-PathFinder.html): bekommt dasselbe Paket (gleicher Inhalt)
+for (const e of index) if (!e.scorm && e.kind === 'html') { const twin = index.find(x => x.scorm && x.path === e.path.replace(/\.html?$/i, '-PathFinder.html')); if (twin) { e.scorm = twin.scorm; e.scormVia = twin.code; } }
 fs.writeFileSync(path.join(out, 'learn', 'index.json'), JSON.stringify(index, null, 1) + '\n');
 
 // Service Worker: App-Dateien für die Offline-Nutzung (Lernpfade unter learn/ werden immer frisch geladen)

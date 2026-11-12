@@ -1,1 +1,361 @@
-{"v":2,"id":"inf9-c1-2","form":"challenge","design":{"pal":8,"font":"pixel","shape":"eckig","hero":"logo","heroImg":""},"kicker":"HACKER-CHALLENGE · LEVEL 1.2","title":"Bezugs-Hacks","subtitle":"Jede Tabelle hier wird mit <b>einer einzigen Formel</b> gefüllt: schreiben, ausfüllen, fertig. Welche Bezüge brauchen ein <code>$</code>?","goals":[],"rank":"","stations":[{"id":"hccfs4g","title":"Start","sub":"Regeln","check":false,"blocks":[{"id":"ignsuv1","type":"info","kind":"regel","title":"Regeln","html":"Keine Tipps. FlowPad prüft jede Lösung mit vielen anderen Zahlen – wer Ergebnisse abtippt, statt mit Zellen zu rechnen, fliegt auf. Diagramm-Aufgaben werden nur im Diagramm gelöst (dann <b>Prüfen</b>), Ausfüll-Aufgaben prüfst du hier im Lernpfad. Das <b><i>fx</i></b>-Handbuch ist erlaubt.","img":"","name":""},{"id":"qbwqsdx","type":"legend"}]},{"id":"u64sb0b","title":"Wechselstube","sub":"Tabelle","check":false,"blocks":[{"id":"17gw4d8","type":"sheet","title":"Wechselstube","html":"Wechselstube: Schreibe <b>eine</b> Formel in <b>B4</b>, die Euro in die Währung der Spalte umrechnet. Fülle sie dann bis <b>D9</b> aus (erst nach rechts, dann nach unten).","sheet":{"cells":{"A1":"Euro","B1":"US-Dollar","C1":"Pfund","D1":"Yen","A2":"Kurs","B2":"1,08","C2":"0,84","D2":"162","A4":"5","A5":"10","A6":"20","A7":"50","A8":"100","A9":"200"},"widths":{"A":90,"B":100,"C":100,"D":100},"fmt":{"B4:C9":"d2","D4:D9":"int"},"styles":{"A1:D1":"head","B2:D2":"inp"},"title":"Wechselstube"},"rules":[{"kind":"fuell","ref":"B4:D9","val":"=$A4*B$2","set":"","msg":"Prüfe deine Formel in B4 und das Ausfüllen bis D9 – denk an die $-Zeichen."}],"ok":"Gehackt! Alle Zellen rechnen richtig.","xp":15}]},{"id":"nfsk1a7","title":"Klassenfahrt-Kasse","sub":"Tabelle","check":false,"blocks":[{"id":"msdaw5g","type":"sheet","title":"Klassenfahrt-Kasse","html":"Anteile: Welcher Anteil der Gesamtkosten entfällt auf jeden Posten? Eine Formel in <b>C2</b>, ausfüllen bis <b>C6</b>.","sheet":{"cells":{"A1":"Posten","B1":"Betrag","C1":"Anteil","A2":"Bus","B2":"480","A3":"Eintritte","B3":"210","A4":"Jugendherberge","B4":"1350","A5":"Verpflegung","B5":"390","A6":"Sonstiges","B6":"75","A7":"Summe","B7":"=B2+B3+B4+B5+B6"},"widths":{"A":160,"B":100,"C":90},"fmt":{"B2:B7":"eur","C2:C6":"pct"},"styles":{"A1:C1":"head","A7":"head"},"title":"Klassenfahrt-Kasse"},"rules":[{"kind":"fuell","ref":"C2:C6","val":"=B2/$B$7","set":"","msg":"Prüfe deine Formel in C2 und das Ausfüllen bis C6 – denk an die $-Zeichen."}],"ok":"Gehackt! Alle Zellen rechnen richtig.","xp":15}]},{"id":"5l5w6qk","title":"Sparplan","sub":"Tabelle","check":false,"blocks":[{"id":"sno5khf","type":"sheet","title":"Sparplan","html":"Sparplan: Jedes Jahr kommen Zinsen auf den Kontostand, danach wird die Einzahlung (<b>B2</b>) gutgeschrieben. Fülle die Jahre 1 bis 10 aus: je eine Formel in <b>A6</b> und <b>B6</b>, dann bis Zeile 15 ausfüllen.","sheet":{"cells":{"A1":"Zinssatz","B1":"3%","A2":"Einzahlung pro Jahr","B2":"300","A4":"Jahr","B4":"Kontostand","A5":"0","B5":"1000"},"widths":{"A":170,"B":110},"fmt":{"B1":"pct","B2":"eur","B5:B15":"eur"},"styles":{"A4:B4":"head","B1:B2":"inp"},"title":"Sparplan"},"rules":[{"kind":"fuell","ref":"A6:A15","val":"=A5+1","set":"","msg":"Prüfe deine Formel in A6 und das Ausfüllen bis A15 – denk an die $-Zeichen."},{"kind":"fuell","ref":"B6:B15","val":"=B5*(1+$B$1)+$B$2","set":"","msg":"Prüfe deine Formel in B6 und das Ausfüllen bis B15 – denk an die $-Zeichen."}],"ok":"Gehackt! Alle Zellen rechnen richtig.","xp":15}]},{"id":"59guwgz","title":"Rabatt-Matrix","sub":"Tabelle","check":false,"blocks":[{"id":"zf1bxnt","type":"fptask","title":"Rabatt-Diagramm","html":"Baue das Diagramm für den rabattierten Preis in <b>B2</b> so, dass du die Formel danach bis <b>E6</b> ausfüllen kannst. <b>DFD → Zelle</b> nicht vergessen.","xp":15,"app":{"kind":"diagramm","cell":"B2","target":"=$A2*(1-B$1)","tabelle":"Rabatt-Matrix","dfd":"leer"},"sheet":{"cells":{"A1":"Preis","B1":"5%","C1":"10%","D1":"20%","E1":"25%","A2":"19,99","A3":"49","A4":"89","A5":"129","A6":"249"},"widths":{"A":90},"fmt":{"B1:E1":"pct","A2:E6":"eur"},"styles":{"A1:E1":"head"},"title":"Rabatt-Matrix"},"tips":[],"solution":"","img":""},{"id":"q186kyo","type":"sheet","title":"Rabatt-Matrix","html":"Rabatt-Matrix: Fülle die Formel aus <b>B2</b> bis <b>E6</b> aus.","sheet":{"cells":{"A1":"Preis","B1":"5%","C1":"10%","D1":"20%","E1":"25%","A2":"19,99","A3":"49","A4":"89","A5":"129","A6":"249"},"widths":{"A":90},"fmt":{"B1:E1":"pct","A2:E6":"eur"},"styles":{"A1:E1":"head"},"title":"Rabatt-Matrix"},"rules":[{"kind":"fuell","ref":"B2:E6","val":"=$A2*(1-B$1)","set":"","msg":"Prüfe deine Formel in B2 und das Ausfüllen bis E6 – denk an die $-Zeichen."}],"ok":"Gehackt! Alle Zellen rechnen richtig.","xp":15}]},{"id":"3i8cwu7","title":"Kopf-Hacks","sub":"ohne FlowPad","check":false,"blocks":[{"id":"j29uk32","type":"task","title":"Kopf-Hack","html":"In <b>D4</b> steht <code>=B$2*$C3</code>. Du kopierst die Zelle nach <b>F7</b>. Welche Formel steht in F7?","xp":5,"answer":"=D$2*$C6","tips":[],"solution":"","img":""},{"id":"qoiv3p6","type":"task","title":"Kopf-Hack","html":"In <b>C5</b> steht <code>=$A1+B$1</code>. Du kopierst die Zelle nach <b>A6</b>. Was steht in A6?","xp":5,"answer":"=$A2+#BEZUG!|#BEZUG!","tips":[],"solution":"","img":""},{"id":"mrtjjpu","type":"info","kind":"abschluss","title":"Grid gehackt!","html":"Alle Aufgaben gelöst. Sichere dein Projekt (oben rechts in FlowPad) – und dann ab zur nächsten Station auf der Lernlandkarte.","img":"","name":""}]}],"cert":{"on":true,"need":"alle","pct":80,"text":"hat die Challenge gemeistert.","show":{"zeit":true,"tipps":true,"quiz":true,"xp":true}}}
+{
+ "v": 2,
+ "id": "inf9-c1-2",
+ "form": "challenge",
+ "design": {
+  "pal": 8,
+  "font": "pixel",
+  "shape": "eckig",
+  "hero": "bild",
+  "heroImg": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAxNiIgc2hhcGUtcmVuZGVyaW5nPSJjcmlzcEVkZ2VzIj48cGF0aCBmaWxsPSIjNWZlMDhhIiBkPSJNNCAyaDh2MWgxdjFoMXY1aC0xdjJoLTJ2Mkg1di0ySDNWOUgyVjRoMVYzaDF6TTUgNnYyaDJWNnptNCAwdjJoMlY2ek03IDl2MWgyVjl6TTYgMTJoMXYxSDZ6bTMgMGgxdjFIOXoiLz48L3N2Zz4=",
+  "theme": "grid",
+  "divider": "linie"
+ },
+ "kicker": "HACKER-CHALLENGE · LEVEL 1.2",
+ "title": "Bezugs-Hacks",
+ "subtitle": "Jede Tabelle hier wird mit <b>einer einzigen Formel</b> gefüllt: schreiben, ausfüllen, fertig. Welche Bezüge brauchen ein <code>$</code>?",
+ "goals": [],
+ "rank": "",
+ "stations": [
+  {
+   "id": "hccfs4g",
+   "title": "Start",
+   "sub": "Regeln",
+   "check": false,
+   "blocks": [
+    {
+     "id": "ignsuv1",
+     "type": "info",
+     "kind": "regel",
+     "title": "Regeln",
+     "html": "Keine Tipps. FlowPad prüft jede Lösung mit vielen anderen Zahlen – wer Ergebnisse abtippt, statt mit Zellen zu rechnen, fliegt auf. Diagramm-Aufgaben werden nur im Diagramm gelöst (dann <b>Prüfen</b>), Ausfüll-Aufgaben prüfst du hier im Lernpfad. Das <b><i>fx</i></b>-Handbuch ist erlaubt.",
+     "img": "",
+     "name": ""
+    },
+    {
+     "id": "qbwqsdx",
+     "type": "legend"
+    }
+   ]
+  },
+  {
+   "id": "u64sb0b",
+   "title": "Wechselstube",
+   "sub": "Tabelle",
+   "check": false,
+   "blocks": [
+    {
+     "id": "17gw4d8",
+     "type": "sheet",
+     "title": "Wechselstube",
+     "html": "Wechselstube: Schreibe <b>eine</b> Formel in <b>B4</b>, die Euro in die Währung der Spalte umrechnet. Fülle sie dann bis <b>D9</b> aus (erst nach rechts, dann nach unten).",
+     "sheet": {
+      "cells": {
+       "A1": "Euro",
+       "B1": "US-Dollar",
+       "C1": "Pfund",
+       "D1": "Yen",
+       "A2": "Kurs",
+       "B2": "1,08",
+       "C2": "0,84",
+       "D2": "162",
+       "A4": "5",
+       "A5": "10",
+       "A6": "20",
+       "A7": "50",
+       "A8": "100",
+       "A9": "200"
+      },
+      "widths": {
+       "A": 90,
+       "B": 100,
+       "C": 100,
+       "D": 100
+      },
+      "fmt": {
+       "B4:C9": "d2",
+       "D4:D9": "int"
+      },
+      "styles": {
+       "A1:D1": "head",
+       "B2:D2": "inp"
+      },
+      "title": "Wechselstube"
+     },
+     "rules": [
+      {
+       "kind": "fuell",
+       "ref": "B4:D9",
+       "val": "=$A4*B$2",
+       "set": "",
+       "msg": "Prüfe deine Formel in B4 und das Ausfüllen bis D9 – denk an die $-Zeichen."
+      }
+     ],
+     "ok": "Gehackt! Alle Zellen rechnen richtig.",
+     "xp": 15
+    }
+   ]
+  },
+  {
+   "id": "nfsk1a7",
+   "title": "Klassenfahrt-Kasse",
+   "sub": "Tabelle",
+   "check": false,
+   "blocks": [
+    {
+     "id": "msdaw5g",
+     "type": "sheet",
+     "title": "Klassenfahrt-Kasse",
+     "html": "Anteile: Welcher Anteil der Gesamtkosten entfällt auf jeden Posten? Eine Formel in <b>C2</b>, ausfüllen bis <b>C6</b>.",
+     "sheet": {
+      "cells": {
+       "A1": "Posten",
+       "B1": "Betrag",
+       "C1": "Anteil",
+       "A2": "Bus",
+       "B2": "480",
+       "A3": "Eintritte",
+       "B3": "210",
+       "A4": "Jugendherberge",
+       "B4": "1350",
+       "A5": "Verpflegung",
+       "B5": "390",
+       "A6": "Sonstiges",
+       "B6": "75",
+       "A7": "Summe",
+       "B7": "=B2+B3+B4+B5+B6"
+      },
+      "widths": {
+       "A": 160,
+       "B": 100,
+       "C": 90
+      },
+      "fmt": {
+       "B2:B7": "eur",
+       "C2:C6": "pct"
+      },
+      "styles": {
+       "A1:C1": "head",
+       "A7": "head"
+      },
+      "title": "Klassenfahrt-Kasse"
+     },
+     "rules": [
+      {
+       "kind": "fuell",
+       "ref": "C2:C6",
+       "val": "=B2/$B$7",
+       "set": "",
+       "msg": "Prüfe deine Formel in C2 und das Ausfüllen bis C6 – denk an die $-Zeichen."
+      }
+     ],
+     "ok": "Gehackt! Alle Zellen rechnen richtig.",
+     "xp": 15
+    }
+   ]
+  },
+  {
+   "id": "5l5w6qk",
+   "title": "Sparplan",
+   "sub": "Tabelle",
+   "check": false,
+   "blocks": [
+    {
+     "id": "sno5khf",
+     "type": "sheet",
+     "title": "Sparplan",
+     "html": "Sparplan: Jedes Jahr kommen Zinsen auf den Kontostand, danach wird die Einzahlung (<b>B2</b>) gutgeschrieben. Fülle die Jahre 1 bis 10 aus: je eine Formel in <b>A6</b> und <b>B6</b>, dann bis Zeile 15 ausfüllen.",
+     "sheet": {
+      "cells": {
+       "A1": "Zinssatz",
+       "B1": "3%",
+       "A2": "Einzahlung pro Jahr",
+       "B2": "300",
+       "A4": "Jahr",
+       "B4": "Kontostand",
+       "A5": "0",
+       "B5": "1000"
+      },
+      "widths": {
+       "A": 170,
+       "B": 110
+      },
+      "fmt": {
+       "B1": "pct",
+       "B2": "eur",
+       "B5:B15": "eur"
+      },
+      "styles": {
+       "A4:B4": "head",
+       "B1:B2": "inp"
+      },
+      "title": "Sparplan"
+     },
+     "rules": [
+      {
+       "kind": "fuell",
+       "ref": "A6:A15",
+       "val": "=A5+1",
+       "set": "",
+       "msg": "Prüfe deine Formel in A6 und das Ausfüllen bis A15 – denk an die $-Zeichen."
+      },
+      {
+       "kind": "fuell",
+       "ref": "B6:B15",
+       "val": "=B5*(1+$B$1)+$B$2",
+       "set": "",
+       "msg": "Prüfe deine Formel in B6 und das Ausfüllen bis B15 – denk an die $-Zeichen."
+      }
+     ],
+     "ok": "Gehackt! Alle Zellen rechnen richtig.",
+     "xp": 15
+    }
+   ]
+  },
+  {
+   "id": "59guwgz",
+   "title": "Rabatt-Matrix",
+   "sub": "Tabelle",
+   "check": false,
+   "blocks": [
+    {
+     "id": "zf1bxnt",
+     "type": "fptask",
+     "title": "Rabatt-Diagramm",
+     "html": "Baue das Diagramm für den rabattierten Preis in <b>B2</b> so, dass du die Formel danach bis <b>E6</b> ausfüllen kannst. <b>DFD → Zelle</b> nicht vergessen.",
+     "xp": 15,
+     "app": {
+      "kind": "diagramm",
+      "cell": "B2",
+      "target": "=$A2*(1-B$1)",
+      "tabelle": "Rabatt-Matrix",
+      "dfd": "leer"
+     },
+     "sheet": {
+      "cells": {
+       "A1": "Preis",
+       "B1": "5%",
+       "C1": "10%",
+       "D1": "20%",
+       "E1": "25%",
+       "A2": "19,99",
+       "A3": "49",
+       "A4": "89",
+       "A5": "129",
+       "A6": "249"
+      },
+      "widths": {
+       "A": 90
+      },
+      "fmt": {
+       "B1:E1": "pct",
+       "A2:E6": "eur"
+      },
+      "styles": {
+       "A1:E1": "head"
+      },
+      "title": "Rabatt-Matrix"
+     },
+     "tips": [],
+     "solution": "",
+     "img": ""
+    },
+    {
+     "id": "q186kyo",
+     "type": "sheet",
+     "title": "Rabatt-Matrix",
+     "html": "Rabatt-Matrix: Fülle die Formel aus <b>B2</b> bis <b>E6</b> aus.",
+     "sheet": {
+      "cells": {
+       "A1": "Preis",
+       "B1": "5%",
+       "C1": "10%",
+       "D1": "20%",
+       "E1": "25%",
+       "A2": "19,99",
+       "A3": "49",
+       "A4": "89",
+       "A5": "129",
+       "A6": "249"
+      },
+      "widths": {
+       "A": 90
+      },
+      "fmt": {
+       "B1:E1": "pct",
+       "A2:E6": "eur"
+      },
+      "styles": {
+       "A1:E1": "head"
+      },
+      "title": "Rabatt-Matrix"
+     },
+     "rules": [
+      {
+       "kind": "fuell",
+       "ref": "B2:E6",
+       "val": "=$A2*(1-B$1)",
+       "set": "",
+       "msg": "Prüfe deine Formel in B2 und das Ausfüllen bis E6 – denk an die $-Zeichen."
+      }
+     ],
+     "ok": "Gehackt! Alle Zellen rechnen richtig.",
+     "xp": 15
+    }
+   ]
+  },
+  {
+   "id": "3i8cwu7",
+   "title": "Kopf-Hacks",
+   "sub": "ohne FlowPad",
+   "check": false,
+   "blocks": [
+    {
+     "id": "j29uk32",
+     "type": "task",
+     "title": "Kopf-Hack",
+     "html": "In <b>D4</b> steht <code>=B$2*$C3</code>. Du kopierst die Zelle nach <b>F7</b>. Welche Formel steht in F7?",
+     "xp": 5,
+     "answer": "=D$2*$C6",
+     "tips": [],
+     "solution": "",
+     "img": "",
+     "tag": "Kopf-Hack"
+    },
+    {
+     "id": "qoiv3p6",
+     "type": "task",
+     "title": "Kopf-Hack",
+     "html": "In <b>C5</b> steht <code>=$A1+B$1</code>. Du kopierst die Zelle nach <b>A6</b>. Was steht in A6?",
+     "xp": 5,
+     "answer": "=$A2+#BEZUG!|#BEZUG!",
+     "tips": [],
+     "solution": "",
+     "img": "",
+     "tag": "Kopf-Hack"
+    },
+    {
+     "id": "mrtjjpu",
+     "type": "info",
+     "kind": "abschluss",
+     "title": "Grid gehackt!",
+     "html": "Alle Aufgaben gelöst. Sichere dein Projekt (oben rechts in FlowPad) – und dann ab zur nächsten Station auf der Lernlandkarte.",
+     "img": "",
+     "name": ""
+    }
+   ]
+  }
+ ],
+ "cert": {
+  "on": true,
+  "need": "alle",
+  "pct": 80,
+  "text": "hat die Challenge gemeistert.",
+  "show": {
+   "zeit": true,
+   "tipps": true,
+   "quiz": true,
+   "xp": true
+  }
+ }
+}

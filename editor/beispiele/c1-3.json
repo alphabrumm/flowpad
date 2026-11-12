@@ -1,1 +1,607 @@
-{"v":2,"id":"inf9-c1-3","form":"challenge","design":{"pal":8,"font":"pixel","shape":"eckig","hero":"logo","heroImg":""},"kicker":"HACKER-CHALLENGE · LEVEL 1.3","title":"Funktions-Hacks","subtitle":"Funktionen verketten, Verteiler setzen, Diagramme lesen. Das <b><i>fx</i></b>-Handbuch in FlowPad ist erlaubt.","goals":[],"rank":"","stations":[{"id":"7wkpumq","title":"Start","sub":"Regeln","check":false,"blocks":[{"id":"gkgmyjj","type":"info","kind":"regel","title":"Regeln","html":"Keine Tipps. FlowPad prüft jede Lösung mit vielen anderen Zahlen – wer Ergebnisse abtippt, statt mit Zellen zu rechnen, fliegt auf. Diagramm-Aufgaben werden nur im Diagramm gelöst (dann <b>Prüfen</b>), Ausfüll-Aufgaben prüfst du hier im Lernpfad. Das <b><i>fx</i></b>-Handbuch ist erlaubt.","img":"","name":""},{"id":"tt1rmgg","type":"legend"}]},{"id":"rny3caz","title":"Pixel-Turnier","sub":"Tabelle","check":false,"blocks":[{"id":"1o6s3bj","type":"fptask","title":"Schnitt","html":"Ada: Durchschnitt ihrer drei Runden, auf <b>eine</b> Nachkommastelle gerundet. Diagramm für <b>E2</b>.","xp":15,"app":{"kind":"diagramm","cell":"E2","target":"=RUNDEN(MITTELWERT(B2:D2);1)","tabelle":"Pixel-Turnier","dfd":"leer"},"sheet":{"cells":{"A1":"Spieler","B1":"Runde 1","C1":"Runde 2","D1":"Runde 3","E1":"Schnitt","F1":"Wertung","G1":"Spannweite","A2":"Ada","B2":"120","C2":"95","D2":"140","A3":"Linus","B3":"88","C3":"132","D3":"101","A4":"Grace","B4":"150","C4":"47","D4":"129","A5":"Alan","B5":"99","C5":"118","A6":"Hedy","B6":"135","C6":"140","D6":"61","A7":"Tim","B7":"77","C7":"103","D7":"98","A9":"Bester Wert","A10":"Anzahl Ergebnisse","A11":"Turnierschnitt"},"widths":{"A":150,"E":90,"F":90,"G":110},"fmt":{"E2:E7":"d1","B11":"d2"},"styles":{"A1:G1":"head","A9:A11":"head"},"title":"Pixel-Turnier"},"tips":[],"solution":"","img":""},{"id":"qzap10o","type":"fptask","title":"Streichergebnis","html":"Die Wertung ist die Summe aller Runden <b>ohne das schlechteste Ergebnis</b>. Diagramm für <b>F2</b>.","xp":15,"app":{"kind":"diagramm","cell":"F2","target":"=SUMME(B2:D2)-MIN(B2:D2)","tabelle":"Pixel-Turnier","dfd":"leer"},"sheet":{"cells":{"A1":"Spieler","B1":"Runde 1","C1":"Runde 2","D1":"Runde 3","E1":"Schnitt","F1":"Wertung","G1":"Spannweite","A2":"Ada","B2":"120","C2":"95","D2":"140","A3":"Linus","B3":"88","C3":"132","D3":"101","A4":"Grace","B4":"150","C4":"47","D4":"129","A5":"Alan","B5":"99","C5":"118","A6":"Hedy","B6":"135","C6":"140","D6":"61","A7":"Tim","B7":"77","C7":"103","D7":"98","A9":"Bester Wert","A10":"Anzahl Ergebnisse","A11":"Turnierschnitt"},"widths":{"A":150,"E":90,"F":90,"G":110},"fmt":{"E2:E7":"d1","B11":"d2"},"styles":{"A1:G1":"head","A9:A11":"head"},"title":"Pixel-Turnier"},"tips":[],"solution":"","img":""},{"id":"olh31uq","type":"sheet","title":"Pixel-Turnier","html":"Wertung für alle: Fülle die Wertung aus <b>F2</b> bis <b>F7</b> aus.","sheet":{"cells":{"A1":"Spieler","B1":"Runde 1","C1":"Runde 2","D1":"Runde 3","E1":"Schnitt","F1":"Wertung","G1":"Spannweite","A2":"Ada","B2":"120","C2":"95","D2":"140","A3":"Linus","B3":"88","C3":"132","D3":"101","A4":"Grace","B4":"150","C4":"47","D4":"129","A5":"Alan","B5":"99","C5":"118","A6":"Hedy","B6":"135","C6":"140","D6":"61","A7":"Tim","B7":"77","C7":"103","D7":"98","A9":"Bester Wert","A10":"Anzahl Ergebnisse","A11":"Turnierschnitt"},"widths":{"A":150,"E":90,"F":90,"G":110},"fmt":{"E2:E7":"d1","B11":"d2"},"styles":{"A1:G1":"head","A9:A11":"head"},"title":"Pixel-Turnier"},"rules":[{"kind":"fuell","ref":"F2:F7","val":"=SUMME(B2:D2)-MIN(B2:D2)","set":"","msg":"Prüfe deine Formel in F2 und das Ausfüllen bis F7 – denk an die $-Zeichen."}],"ok":"Gehackt! Alle Zellen rechnen richtig.","xp":15},{"id":"g0pzkq1","type":"sheet","title":"Pixel-Turnier","html":"Spannweite: Spannweite = bestes minus schlechtestes Ergebnis eines Spielers. Eine Formel in <b>G2</b>, ausfüllen bis <b>G7</b>.","sheet":{"cells":{"A1":"Spieler","B1":"Runde 1","C1":"Runde 2","D1":"Runde 3","E1":"Schnitt","F1":"Wertung","G1":"Spannweite","A2":"Ada","B2":"120","C2":"95","D2":"140","A3":"Linus","B3":"88","C3":"132","D3":"101","A4":"Grace","B4":"150","C4":"47","D4":"129","A5":"Alan","B5":"99","C5":"118","A6":"Hedy","B6":"135","C6":"140","D6":"61","A7":"Tim","B7":"77","C7":"103","D7":"98","A9":"Bester Wert","A10":"Anzahl Ergebnisse","A11":"Turnierschnitt"},"widths":{"A":150,"E":90,"F":90,"G":110},"fmt":{"E2:E7":"d1","B11":"d2"},"styles":{"A1:G1":"head","A9:A11":"head"},"title":"Pixel-Turnier"},"rules":[{"kind":"fuell","ref":"G2:G7","val":"=MAX(B2:D2)-MIN(B2:D2)","set":"","msg":"Prüfe deine Formel in G2 und das Ausfüllen bis G7 – denk an die $-Zeichen."}],"ok":"Gehackt! Alle Zellen rechnen richtig.","xp":15},{"id":"43b07lu","type":"fptask","title":"Bester Wert","html":"Das beste Einzelergebnis des ganzen Turniers in <b>B9</b>.","xp":10,"app":{"kind":"formel","cell":"B9","target":"=MAX(B2:D7)","tabelle":"Pixel-Turnier","dfd":""},"sheet":{"cells":{"A1":"Spieler","B1":"Runde 1","C1":"Runde 2","D1":"Runde 3","E1":"Schnitt","F1":"Wertung","G1":"Spannweite","A2":"Ada","B2":"120","C2":"95","D2":"140","A3":"Linus","B3":"88","C3":"132","D3":"101","A4":"Grace","B4":"150","C4":"47","D4":"129","A5":"Alan","B5":"99","C5":"118","A6":"Hedy","B6":"135","C6":"140","D6":"61","A7":"Tim","B7":"77","C7":"103","D7":"98","A9":"Bester Wert","A10":"Anzahl Ergebnisse","A11":"Turnierschnitt"},"widths":{"A":150,"E":90,"F":90,"G":110},"fmt":{"E2:E7":"d1","B11":"d2"},"styles":{"A1:G1":"head","A9:A11":"head"},"title":"Pixel-Turnier"},"tips":[],"solution":"","img":""},{"id":"ay5gcq8","type":"fptask","title":"Gezählt","html":"Wie viele Rundenergebnisse liegen vor? Lass FlowPad zählen – in <b>B10</b>.","xp":10,"app":{"kind":"formel","cell":"B10","target":"=ANZAHL(B2:D7)","tabelle":"Pixel-Turnier","dfd":""},"sheet":{"cells":{"A1":"Spieler","B1":"Runde 1","C1":"Runde 2","D1":"Runde 3","E1":"Schnitt","F1":"Wertung","G1":"Spannweite","A2":"Ada","B2":"120","C2":"95","D2":"140","A3":"Linus","B3":"88","C3":"132","D3":"101","A4":"Grace","B4":"150","C4":"47","D4":"129","A5":"Alan","B5":"99","C5":"118","A6":"Hedy","B6":"135","C6":"140","D6":"61","A7":"Tim","B7":"77","C7":"103","D7":"98","A9":"Bester Wert","A10":"Anzahl Ergebnisse","A11":"Turnierschnitt"},"widths":{"A":150,"E":90,"F":90,"G":110},"fmt":{"E2:E7":"d1","B11":"d2"},"styles":{"A1:G1":"head","A9:A11":"head"},"title":"Pixel-Turnier"},"tips":[],"solution":"","img":""},{"id":"nkm7wg3","type":"image","src":"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGFyaWEtbGFiZWw9IkRhdGVuZmx1c3NkaWFncmFtbSIgcm9sZT0iaW1nIiBzdHlsZT0ibWF4LXdpZHRoOjM0N3B4O21pbi13aWR0aDoyNTBweCIgdmlld2JveD0iNDEyLjc4NDY3MTUzMjg0Njc0IDkgMzQ2Ljk5OTk5OTk5OTk5OTk0IDUwMiI+PGRlZnM+PG1hcmtlciBpZD0iYWgiIG1hcmtlcmhlaWdodD0iNyIgbWFya2Vyd2lkdGg9IjciIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIiByZWZ4PSI5IiByZWZ5PSI1IiB2aWV3Ym94PSIwIDAgMTAgMTAiPjxwYXRoIGNsYXNzPSJhaCIgZD0iTTAgMEwxMCA1TDAgMTB6Ij48L3BhdGg+PC9tYXJrZXI+PC9kZWZzPjxwYXRoIGNsYXNzPSJlZCIgZD0iTTQ5OC4yODQ2NzE1MzI4NDY3NCw2NSBDNDk4LjI4NDY3MTUzMjg0Njc0LDk1IDQ5OC4yODQ2NzE1MzI4NDY3NCw5NCA0OTguMjg0NjcxNTMyODQ2NzQsMTI0IiBtYXJrZXItZW5kPSJ1cmwoI2FoKSI+PC9wYXRoPjxwYXRoIGNsYXNzPSJlZCIgZD0iTTQ5OC4yODQ2NzE1MzI4NDY3NCwxMzcgQzQ5OC4yODQ2NzE1MzI4NDY3NCwxNjcgNDk4LjI4NDY3MTUzMjg0Njc0LDE2MyA0OTguMjg0NjcxNTMyODQ2NzQsMTkzIiBtYXJrZXItZW5kPSJ1cmwoI2FoKSI+PC9wYXRoPjxwYXRoIGNsYXNzPSJlZCIgZD0iTTQ5OC4yODQ2NzE1MzI4NDY3NCwyNDAgQzQ5OC4yODQ2NzE1MzI4NDY3NCwyNzAgNDgzLjI4NDY3MTUzMjg0Njc0LDI1MS4zNTkzMzE0NzMyMzM4NSA0ODMuMjg0NjcxNTMyODQ2NzQsMjgxLjM1OTMzMTQ3MzIzMzg1IiBtYXJrZXItZW5kPSJ1cmwoI2FoKSI+PC9wYXRoPjx0ZXh0IGNsYXNzPSJzbiIgeD0iNDcyLjI4NDY3MTUzMjg0Njc0IiB5PSIyNzIuMzU5MzMxNDczMjMzODUiPjE8L3RleHQ+PHBhdGggY2xhc3M9ImVkIiBkPSJNNDk4LjI4NDY3MTUzMjg0Njc0LDEzNyBDNDk4LjI4NDY3MTUzMjg0Njc0LDE2NyA2NjQuNzg0NjcxNTMyODQ2NywxNjMgNjY0Ljc4NDY3MTUzMjg0NjcsMTkzIiBtYXJrZXItZW5kPSJ1cmwoI2FoKSI+PC9wYXRoPjxwYXRoIGNsYXNzPSJlZCIgZD0iTTY2NC43ODQ2NzE1MzI4NDY3LDI0MCBDNjY0Ljc4NDY3MTUzMjg0NjcsMjcwIDUxMy4yODQ2NzE1MzI4NDY3LDI1MS4zNTkzMzE0NzMyMzM4NSA1MTMuMjg0NjcxNTMyODQ2NywyODEuMzU5MzMxNDczMjMzODUiIG1hcmtlci1lbmQ9InVybCgjYWgpIj48L3BhdGg+PHRleHQgY2xhc3M9InNuIiB4PSI1MDIuMjg0NjcxNTMyODQ2NyIgeT0iMjcyLjM1OTMzMTQ3MzIzMzg1Ij4yPC90ZXh0PjxwYXRoIGNsYXNzPSJlZCIgZD0iTTQ5OC4yODQ2NzE1MzI4NDY3NCwzMjYgQzQ5OC4yODQ2NzE1MzI4NDY3NCwzNTYgNTM1LjU0Mzc5NTYyMDQzOCwzMzUuNDE4NDAyNjg5NTAzNyA1MzUuNTQzNzk1NjIwNDM4LDM2NS40MTg0MDI2ODk1MDM3IiBtYXJrZXItZW5kPSJ1cmwoI2FoKSI+PC9wYXRoPjx0ZXh0IGNsYXNzPSJzbiIgeD0iNTI0LjU0Mzc5NTYyMDQzOCIgeT0iMzU2LjQxODQwMjY4OTUwMzciPjE8L3RleHQ+PHBhdGggY2xhc3M9ImVkIiBkPSJNNjAxLjU4NzU5MTI0MDg3NTksMzM1IEM2MDEuNTg3NTkxMjQwODc1OSwzNjUgNTY1LjU0Mzc5NTYyMDQzOCwzMzUuNDE4NDAyNjg5NTAzNyA1NjUuNTQzNzk1NjIwNDM4LDM2NS40MTg0MDI2ODk1MDM3IiBtYXJrZXItZW5kPSJ1cmwoI2FoKSI+PC9wYXRoPjx0ZXh0IGNsYXNzPSJzbiIgeD0iNTU0LjU0Mzc5NTYyMDQzOCIgeT0iMzU2LjQxODQwMjY4OTUwMzciPjI8L3RleHQ+PHBhdGggY2xhc3M9ImVkIiBkPSJNNTUwLjU0Mzc5NTYyMDQzOCw0MTIgQzU1MC41NDM3OTU2MjA0MzgsNDQyIDU1MC41NDM3OTU2MjA0MzgsNDI0IDU1MC41NDM3OTU2MjA0MzgsNDU0IiBtYXJrZXItZW5kPSJ1cmwoI2FoKSI+PC9wYXRoPjxlbGxpcHNlIGNsYXNzPSJmbiIgY3g9IjU1MC41NDM3OTU2MjA0MzgiIGN5PSIzODkiIHJ4PSI3OSIgcnk9IjIzIj48L2VsbGlwc2U+PHRleHQgY2xhc3M9InQtZm4iIHg9IjU1MC41NDM3OTU2MjA0MzgiIHk9IjM5NCI+UlVOREVOPC90ZXh0PjxlbGxpcHNlIGNsYXNzPSJmbiIgY3g9IjQ5OC4yODQ2NzE1MzI4NDY3NCIgY3k9IjMwMyIgcng9IjM0IiByeT0iMjMiPjwvZWxsaXBzZT48dGV4dCBjbGFzcz0idC1mbiIgeD0iNDk4LjI4NDY3MTUzMjg0Njc0IiB5PSIzMDgiPi88L3RleHQ+PGVsbGlwc2UgY2xhc3M9ImZuIiBjeD0iNDk4LjI4NDY3MTUzMjg0Njc0IiBjeT0iMjE3IiByeD0iNjkuNSIgcnk9IjIzIj48L2VsbGlwc2U+PHRleHQgY2xhc3M9InQtZm4iIHg9IjQ5OC4yODQ2NzE1MzI4NDY3NCIgeT0iMjIyIj5TVU1NRTwvdGV4dD48cmVjdCBjbGFzcz0iaW4iIGhlaWdodD0iNDAiIHdpZHRoPSI3MSIgeD0iNDYyLjc4NDY3MTUzMjg0Njc0IiB5PSIyNSI+PC9yZWN0Pjx0ZXh0IGNsYXNzPSJ0LWluIiB4PSI0OTguMjg0NjcxNTMyODQ2NzQiIHk9IjUwIj5CMjpENzwvdGV4dD48Y2lyY2xlIGNsYXNzPSJzcCIgY3g9IjQ5OC4yODQ2NzE1MzI4NDY3NCIgY3k9IjEzMSIgcj0iNiI+PC9jaXJjbGU+PGVsbGlwc2UgY2xhc3M9ImZuIiBjeD0iNjY0Ljc4NDY3MTUzMjg0NjciIGN5PSIyMTciIHJ4PSI3OSIgcnk9IjIzIj48L2VsbGlwc2U+PHRleHQgY2xhc3M9InQtZm4iIHg9IjY2NC43ODQ2NzE1MzI4NDY3IiB5PSIyMjIiPkFOWkFITDwvdGV4dD48dGV4dCBjbGFzcz0idC1rIiB4PSI2MDEuNTg3NTkxMjQwODc1OSIgeT0iMzMxIj4yPC90ZXh0PjxyZWN0IGNsYXNzPSJvdXQiIGhlaWdodD0iNDAiIHdpZHRoPSIyMDYiIHg9IjQ0Ny41NDM3OTU2MjA0MzgiIHk9IjQ1NSI+PC9yZWN0Pjx0ZXh0IGNsYXNzPSJ0LW91dCIgeD0iNTUwLjU0Mzc5NTYyMDQzOCIgeT0iNDgwIj5UdXJuaWVyc2Nobml0dCAoQjExKTwvdGV4dD48L3N2Zz4=","alt":"Datenflussdiagramm","caption":"","size":"voll"},{"id":"8n46bx7","type":"fptask","title":"Geheimes Diagramm","html":"Welche Formel steckt in diesem Diagramm? Schreibe sie in <b>B11</b>.","xp":10,"app":{"kind":"formel","cell":"B11","target":"=RUNDEN(SUMME(B2:D7)/ANZAHL(B2:D7);2)","tabelle":"Pixel-Turnier","dfd":""},"sheet":{"cells":{"A1":"Spieler","B1":"Runde 1","C1":"Runde 2","D1":"Runde 3","E1":"Schnitt","F1":"Wertung","G1":"Spannweite","A2":"Ada","B2":"120","C2":"95","D2":"140","A3":"Linus","B3":"88","C3":"132","D3":"101","A4":"Grace","B4":"150","C4":"47","D4":"129","A5":"Alan","B5":"99","C5":"118","A6":"Hedy","B6":"135","C6":"140","D6":"61","A7":"Tim","B7":"77","C7":"103","D7":"98","A9":"Bester Wert","A10":"Anzahl Ergebnisse","A11":"Turnierschnitt"},"widths":{"A":150,"E":90,"F":90,"G":110},"fmt":{"E2:E7":"d1","B11":"d2"},"styles":{"A1:G1":"head","A9:A11":"head"},"title":"Pixel-Turnier"},"tips":[],"solution":"","img":""}]},{"id":"v03nlz6","title":"Gamertags","sub":"Tabelle","check":false,"blocks":[{"id":"hwdqryz","type":"fptask","title":"Gamertag (Alpha)","html":"Gamertag: die ersten <b>zwei</b> Buchstaben des Vornamens in GROSSbuchstaben, dann die ersten <b>drei</b> des Nachnamens klein, dann die letzten zwei Ziffern des Jahrgangs. <br><code>Ada · Lovelace · 2011 → ADlov11</code>","xp":15,"app":{"kind":"diagramm","cell":"D2","target":"=GROSS(LINKS(A2;2))&KLEIN(LINKS(B2;3))&RECHTS(C2;2)","tabelle":"Gamertags","dfd":"leer"},"sheet":{"cells":{"A1":"Vorname","B1":"Nachname","C1":"Jahrgang","D1":"Gamertag","A2":"Ada","B2":"Lovelace","C2":"2011"},"widths":{"A":110,"B":120,"C":90,"D":130},"styles":{"A1:D1":"head","D2":"out"},"title":"Gamertags"},"tips":[],"solution":"","img":""},{"id":"dae00wq","type":"info","kind":"abschluss","title":"Grid gehackt!","html":"Alle Aufgaben gelöst. Sichere dein Projekt (oben rechts in FlowPad) – und dann ab zur nächsten Station auf der Lernlandkarte.","img":"","name":""}]}],"cert":{"on":true,"need":"alle","pct":80,"text":"hat die Challenge gemeistert.","show":{"zeit":true,"tipps":true,"quiz":true,"xp":true}}}
+{
+ "v": 2,
+ "id": "inf9-c1-3",
+ "form": "challenge",
+ "design": {
+  "pal": 8,
+  "font": "pixel",
+  "shape": "eckig",
+  "hero": "logo",
+  "heroImg": ""
+ },
+ "kicker": "HACKER-CHALLENGE · LEVEL 1.3",
+ "title": "Funktions-Hacks",
+ "subtitle": "Funktionen verketten, Verteiler setzen, Diagramme lesen. Das <b><i>fx</i></b>-Handbuch in FlowPad ist erlaubt.",
+ "goals": [],
+ "rank": "",
+ "stations": [
+  {
+   "id": "7wkpumq",
+   "title": "Start",
+   "sub": "Regeln",
+   "check": false,
+   "blocks": [
+    {
+     "id": "gkgmyjj",
+     "type": "info",
+     "kind": "regel",
+     "title": "Regeln",
+     "html": "Keine Tipps. FlowPad prüft jede Lösung mit vielen anderen Zahlen – wer Ergebnisse abtippt, statt mit Zellen zu rechnen, fliegt auf. Diagramm-Aufgaben werden nur im Diagramm gelöst (dann <b>Prüfen</b>), Ausfüll-Aufgaben prüfst du hier im Lernpfad. Das <b><i>fx</i></b>-Handbuch ist erlaubt.",
+     "img": "",
+     "name": ""
+    },
+    {
+     "id": "tt1rmgg",
+     "type": "legend"
+    }
+   ]
+  },
+  {
+   "id": "rny3caz",
+   "title": "Pixel-Turnier",
+   "sub": "Tabelle",
+   "check": false,
+   "blocks": [
+    {
+     "id": "1o6s3bj",
+     "type": "fptask",
+     "title": "Schnitt",
+     "html": "Ada: Durchschnitt ihrer drei Runden, auf <b>eine</b> Nachkommastelle gerundet. Diagramm für <b>E2</b>.",
+     "xp": 15,
+     "app": {
+      "kind": "diagramm",
+      "cell": "E2",
+      "target": "=RUNDEN(MITTELWERT(B2:D2);1)",
+      "tabelle": "Pixel-Turnier",
+      "dfd": "leer"
+     },
+     "sheet": {
+      "cells": {
+       "A1": "Spieler",
+       "B1": "Runde 1",
+       "C1": "Runde 2",
+       "D1": "Runde 3",
+       "E1": "Schnitt",
+       "F1": "Wertung",
+       "G1": "Spannweite",
+       "A2": "Ada",
+       "B2": "120",
+       "C2": "95",
+       "D2": "140",
+       "A3": "Linus",
+       "B3": "88",
+       "C3": "132",
+       "D3": "101",
+       "A4": "Grace",
+       "B4": "150",
+       "C4": "47",
+       "D4": "129",
+       "A5": "Alan",
+       "B5": "99",
+       "C5": "118",
+       "A6": "Hedy",
+       "B6": "135",
+       "C6": "140",
+       "D6": "61",
+       "A7": "Tim",
+       "B7": "77",
+       "C7": "103",
+       "D7": "98",
+       "A9": "Bester Wert",
+       "A10": "Anzahl Ergebnisse",
+       "A11": "Turnierschnitt"
+      },
+      "widths": {
+       "A": 150,
+       "E": 90,
+       "F": 90,
+       "G": 110
+      },
+      "fmt": {
+       "E2:E7": "d1",
+       "B11": "d2"
+      },
+      "styles": {
+       "A1:G1": "head",
+       "A9:A11": "head"
+      },
+      "title": "Pixel-Turnier"
+     },
+     "tips": [],
+     "solution": "",
+     "img": ""
+    },
+    {
+     "id": "qzap10o",
+     "type": "fptask",
+     "title": "Streichergebnis",
+     "html": "Die Wertung ist die Summe aller Runden <b>ohne das schlechteste Ergebnis</b>. Diagramm für <b>F2</b>.",
+     "xp": 15,
+     "app": {
+      "kind": "diagramm",
+      "cell": "F2",
+      "target": "=SUMME(B2:D2)-MIN(B2:D2)",
+      "tabelle": "Pixel-Turnier",
+      "dfd": "leer"
+     },
+     "sheet": {
+      "cells": {
+       "A1": "Spieler",
+       "B1": "Runde 1",
+       "C1": "Runde 2",
+       "D1": "Runde 3",
+       "E1": "Schnitt",
+       "F1": "Wertung",
+       "G1": "Spannweite",
+       "A2": "Ada",
+       "B2": "120",
+       "C2": "95",
+       "D2": "140",
+       "A3": "Linus",
+       "B3": "88",
+       "C3": "132",
+       "D3": "101",
+       "A4": "Grace",
+       "B4": "150",
+       "C4": "47",
+       "D4": "129",
+       "A5": "Alan",
+       "B5": "99",
+       "C5": "118",
+       "A6": "Hedy",
+       "B6": "135",
+       "C6": "140",
+       "D6": "61",
+       "A7": "Tim",
+       "B7": "77",
+       "C7": "103",
+       "D7": "98",
+       "A9": "Bester Wert",
+       "A10": "Anzahl Ergebnisse",
+       "A11": "Turnierschnitt"
+      },
+      "widths": {
+       "A": 150,
+       "E": 90,
+       "F": 90,
+       "G": 110
+      },
+      "fmt": {
+       "E2:E7": "d1",
+       "B11": "d2"
+      },
+      "styles": {
+       "A1:G1": "head",
+       "A9:A11": "head"
+      },
+      "title": "Pixel-Turnier"
+     },
+     "tips": [],
+     "solution": "",
+     "img": ""
+    },
+    {
+     "id": "olh31uq",
+     "type": "sheet",
+     "title": "Pixel-Turnier",
+     "html": "Wertung für alle: Fülle die Wertung aus <b>F2</b> bis <b>F7</b> aus.",
+     "sheet": {
+      "cells": {
+       "A1": "Spieler",
+       "B1": "Runde 1",
+       "C1": "Runde 2",
+       "D1": "Runde 3",
+       "E1": "Schnitt",
+       "F1": "Wertung",
+       "G1": "Spannweite",
+       "A2": "Ada",
+       "B2": "120",
+       "C2": "95",
+       "D2": "140",
+       "A3": "Linus",
+       "B3": "88",
+       "C3": "132",
+       "D3": "101",
+       "A4": "Grace",
+       "B4": "150",
+       "C4": "47",
+       "D4": "129",
+       "A5": "Alan",
+       "B5": "99",
+       "C5": "118",
+       "A6": "Hedy",
+       "B6": "135",
+       "C6": "140",
+       "D6": "61",
+       "A7": "Tim",
+       "B7": "77",
+       "C7": "103",
+       "D7": "98",
+       "A9": "Bester Wert",
+       "A10": "Anzahl Ergebnisse",
+       "A11": "Turnierschnitt"
+      },
+      "widths": {
+       "A": 150,
+       "E": 90,
+       "F": 90,
+       "G": 110
+      },
+      "fmt": {
+       "E2:E7": "d1",
+       "B11": "d2"
+      },
+      "styles": {
+       "A1:G1": "head",
+       "A9:A11": "head"
+      },
+      "title": "Pixel-Turnier"
+     },
+     "rules": [
+      {
+       "kind": "fuell",
+       "ref": "F2:F7",
+       "val": "=SUMME(B2:D2)-MIN(B2:D2)",
+       "set": "",
+       "msg": "Prüfe deine Formel in F2 und das Ausfüllen bis F7 – denk an die $-Zeichen."
+      }
+     ],
+     "ok": "Gehackt! Alle Zellen rechnen richtig.",
+     "xp": 15
+    },
+    {
+     "id": "g0pzkq1",
+     "type": "sheet",
+     "title": "Pixel-Turnier",
+     "html": "Spannweite: Spannweite = bestes minus schlechtestes Ergebnis eines Spielers. Eine Formel in <b>G2</b>, ausfüllen bis <b>G7</b>.",
+     "sheet": {
+      "cells": {
+       "A1": "Spieler",
+       "B1": "Runde 1",
+       "C1": "Runde 2",
+       "D1": "Runde 3",
+       "E1": "Schnitt",
+       "F1": "Wertung",
+       "G1": "Spannweite",
+       "A2": "Ada",
+       "B2": "120",
+       "C2": "95",
+       "D2": "140",
+       "A3": "Linus",
+       "B3": "88",
+       "C3": "132",
+       "D3": "101",
+       "A4": "Grace",
+       "B4": "150",
+       "C4": "47",
+       "D4": "129",
+       "A5": "Alan",
+       "B5": "99",
+       "C5": "118",
+       "A6": "Hedy",
+       "B6": "135",
+       "C6": "140",
+       "D6": "61",
+       "A7": "Tim",
+       "B7": "77",
+       "C7": "103",
+       "D7": "98",
+       "A9": "Bester Wert",
+       "A10": "Anzahl Ergebnisse",
+       "A11": "Turnierschnitt"
+      },
+      "widths": {
+       "A": 150,
+       "E": 90,
+       "F": 90,
+       "G": 110
+      },
+      "fmt": {
+       "E2:E7": "d1",
+       "B11": "d2"
+      },
+      "styles": {
+       "A1:G1": "head",
+       "A9:A11": "head"
+      },
+      "title": "Pixel-Turnier"
+     },
+     "rules": [
+      {
+       "kind": "fuell",
+       "ref": "G2:G7",
+       "val": "=MAX(B2:D2)-MIN(B2:D2)",
+       "set": "",
+       "msg": "Prüfe deine Formel in G2 und das Ausfüllen bis G7 – denk an die $-Zeichen."
+      }
+     ],
+     "ok": "Gehackt! Alle Zellen rechnen richtig.",
+     "xp": 15
+    },
+    {
+     "id": "43b07lu",
+     "type": "fptask",
+     "title": "Bester Wert",
+     "html": "Das beste Einzelergebnis des ganzen Turniers in <b>B9</b>.",
+     "xp": 10,
+     "app": {
+      "kind": "formel",
+      "cell": "B9",
+      "target": "=MAX(B2:D7)",
+      "tabelle": "Pixel-Turnier",
+      "dfd": ""
+     },
+     "sheet": {
+      "cells": {
+       "A1": "Spieler",
+       "B1": "Runde 1",
+       "C1": "Runde 2",
+       "D1": "Runde 3",
+       "E1": "Schnitt",
+       "F1": "Wertung",
+       "G1": "Spannweite",
+       "A2": "Ada",
+       "B2": "120",
+       "C2": "95",
+       "D2": "140",
+       "A3": "Linus",
+       "B3": "88",
+       "C3": "132",
+       "D3": "101",
+       "A4": "Grace",
+       "B4": "150",
+       "C4": "47",
+       "D4": "129",
+       "A5": "Alan",
+       "B5": "99",
+       "C5": "118",
+       "A6": "Hedy",
+       "B6": "135",
+       "C6": "140",
+       "D6": "61",
+       "A7": "Tim",
+       "B7": "77",
+       "C7": "103",
+       "D7": "98",
+       "A9": "Bester Wert",
+       "A10": "Anzahl Ergebnisse",
+       "A11": "Turnierschnitt"
+      },
+      "widths": {
+       "A": 150,
+       "E": 90,
+       "F": 90,
+       "G": 110
+      },
+      "fmt": {
+       "E2:E7": "d1",
+       "B11": "d2"
+      },
+      "styles": {
+       "A1:G1": "head",
+       "A9:A11": "head"
+      },
+      "title": "Pixel-Turnier"
+     },
+     "tips": [],
+     "solution": "",
+     "img": ""
+    },
+    {
+     "id": "ay5gcq8",
+     "type": "fptask",
+     "title": "Gezählt",
+     "html": "Wie viele Rundenergebnisse liegen vor? Lass FlowPad zählen – in <b>B10</b>.",
+     "xp": 10,
+     "app": {
+      "kind": "formel",
+      "cell": "B10",
+      "target": "=ANZAHL(B2:D7)",
+      "tabelle": "Pixel-Turnier",
+      "dfd": ""
+     },
+     "sheet": {
+      "cells": {
+       "A1": "Spieler",
+       "B1": "Runde 1",
+       "C1": "Runde 2",
+       "D1": "Runde 3",
+       "E1": "Schnitt",
+       "F1": "Wertung",
+       "G1": "Spannweite",
+       "A2": "Ada",
+       "B2": "120",
+       "C2": "95",
+       "D2": "140",
+       "A3": "Linus",
+       "B3": "88",
+       "C3": "132",
+       "D3": "101",
+       "A4": "Grace",
+       "B4": "150",
+       "C4": "47",
+       "D4": "129",
+       "A5": "Alan",
+       "B5": "99",
+       "C5": "118",
+       "A6": "Hedy",
+       "B6": "135",
+       "C6": "140",
+       "D6": "61",
+       "A7": "Tim",
+       "B7": "77",
+       "C7": "103",
+       "D7": "98",
+       "A9": "Bester Wert",
+       "A10": "Anzahl Ergebnisse",
+       "A11": "Turnierschnitt"
+      },
+      "widths": {
+       "A": 150,
+       "E": 90,
+       "F": 90,
+       "G": 110
+      },
+      "fmt": {
+       "E2:E7": "d1",
+       "B11": "d2"
+      },
+      "styles": {
+       "A1:G1": "head",
+       "A9:A11": "head"
+      },
+      "title": "Pixel-Turnier"
+     },
+     "tips": [],
+     "solution": "",
+     "img": ""
+    },
+    {
+     "id": "nkm7wg3",
+     "type": "image",
+     "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGFyaWEtbGFiZWw9IkRhdGVuZmx1c3NkaWFncmFtbSIgcm9sZT0iaW1nIiBzdHlsZT0ibWF4LXdpZHRoOjM0N3B4O21pbi13aWR0aDoyNTBweCIgdmlld0JveD0iNDEyLjc4NDY3MTUzMjg0Njc0IDkgMzQ2Ljk5OTk5OTk5OTk5OTk0IDUwMiI+PHN0eWxlPnN2Z3tmb250LWZhbWlseToiSmV0QnJhaW5zIE1vbm8iLHVpLW1vbm9zcGFjZSxNZW5sbyxtb25vc3BhY2V9LmVke2ZpbGw6bm9uZTtzdHJva2U6IzMzNDE1YTtzdHJva2Utd2lkdGg6Mi4yfS5haHtmaWxsOiMzMzQxNWF9cmVjdC5pbntmaWxsOiNlNmVmZmY7c3Ryb2tlOiMyYTZmZDY7c3Ryb2tlLXdpZHRoOjIuMn1yZWN0Lm91dHtmaWxsOiNlM2Y2ZWE7c3Ryb2tlOiMxZjhmNTU7c3Ryb2tlLXdpZHRoOjIuMn1lbGxpcHNlLGVsbGlwc2UuZm57ZmlsbDojZmZmM2M0O3N0cm9rZTojYTg3NDAwO3N0cm9rZS13aWR0aDoyLjR9LnNwe2ZpbGw6IzFjMjUzM310ZXh0e3RleHQtYW5jaG9yOm1pZGRsZTtmb250LXNpemU6MTVweDtmb250LXdlaWdodDo3MDB9LnQtaW57ZmlsbDojMTQzMTVhfS50LW91dHtmaWxsOiMxNDVhMzJ9LnQtZm57ZmlsbDojNWEzZTAwfS50LWt7ZmlsbDojMWMyNTMzO2ZvbnQtc2l6ZToxN3B4fS5zbntmaWxsOiNhODc0MDA7Zm9udC1zaXplOjExcHh9PC9zdHlsZT48ZGVmcz48bWFya2VyIGlkPSJhaCIgbWFya2VySGVpZ2h0PSI3IiBtYXJrZXJXaWR0aD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiIHJlZlg9IjkiIHJlZlk9IjUiIHZpZXdCb3g9IjAgMCAxMCAxMCI+PHBhdGggY2xhc3M9ImFoIiBkPSJNMCAwTDEwIDVMMCAxMHoiPjwvcGF0aD48L21hcmtlcj48L2RlZnM+PHBhdGggY2xhc3M9ImVkIiBkPSJNNDk4LjI4NDY3MTUzMjg0Njc0LDY1IEM0OTguMjg0NjcxNTMyODQ2NzQsOTUgNDk4LjI4NDY3MTUzMjg0Njc0LDk0IDQ5OC4yODQ2NzE1MzI4NDY3NCwxMjQiIG1hcmtlci1lbmQ9InVybCgjYWgpIj48L3BhdGg+PHBhdGggY2xhc3M9ImVkIiBkPSJNNDk4LjI4NDY3MTUzMjg0Njc0LDEzNyBDNDk4LjI4NDY3MTUzMjg0Njc0LDE2NyA0OTguMjg0NjcxNTMyODQ2NzQsMTYzIDQ5OC4yODQ2NzE1MzI4NDY3NCwxOTMiIG1hcmtlci1lbmQ9InVybCgjYWgpIj48L3BhdGg+PHBhdGggY2xhc3M9ImVkIiBkPSJNNDk4LjI4NDY3MTUzMjg0Njc0LDI0MCBDNDk4LjI4NDY3MTUzMjg0Njc0LDI3MCA0ODMuMjg0NjcxNTMyODQ2NzQsMjUxLjM1OTMzMTQ3MzIzMzg1IDQ4My4yODQ2NzE1MzI4NDY3NCwyODEuMzU5MzMxNDczMjMzODUiIG1hcmtlci1lbmQ9InVybCgjYWgpIj48L3BhdGg+PHRleHQgY2xhc3M9InNuIiB4PSI0NzIuMjg0NjcxNTMyODQ2NzQiIHk9IjI3Mi4zNTkzMzE0NzMyMzM4NSI+MTwvdGV4dD48cGF0aCBjbGFzcz0iZWQiIGQ9Ik00OTguMjg0NjcxNTMyODQ2NzQsMTM3IEM0OTguMjg0NjcxNTMyODQ2NzQsMTY3IDY2NC43ODQ2NzE1MzI4NDY3LDE2MyA2NjQuNzg0NjcxNTMyODQ2NywxOTMiIG1hcmtlci1lbmQ9InVybCgjYWgpIj48L3BhdGg+PHBhdGggY2xhc3M9ImVkIiBkPSJNNjY0Ljc4NDY3MTUzMjg0NjcsMjQwIEM2NjQuNzg0NjcxNTMyODQ2NywyNzAgNTEzLjI4NDY3MTUzMjg0NjcsMjUxLjM1OTMzMTQ3MzIzMzg1IDUxMy4yODQ2NzE1MzI4NDY3LDI4MS4zNTkzMzE0NzMyMzM4NSIgbWFya2VyLWVuZD0idXJsKCNhaCkiPjwvcGF0aD48dGV4dCBjbGFzcz0ic24iIHg9IjUwMi4yODQ2NzE1MzI4NDY3IiB5PSIyNzIuMzU5MzMxNDczMjMzODUiPjI8L3RleHQ+PHBhdGggY2xhc3M9ImVkIiBkPSJNNDk4LjI4NDY3MTUzMjg0Njc0LDMyNiBDNDk4LjI4NDY3MTUzMjg0Njc0LDM1NiA1MzUuNTQzNzk1NjIwNDM4LDMzNS40MTg0MDI2ODk1MDM3IDUzNS41NDM3OTU2MjA0MzgsMzY1LjQxODQwMjY4OTUwMzciIG1hcmtlci1lbmQ9InVybCgjYWgpIj48L3BhdGg+PHRleHQgY2xhc3M9InNuIiB4PSI1MjQuNTQzNzk1NjIwNDM4IiB5PSIzNTYuNDE4NDAyNjg5NTAzNyI+MTwvdGV4dD48cGF0aCBjbGFzcz0iZWQiIGQ9Ik02MDEuNTg3NTkxMjQwODc1OSwzMzUgQzYwMS41ODc1OTEyNDA4NzU5LDM2NSA1NjUuNTQzNzk1NjIwNDM4LDMzNS40MTg0MDI2ODk1MDM3IDU2NS41NDM3OTU2MjA0MzgsMzY1LjQxODQwMjY4OTUwMzciIG1hcmtlci1lbmQ9InVybCgjYWgpIj48L3BhdGg+PHRleHQgY2xhc3M9InNuIiB4PSI1NTQuNTQzNzk1NjIwNDM4IiB5PSIzNTYuNDE4NDAyNjg5NTAzNyI+MjwvdGV4dD48cGF0aCBjbGFzcz0iZWQiIGQ9Ik01NTAuNTQzNzk1NjIwNDM4LDQxMiBDNTUwLjU0Mzc5NTYyMDQzOCw0NDIgNTUwLjU0Mzc5NTYyMDQzOCw0MjQgNTUwLjU0Mzc5NTYyMDQzOCw0NTQiIG1hcmtlci1lbmQ9InVybCgjYWgpIj48L3BhdGg+PGVsbGlwc2UgY2xhc3M9ImZuIiBjeD0iNTUwLjU0Mzc5NTYyMDQzOCIgY3k9IjM4OSIgcng9Ijc5IiByeT0iMjMiPjwvZWxsaXBzZT48dGV4dCBjbGFzcz0idC1mbiIgeD0iNTUwLjU0Mzc5NTYyMDQzOCIgeT0iMzk0Ij5SVU5ERU48L3RleHQ+PGVsbGlwc2UgY2xhc3M9ImZuIiBjeD0iNDk4LjI4NDY3MTUzMjg0Njc0IiBjeT0iMzAzIiByeD0iMzQiIHJ5PSIyMyI+PC9lbGxpcHNlPjx0ZXh0IGNsYXNzPSJ0LWZuIiB4PSI0OTguMjg0NjcxNTMyODQ2NzQiIHk9IjMwOCI+LzwvdGV4dD48ZWxsaXBzZSBjbGFzcz0iZm4iIGN4PSI0OTguMjg0NjcxNTMyODQ2NzQiIGN5PSIyMTciIHJ4PSI2OS41IiByeT0iMjMiPjwvZWxsaXBzZT48dGV4dCBjbGFzcz0idC1mbiIgeD0iNDk4LjI4NDY3MTUzMjg0Njc0IiB5PSIyMjIiPlNVTU1FPC90ZXh0PjxyZWN0IGNsYXNzPSJpbiIgaGVpZ2h0PSI0MCIgd2lkdGg9IjcxIiB4PSI0NjIuNzg0NjcxNTMyODQ2NzQiIHk9IjI1Ij48L3JlY3Q+PHRleHQgY2xhc3M9InQtaW4iIHg9IjQ5OC4yODQ2NzE1MzI4NDY3NCIgeT0iNTAiPkIyOkQ3PC90ZXh0PjxjaXJjbGUgY2xhc3M9InNwIiBjeD0iNDk4LjI4NDY3MTUzMjg0Njc0IiBjeT0iMTMxIiByPSI2Ij48L2NpcmNsZT48ZWxsaXBzZSBjbGFzcz0iZm4iIGN4PSI2NjQuNzg0NjcxNTMyODQ2NyIgY3k9IjIxNyIgcng9Ijc5IiByeT0iMjMiPjwvZWxsaXBzZT48dGV4dCBjbGFzcz0idC1mbiIgeD0iNjY0Ljc4NDY3MTUzMjg0NjciIHk9IjIyMiI+QU5aQUhMPC90ZXh0Pjx0ZXh0IGNsYXNzPSJ0LWsiIHg9IjYwMS41ODc1OTEyNDA4NzU5IiB5PSIzMzEiPjI8L3RleHQ+PHJlY3QgY2xhc3M9Im91dCIgaGVpZ2h0PSI0MCIgd2lkdGg9IjIwNiIgeD0iNDQ3LjU0Mzc5NTYyMDQzOCIgeT0iNDU1Ij48L3JlY3Q+PHRleHQgY2xhc3M9InQtb3V0IiB4PSI1NTAuNTQzNzk1NjIwNDM4IiB5PSI0ODAiPlR1cm5pZXJzY2huaXR0IChCMTEpPC90ZXh0Pjwvc3ZnPg==",
+     "alt": "Datenflussdiagramm",
+     "caption": "",
+     "size": "voll"
+    },
+    {
+     "id": "8n46bx7",
+     "type": "fptask",
+     "title": "Geheimes Diagramm",
+     "html": "Welche Formel steckt in diesem Diagramm? Schreibe sie in <b>B11</b>.",
+     "xp": 10,
+     "app": {
+      "kind": "formel",
+      "cell": "B11",
+      "target": "=RUNDEN(SUMME(B2:D7)/ANZAHL(B2:D7);2)",
+      "tabelle": "Pixel-Turnier",
+      "dfd": ""
+     },
+     "sheet": {
+      "cells": {
+       "A1": "Spieler",
+       "B1": "Runde 1",
+       "C1": "Runde 2",
+       "D1": "Runde 3",
+       "E1": "Schnitt",
+       "F1": "Wertung",
+       "G1": "Spannweite",
+       "A2": "Ada",
+       "B2": "120",
+       "C2": "95",
+       "D2": "140",
+       "A3": "Linus",
+       "B3": "88",
+       "C3": "132",
+       "D3": "101",
+       "A4": "Grace",
+       "B4": "150",
+       "C4": "47",
+       "D4": "129",
+       "A5": "Alan",
+       "B5": "99",
+       "C5": "118",
+       "A6": "Hedy",
+       "B6": "135",
+       "C6": "140",
+       "D6": "61",
+       "A7": "Tim",
+       "B7": "77",
+       "C7": "103",
+       "D7": "98",
+       "A9": "Bester Wert",
+       "A10": "Anzahl Ergebnisse",
+       "A11": "Turnierschnitt"
+      },
+      "widths": {
+       "A": 150,
+       "E": 90,
+       "F": 90,
+       "G": 110
+      },
+      "fmt": {
+       "E2:E7": "d1",
+       "B11": "d2"
+      },
+      "styles": {
+       "A1:G1": "head",
+       "A9:A11": "head"
+      },
+      "title": "Pixel-Turnier"
+     },
+     "tips": [],
+     "solution": "",
+     "img": ""
+    }
+   ]
+  },
+  {
+   "id": "v03nlz6",
+   "title": "Gamertags",
+   "sub": "Tabelle",
+   "check": false,
+   "blocks": [
+    {
+     "id": "hwdqryz",
+     "type": "fptask",
+     "title": "Gamertag (Alpha)",
+     "html": "Gamertag: die ersten <b>zwei</b> Buchstaben des Vornamens in GROSSbuchstaben, dann die ersten <b>drei</b> des Nachnamens klein, dann die letzten zwei Ziffern des Jahrgangs. <br><code>Ada · Lovelace · 2011 → ADlov11</code>",
+     "xp": 15,
+     "app": {
+      "kind": "diagramm",
+      "cell": "D2",
+      "target": "=GROSS(LINKS(A2;2))&KLEIN(LINKS(B2;3))&RECHTS(C2;2)",
+      "tabelle": "Gamertags",
+      "dfd": "leer"
+     },
+     "sheet": {
+      "cells": {
+       "A1": "Vorname",
+       "B1": "Nachname",
+       "C1": "Jahrgang",
+       "D1": "Gamertag",
+       "A2": "Ada",
+       "B2": "Lovelace",
+       "C2": "2011"
+      },
+      "widths": {
+       "A": 110,
+       "B": 120,
+       "C": 90,
+       "D": 130
+      },
+      "styles": {
+       "A1:D1": "head",
+       "D2": "out"
+      },
+      "title": "Gamertags"
+     },
+     "tips": [],
+     "solution": "",
+     "img": ""
+    },
+    {
+     "id": "dae00wq",
+     "type": "info",
+     "kind": "abschluss",
+     "title": "Grid gehackt!",
+     "html": "Alle Aufgaben gelöst. Sichere dein Projekt (oben rechts in FlowPad) – und dann ab zur nächsten Station auf der Lernlandkarte.",
+     "img": "",
+     "name": ""
+    }
+   ]
+  }
+ ],
+ "cert": {
+  "on": true,
+  "need": "alle",
+  "pct": 80,
+  "text": "hat die Challenge gemeistert.",
+  "show": {
+   "zeit": true,
+   "tipps": true,
+   "quiz": true,
+   "xp": true
+  }
+ }
+}

@@ -1,1 +1,532 @@
-{"v":2,"id":"inf9-c1-4","form":"challenge","design":{"pal":8,"font":"pixel","shape":"eckig","hero":"logo","heroImg":""},"kicker":"HACKER-CHALLENGE · LEVEL 1.4","title":"WENN-Hacks","subtitle":"Entscheidungen, Grenzfälle, verschachtelte WENNs. FlowPad testet genau an den Grenzen – „größer“ und „größer gleich“ sind hier zwei verschiedene Welten.","goals":[],"rank":"","stations":[{"id":"gotz7oz","title":"Start","sub":"Regeln","check":false,"blocks":[{"id":"3nkiem4","type":"info","kind":"regel","title":"Regeln","html":"Keine Tipps. FlowPad prüft jede Lösung mit vielen anderen Zahlen – wer Ergebnisse abtippt, statt mit Zellen zu rechnen, fliegt auf. Diagramm-Aufgaben werden nur im Diagramm gelöst (dann <b>Prüfen</b>), Ausfüll-Aufgaben prüfst du hier im Lernpfad. Das <b><i>fx</i></b>-Handbuch ist erlaubt.","img":"","name":""},{"id":"9ojw03s","type":"legend"}]},{"id":"9i4wory","title":"Freibad","sub":"Tabelle","check":false,"blocks":[{"id":"q1l4arw","type":"sheet","title":"Freibad","html":"Eintritt: Eintritt laut Preisliste: unter 6 Jahren, unter 18 Jahren, Erwachsene. Eine Formel in <b>D2</b>, ausfüllen bis <b>D9</b>. Die Preise kommen aus der Preisliste.","sheet":{"cells":{"A1":"Name","B1":"Alter","C1":"Ausweis","D1":"Eintritt","E1":"Zu zahlen","G1":"Preisliste","G2":"unter 6 Jahren","H2":"0","G3":"unter 18 Jahren","H3":"2,5","G4":"Erwachsene","H4":"4,5","G5":"Ermäßigung mit Ausweis","H5":"50%","A2":"Mia","B2":"5","C2":"nein","A3":"Ben","B3":"6","C3":"ja","A4":"Lea","B4":"17","C4":"ja","A5":"Tom","B5":"18","C5":"nein","A6":"Ali","B6":"35","C6":"nein","A7":"Zoe","B7":"12","C7":"ja","A8":"Max","B8":"19","C8":"ja","A9":"Ida","B9":"72","C9":"nein"},"widths":{"A":80,"B":70,"C":80,"D":90,"E":100,"G":230,"H":80},"fmt":{"H2:H4":"eur","H5":"pct","D2:E9":"eur"},"styles":{"A1:E1":"head","G1":"head","H2:H5":"inp"},"title":"Freibad"},"rules":[{"kind":"fuell","ref":"D2:D9","val":"=WENN(B2<6;$H$2;WENN(B2<18;$H$3;$H$4))","set":"","msg":"Prüfe deine Formel in D2 und das Ausfüllen bis D9 – denk an die $-Zeichen."}],"ok":"Gehackt! Alle Zellen rechnen richtig.","xp":15},{"id":"ptu451f","type":"fptask","title":"Ermäßigung","html":"Wer einen Ausweis hat (<code>ja</code>), bekommt die Ermäßigung aus <b>H5</b> auf den Eintritt. Alle anderen zahlen den vollen Eintritt. Diagramm für <b>E2</b>.","xp":15,"app":{"kind":"diagramm","cell":"E2","target":"=WENN(C2=\"ja\";D2*(1-$H$5);D2)","tabelle":"Freibad","dfd":"leer"},"sheet":{"cells":{"A1":"Name","B1":"Alter","C1":"Ausweis","D1":"Eintritt","E1":"Zu zahlen","G1":"Preisliste","G2":"unter 6 Jahren","H2":"0","G3":"unter 18 Jahren","H3":"2,5","G4":"Erwachsene","H4":"4,5","G5":"Ermäßigung mit Ausweis","H5":"50%","A2":"Mia","B2":"5","C2":"nein","A3":"Ben","B3":"6","C3":"ja","A4":"Lea","B4":"17","C4":"ja","A5":"Tom","B5":"18","C5":"nein","A6":"Ali","B6":"35","C6":"nein","A7":"Zoe","B7":"12","C7":"ja","A8":"Max","B8":"19","C8":"ja","A9":"Ida","B9":"72","C9":"nein"},"widths":{"A":80,"B":70,"C":80,"D":90,"E":100,"G":230,"H":80},"fmt":{"H2:H4":"eur","H5":"pct","D2:E9":"eur"},"styles":{"A1:E1":"head","G1":"head","H2:H5":"inp"},"title":"Freibad"},"tips":[],"solution":"","img":""},{"id":"xjtydfu","type":"sheet","title":"Freibad","html":"Zu zahlen: Fülle <b>E2</b> bis <b>E9</b> aus.","sheet":{"cells":{"A1":"Name","B1":"Alter","C1":"Ausweis","D1":"Eintritt","E1":"Zu zahlen","G1":"Preisliste","G2":"unter 6 Jahren","H2":"0","G3":"unter 18 Jahren","H3":"2,5","G4":"Erwachsene","H4":"4,5","G5":"Ermäßigung mit Ausweis","H5":"50%","A2":"Mia","B2":"5","C2":"nein","A3":"Ben","B3":"6","C3":"ja","A4":"Lea","B4":"17","C4":"ja","A5":"Tom","B5":"18","C5":"nein","A6":"Ali","B6":"35","C6":"nein","A7":"Zoe","B7":"12","C7":"ja","A8":"Max","B8":"19","C8":"ja","A9":"Ida","B9":"72","C9":"nein"},"widths":{"A":80,"B":70,"C":80,"D":90,"E":100,"G":230,"H":80},"fmt":{"H2:H4":"eur","H5":"pct","D2:E9":"eur"},"styles":{"A1:E1":"head","G1":"head","H2:H5":"inp"},"title":"Freibad"},"rules":[{"kind":"fuell","ref":"E2:E9","val":"=WENN(C2=\"ja\";D2*(1-$H$5);D2)","set":"","msg":"Prüfe deine Formel in E2 und das Ausfüllen bis E9 – denk an die $-Zeichen."}],"ok":"Gehackt! Alle Zellen rechnen richtig.","xp":15}]},{"id":"i7waane","title":"Merch-Shop","sub":"Tabelle","check":false,"blocks":[{"id":"sqgjol2","type":"fptask","title":"Versand","html":"Versand kostet 4,90 €. Ab 50 € Warenwert ist er gratis. Formel in <b>B3</b>.","xp":10,"app":{"kind":"formel","cell":"B3","target":"=WENN(B1>=50;0;4,9)","tabelle":"Merch-Shop","dfd":""},"sheet":{"cells":{"A1":"Warenwert","B1":"42","A2":"Gutschein-Code","B2":"HACK10","A3":"Versand","A4":"Rabatt","A5":"Bonuspunkte"},"widths":{"A":160,"B":100},"fmt":{"B1":"eur","B3":"eur","B4":"eur"},"styles":{"B1:B2":"inp","B3:B5":"out"},"title":"Merch-Shop"},"tips":[],"solution":"","img":""},{"id":"wjnz8kf","type":"fptask","title":"Gutschein","html":"Mit dem Code <code>HACK10</code> gibt es 10 % Rabatt auf den Warenwert – aber <b>höchstens 8 €</b>. Ohne gültigen Code gibt es nichts. Formel in <b>B4</b>.","xp":10,"app":{"kind":"formel","cell":"B4","target":"=WENN(B2=\"HACK10\";MIN(B1*10%;8);0)","tabelle":"Merch-Shop","dfd":""},"sheet":{"cells":{"A1":"Warenwert","B1":"42","A2":"Gutschein-Code","B2":"HACK10","A3":"Versand","A4":"Rabatt","A5":"Bonuspunkte"},"widths":{"A":160,"B":100},"fmt":{"B1":"eur","B3":"eur","B4":"eur"},"styles":{"B1:B2":"inp","B3:B5":"out"},"title":"Merch-Shop"},"tips":[],"solution":"","img":""},{"id":"9tm5n7f","type":"fptask","title":"Bonuspunkte","html":"Für je <b>volle</b> 10 € Warenwert gibt es einen Bonuspunkt. Ab 100 € Warenwert gibt es doppelt so viele Punkte. Diagramm für <b>B5</b>.","xp":15,"app":{"kind":"diagramm","cell":"B5","target":"=GANZZAHL(B1/10)*WENN(B1>=100;2;1)","tabelle":"Merch-Shop","dfd":"leer"},"sheet":{"cells":{"A1":"Warenwert","B1":"42","A2":"Gutschein-Code","B2":"HACK10","A3":"Versand","A4":"Rabatt","A5":"Bonuspunkte"},"widths":{"A":160,"B":100},"fmt":{"B1":"eur","B3":"eur","B4":"eur"},"styles":{"B1:B2":"inp","B3:B5":"out"},"title":"Merch-Shop"},"tips":[],"solution":"","img":""}]},{"id":"2h9hq0o","title":"Rangrechner","sub":"Tabelle","check":false,"blocks":[{"id":"i459d43","type":"image","src":"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGFyaWEtbGFiZWw9IkRhdGVuZmx1c3NkaWFncmFtbSIgcm9sZT0iaW1nIiBzdHlsZT0ibWF4LXdpZHRoOjc4M3B4O21pbi13aWR0aDo1NjNweCIgdmlld2JveD0iNi42NTc3NTQwMTA2OTUxODYgOSA3ODIuNTI0MDY0MTcxMTIzIDUwMiI+PGRlZnM+PG1hcmtlciBpZD0iYWgiIG1hcmtlcmhlaWdodD0iNyIgbWFya2Vyd2lkdGg9IjciIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIiByZWZ4PSI5IiByZWZ5PSI1IiB2aWV3Ym94PSIwIDAgMTAgMTAiPjxwYXRoIGNsYXNzPSJhaCIgZD0iTTAgMEwxMCA1TDAgMTB6Ij48L3BhdGg+PC9tYXJrZXI+PC9kZWZzPjxwYXRoIGNsYXNzPSJlZCIgZD0iTTg5LjY1Nzc1NDAxMDY5NTE5LDY1IEM4OS42NTc3NTQwMTA2OTUxOSw5NSA4OS42NTc3NTQwMTA2OTUxOSw5NCA4OS42NTc3NTQwMTA2OTUxOSwxMjQiIG1hcmtlci1lbmQ9InVybCgjYWgpIj48L3BhdGg+PHBhdGggY2xhc3M9ImVkIiBkPSJNODkuNjU3NzU0MDEwNjk1MTksMTM3IEM4OS42NTc3NTQwMTA2OTUxOSwyMDkuMTc5NjY1NzM2NjE2OTMgMTI5LjY5NTE4NzE2NTc3NTQsMjA5LjE3OTY2NTczNjYxNjkzIDEyOS42OTUxODcxNjU3NzU0LDI4MS4zNTkzMzE0NzMyMzM4NSIgbWFya2VyLWVuZD0idXJsKCNhaCkiPjwvcGF0aD48dGV4dCBjbGFzcz0ic24iIHg9IjExOC42OTUxODcxNjU3NzU0IiB5PSIyNzIuMzU5MzMxNDczMjMzODUiPjE8L3RleHQ+PHBhdGggY2xhc3M9ImVkIiBkPSJNMTk4Ljg0NDkxOTc4NjA5NjI2LDI0OSBDMTk4Ljg0NDkxOTc4NjA5NjI2LDI3OSAxNTkuNjk1MTg3MTY1Nzc1NCwyNTEuMzU5MzMxNDczMjMzODUgMTU5LjY5NTE4NzE2NTc3NTQsMjgxLjM1OTMzMTQ3MzIzMzg1IiBtYXJrZXItZW5kPSJ1cmwoI2FoKSI+PC9wYXRoPjx0ZXh0IGNsYXNzPSJzbiIgeD0iMTQ4LjY5NTE4NzE2NTc3NTQiIHk9IjI3Mi4zNTkzMzE0NzMyMzM4NSI+MjwvdGV4dD48cGF0aCBjbGFzcz0iZWQiIGQ9Ik0xNDQuNjk1MTg3MTY1Nzc1NCwzMjYgQzE0NC42OTUxODcxNjU3NzU0LDM1NiAyODYuMDIxMzkwMzc0MzMxNTMsMzM4LjA4MTQxNTcxMjk1NzkgMjg2LjAyMTM5MDM3NDMzMTUzLDM2OC4wODE0MTU3MTI5NTc5IiBtYXJrZXItZW5kPSJ1cmwoI2FoKSI+PC9wYXRoPjx0ZXh0IGNsYXNzPSJzbiIgeD0iMjc1LjAyMTM5MDM3NDMzMTUzIiB5PSIzNTkuMDgxNDE1NzEyOTU3OSI+MTwvdGV4dD48cGF0aCBjbGFzcz0iZWQiIGQ9Ik0zMDkuODA3NDg2NjMxMDE2MDUsMzM1IEMzMDkuODA3NDg2NjMxMDE2MDUsMzY1IDMxNi4wMjEzOTAzNzQzMzE1MywzMzUgMzE2LjAyMTM5MDM3NDMzMTUzLDM2NSIgbWFya2VyLWVuZD0idXJsKCNhaCkiPjwvcGF0aD48dGV4dCBjbGFzcz0ic24iIHg9IjMwNS4wMjEzOTAzNzQzMzE1MyIgeT0iMzU2Ij4yPC90ZXh0PjxwYXRoIGNsYXNzPSJlZCIgZD0iTTg5LjY1Nzc1NDAxMDY5NTE5LDEzNyBDODkuNjU3NzU0MDEwNjk1MTksMTY3IDI0MC42NTc3NTQwMTA2OTUyLDE2NC41OTQ1MzQ5OTI1OTUzNiAyNDAuNjU3NzU0MDEwNjk1MiwxOTQuNTk0NTM0OTkyNTk1MzYiIG1hcmtlci1lbmQ9InVybCgjYWgpIj48L3BhdGg+PHRleHQgY2xhc3M9InNuIiB4PSIyMjkuNjU3NzU0MDEwNjk1MiIgeT0iMTg1LjU5NDUzNDk5MjU5NTM2Ij4xPC90ZXh0PjxwYXRoIGNsYXNzPSJlZCIgZD0iTTQyMS42NTc3NTQwMTA2OTUxNiwxNjMgQzQyMS42NTc3NTQwMTA2OTUxNiwxOTMgMjcwLjY1Nzc1NDAxMDY5NTE2LDE2NC41OTQ1MzQ5OTI1OTUzNiAyNzAuNjU3NzU0MDEwNjk1MTYsMTk0LjU5NDUzNDk5MjU5NTM2IiBtYXJrZXItZW5kPSJ1cmwoI2FoKSI+PC9wYXRoPjx0ZXh0IGNsYXNzPSJzbiIgeD0iMjU5LjY1Nzc1NDAxMDY5NTE2IiB5PSIxODUuNTk0NTM0OTkyNTk1MzYiPjI8L3RleHQ+PHBhdGggY2xhc3M9ImVkIiBkPSJNMjU1LjY1Nzc1NDAxMDY5NTIsMjQwIEMyNTUuNjU3NzU0MDEwNjk1MiwyNzAgNDYyLjY3Mzc5Njc5MTQ0Mzg2LDI1Mi4wODE0MTU3MTI5NTc5IDQ2Mi42NzM3OTY3OTE0NDM4NiwyODIuMDgxNDE1NzEyOTU3OSIgbWFya2VyLWVuZD0idXJsKCNhaCkiPjwvcGF0aD48dGV4dCBjbGFzcz0ic24iIHg9IjQ1MS42NzM3OTY3OTE0NDM4NiIgeT0iMjczLjA4MTQxNTcxMjk1NzkiPjE8L3RleHQ+PHBhdGggY2xhc3M9ImVkIiBkPSJNNTI4LjE4MTgxODE4MTgxODEsMjQ5IEM1MjguMTgxODE4MTgxODE4MSwyNzkgNDkyLjY3Mzc5Njc5MTQ0Mzg2LDI0OSA0OTIuNjczNzk2NzkxNDQzODYsMjc5IiBtYXJrZXItZW5kPSJ1cmwoI2FoKSI+PC9wYXRoPjx0ZXh0IGNsYXNzPSJzbiIgeD0iNDgxLjY3Mzc5Njc5MTQ0Mzg2IiB5PSIyNzAiPjI8L3RleHQ+PHBhdGggY2xhc3M9ImVkIiBkPSJNNjk0LjE4MTgxODE4MTgxODEsMjQ5IEM2OTQuMTgxODE4MTgxODE4MSwyNzkgNTIyLjY3Mzc5Njc5MTQ0MzksMjUyLjA4MTQxNTcxMjk1NzkgNTIyLjY3Mzc5Njc5MTQ0MzksMjgyLjA4MTQxNTcxMjk1NzkiIG1hcmtlci1lbmQ9InVybCgjYWgpIj48L3BhdGg+PHRleHQgY2xhc3M9InNuIiB4PSI1MTEuNjczNzk2NzkxNDQzOSIgeT0iMjczLjA4MTQxNTcxMjk1NzkiPjM8L3RleHQ+PHBhdGggY2xhc3M9ImVkIiBkPSJNNDkyLjY3Mzc5Njc5MTQ0Mzg2LDMyNiBDNDkyLjY3Mzc5Njc5MTQ0Mzg2LDM1NiAzNDYuMDIxMzkwMzc0MzMxNTMsMzM4LjA4MTQxNTcxMjk1NzkgMzQ2LjAyMTM5MDM3NDMzMTUzLDM2OC4wODE0MTU3MTI5NTc5IiBtYXJrZXItZW5kPSJ1cmwoI2FoKSI+PC9wYXRoPjx0ZXh0IGNsYXNzPSJzbiIgeD0iMzM1LjAyMTM5MDM3NDMzMTUzIiB5PSIzNTkuMDgxNDE1NzEyOTU3OSI+MzwvdGV4dD48cGF0aCBjbGFzcz0iZWQiIGQ9Ik0zMTYuMDIxMzkwMzc0MzMxNTMsNDEyIEMzMTYuMDIxMzkwMzc0MzMxNTMsNDQyIDMxNi4wMjEzOTAzNzQzMzE1Myw0MjQgMzE2LjAyMTM5MDM3NDMzMTUzLDQ1NCIgbWFya2VyLWVuZD0idXJsKCNhaCkiPjwvcGF0aD48ZWxsaXBzZSBjbGFzcz0iZm4iIGN4PSIzMTYuMDIxMzkwMzc0MzMxNTMiIGN5PSIzODkiIHJ4PSI2MCIgcnk9IjIzIj48L2VsbGlwc2U+PHRleHQgY2xhc3M9InQtZm4iIHg9IjMxNi4wMjEzOTAzNzQzMzE1MyIgeT0iMzk0Ij5XRU5OPC90ZXh0PjxlbGxpcHNlIGNsYXNzPSJmbiIgY3g9IjE0NC42OTUxODcxNjU3NzU0IiBjeT0iMzAzIiByeD0iMzQiIHJ5PSIyMyI+PC9lbGxpcHNlPjx0ZXh0IGNsYXNzPSJ0LWZuIiB4PSIxNDQuNjk1MTg3MTY1Nzc1NCIgeT0iMzA4Ij4mZ3Q7PC90ZXh0PjxyZWN0IGNsYXNzPSJpbiIgaGVpZ2h0PSI0MCIgd2lkdGg9IjEzNCIgeD0iMjIuNjU3NzU0MDEwNjk1MTg2IiB5PSIyNSI+PC9yZWN0Pjx0ZXh0IGNsYXNzPSJ0LWluIiB4PSI4OS42NTc3NTQwMTA2OTUxOSIgeT0iNTAiPlByb3plbnQgKEIxKTwvdGV4dD48Y2lyY2xlIGNsYXNzPSJzcCIgY3g9Ijg5LjY1Nzc1NDAxMDY5NTE5IiBjeT0iMTMxIiByPSI2Ij48L2NpcmNsZT48dGV4dCBjbGFzcz0idC1rIiB4PSIxOTguODQ0OTE5Nzg2MDk2MjYiIHk9IjI0NSI+ODU8L3RleHQ+PHRleHQgY2xhc3M9InQtayIgeD0iMzA5LjgwNzQ4NjYzMTAxNjA1IiB5PSIzMzEiPiJBbHBoYSBIYWNrZXIiPC90ZXh0PjxlbGxpcHNlIGNsYXNzPSJmbiIgY3g9IjQ5Mi42NzM3OTY3OTE0NDM4NiIgY3k9IjMwMyIgcng9IjYwIiByeT0iMjMiPjwvZWxsaXBzZT48dGV4dCBjbGFzcz0idC1mbiIgeD0iNDkyLjY3Mzc5Njc5MTQ0Mzg2IiB5PSIzMDgiPldFTk48L3RleHQ+PGVsbGlwc2UgY2xhc3M9ImZuIiBjeD0iMjU1LjY1Nzc1NDAxMDY5NTIiIGN5PSIyMTciIHJ4PSI0MSIgcnk9IjIzIj48L2VsbGlwc2U+PHRleHQgY2xhc3M9InQtZm4iIHg9IjI1NS42NTc3NTQwMTA2OTUyIiB5PSIyMjIiPiZndDs9PC90ZXh0Pjx0ZXh0IGNsYXNzPSJ0LWsiIHg9IjQyMS42NTc3NTQwMTA2OTUxNiIgeT0iMTU5Ij41NTwvdGV4dD48dGV4dCBjbGFzcz0idC1rIiB4PSI1MjguMTgxODE4MTgxODE4MSIgeT0iMjQ1Ij4iVHJ1ZSBIYWNrZXIiPC90ZXh0Pjx0ZXh0IGNsYXNzPSJ0LWsiIHg9IjY5NC4xODE4MTgxODE4MTgxIiB5PSIyNDUiPiJMaXR0bGUgSGFja2VyIjwvdGV4dD48cmVjdCBjbGFzcz0ib3V0IiBoZWlnaHQ9IjQwIiB3aWR0aD0iMTA3IiB4PSIyNjIuNTIxMzkwMzc0MzMxNTMiIHk9IjQ1NSI+PC9yZWN0Pjx0ZXh0IGNsYXNzPSJ0LW91dCIgeD0iMzE2LjAyMTM5MDM3NDMzMTUzIiB5PSI0ODAiPlJhbmcgKEIyKTwvdGV4dD48L3N2Zz4=","alt":"Datenflussdiagramm","caption":"","size":"voll"},{"id":"j5p5k8a","type":"fptask","title":"Geheimer Rangrechner","html":"Welche Formel steckt in diesem Diagramm? Schreibe sie in <b>B2</b>.","xp":10,"app":{"kind":"formel","cell":"B2","target":"=WENN(B1>85;\"Alpha Hacker\";WENN(B1>=55;\"True Hacker\";\"Little Hacker\"))","tabelle":"Rangrechner","dfd":""},"sheet":{"cells":{"A1":"Prozent","B1":"73","A2":"Rang"},"widths":{"A":120,"B":150},"styles":{"B1":"inp","B2":"out"},"title":"Rangrechner"},"tips":[],"solution":"","img":""}]},{"id":"ku35s3x","title":"Achterbahn","sub":"Tabelle","check":false,"blocks":[{"id":"10elxbb","type":"fptask","title":"Achterbahn","html":"Mitfahren darf, wer mindestens 140 cm groß ist – oder mindestens 120 cm groß <b>und</b> in Begleitung (<code>ja</code>). In <b>B3</b> soll <code>ja</code> oder <code>nein</code> stehen.","xp":10,"app":{"kind":"formel","cell":"B3","target":"=WENN(ODER(B1>=140;UND(B1>=120;B2=\"ja\"));\"ja\";\"nein\")","tabelle":"Achterbahn","dfd":""},"sheet":{"cells":{"A1":"Größe (cm)","B1":"128","A2":"Begleitung","B2":"ja","A3":"Darf mitfahren"},"widths":{"A":170,"B":80},"styles":{"B1:B2":"inp","B3":"out"},"title":"Achterbahn"},"tips":[],"solution":"","img":""},{"id":"cvg645j","type":"info","kind":"abschluss","title":"Grid gehackt!","html":"Alle Aufgaben gelöst. Sichere dein Projekt (oben rechts in FlowPad) – und dann ab zur nächsten Station auf der Lernlandkarte.","img":"","name":""}]}],"cert":{"on":true,"need":"alle","pct":80,"text":"hat die Challenge gemeistert.","show":{"zeit":true,"tipps":true,"quiz":true,"xp":true}}}
+{
+ "v": 2,
+ "id": "inf9-c1-4",
+ "form": "challenge",
+ "design": {
+  "pal": 8,
+  "font": "pixel",
+  "shape": "eckig",
+  "hero": "logo",
+  "heroImg": ""
+ },
+ "kicker": "HACKER-CHALLENGE · LEVEL 1.4",
+ "title": "WENN-Hacks",
+ "subtitle": "Entscheidungen, Grenzfälle, verschachtelte WENNs. FlowPad testet genau an den Grenzen – „größer“ und „größer gleich“ sind hier zwei verschiedene Welten.",
+ "goals": [],
+ "rank": "",
+ "stations": [
+  {
+   "id": "gotz7oz",
+   "title": "Start",
+   "sub": "Regeln",
+   "check": false,
+   "blocks": [
+    {
+     "id": "3nkiem4",
+     "type": "info",
+     "kind": "regel",
+     "title": "Regeln",
+     "html": "Keine Tipps. FlowPad prüft jede Lösung mit vielen anderen Zahlen – wer Ergebnisse abtippt, statt mit Zellen zu rechnen, fliegt auf. Diagramm-Aufgaben werden nur im Diagramm gelöst (dann <b>Prüfen</b>), Ausfüll-Aufgaben prüfst du hier im Lernpfad. Das <b><i>fx</i></b>-Handbuch ist erlaubt.",
+     "img": "",
+     "name": ""
+    },
+    {
+     "id": "9ojw03s",
+     "type": "legend"
+    }
+   ]
+  },
+  {
+   "id": "9i4wory",
+   "title": "Freibad",
+   "sub": "Tabelle",
+   "check": false,
+   "blocks": [
+    {
+     "id": "q1l4arw",
+     "type": "sheet",
+     "title": "Freibad",
+     "html": "Eintritt: Eintritt laut Preisliste: unter 6 Jahren, unter 18 Jahren, Erwachsene. Eine Formel in <b>D2</b>, ausfüllen bis <b>D9</b>. Die Preise kommen aus der Preisliste.",
+     "sheet": {
+      "cells": {
+       "A1": "Name",
+       "B1": "Alter",
+       "C1": "Ausweis",
+       "D1": "Eintritt",
+       "E1": "Zu zahlen",
+       "G1": "Preisliste",
+       "G2": "unter 6 Jahren",
+       "H2": "0",
+       "G3": "unter 18 Jahren",
+       "H3": "2,5",
+       "G4": "Erwachsene",
+       "H4": "4,5",
+       "G5": "Ermäßigung mit Ausweis",
+       "H5": "50%",
+       "A2": "Mia",
+       "B2": "5",
+       "C2": "nein",
+       "A3": "Ben",
+       "B3": "6",
+       "C3": "ja",
+       "A4": "Lea",
+       "B4": "17",
+       "C4": "ja",
+       "A5": "Tom",
+       "B5": "18",
+       "C5": "nein",
+       "A6": "Ali",
+       "B6": "35",
+       "C6": "nein",
+       "A7": "Zoe",
+       "B7": "12",
+       "C7": "ja",
+       "A8": "Max",
+       "B8": "19",
+       "C8": "ja",
+       "A9": "Ida",
+       "B9": "72",
+       "C9": "nein"
+      },
+      "widths": {
+       "A": 80,
+       "B": 70,
+       "C": 80,
+       "D": 90,
+       "E": 100,
+       "G": 230,
+       "H": 80
+      },
+      "fmt": {
+       "H2:H4": "eur",
+       "H5": "pct",
+       "D2:E9": "eur"
+      },
+      "styles": {
+       "A1:E1": "head",
+       "G1": "head",
+       "H2:H5": "inp"
+      },
+      "title": "Freibad"
+     },
+     "rules": [
+      {
+       "kind": "fuell",
+       "ref": "D2:D9",
+       "val": "=WENN(B2<6;$H$2;WENN(B2<18;$H$3;$H$4))",
+       "set": "",
+       "msg": "Prüfe deine Formel in D2 und das Ausfüllen bis D9 – denk an die $-Zeichen."
+      }
+     ],
+     "ok": "Gehackt! Alle Zellen rechnen richtig.",
+     "xp": 15
+    },
+    {
+     "id": "ptu451f",
+     "type": "fptask",
+     "title": "Ermäßigung",
+     "html": "Wer einen Ausweis hat (<code>ja</code>), bekommt die Ermäßigung aus <b>H5</b> auf den Eintritt. Alle anderen zahlen den vollen Eintritt. Diagramm für <b>E2</b>.",
+     "xp": 15,
+     "app": {
+      "kind": "diagramm",
+      "cell": "E2",
+      "target": "=WENN(C2=\"ja\";D2*(1-$H$5);D2)",
+      "tabelle": "Freibad",
+      "dfd": "leer"
+     },
+     "sheet": {
+      "cells": {
+       "A1": "Name",
+       "B1": "Alter",
+       "C1": "Ausweis",
+       "D1": "Eintritt",
+       "E1": "Zu zahlen",
+       "G1": "Preisliste",
+       "G2": "unter 6 Jahren",
+       "H2": "0",
+       "G3": "unter 18 Jahren",
+       "H3": "2,5",
+       "G4": "Erwachsene",
+       "H4": "4,5",
+       "G5": "Ermäßigung mit Ausweis",
+       "H5": "50%",
+       "A2": "Mia",
+       "B2": "5",
+       "C2": "nein",
+       "A3": "Ben",
+       "B3": "6",
+       "C3": "ja",
+       "A4": "Lea",
+       "B4": "17",
+       "C4": "ja",
+       "A5": "Tom",
+       "B5": "18",
+       "C5": "nein",
+       "A6": "Ali",
+       "B6": "35",
+       "C6": "nein",
+       "A7": "Zoe",
+       "B7": "12",
+       "C7": "ja",
+       "A8": "Max",
+       "B8": "19",
+       "C8": "ja",
+       "A9": "Ida",
+       "B9": "72",
+       "C9": "nein"
+      },
+      "widths": {
+       "A": 80,
+       "B": 70,
+       "C": 80,
+       "D": 90,
+       "E": 100,
+       "G": 230,
+       "H": 80
+      },
+      "fmt": {
+       "H2:H4": "eur",
+       "H5": "pct",
+       "D2:E9": "eur"
+      },
+      "styles": {
+       "A1:E1": "head",
+       "G1": "head",
+       "H2:H5": "inp"
+      },
+      "title": "Freibad"
+     },
+     "tips": [],
+     "solution": "",
+     "img": ""
+    },
+    {
+     "id": "xjtydfu",
+     "type": "sheet",
+     "title": "Freibad",
+     "html": "Zu zahlen: Fülle <b>E2</b> bis <b>E9</b> aus.",
+     "sheet": {
+      "cells": {
+       "A1": "Name",
+       "B1": "Alter",
+       "C1": "Ausweis",
+       "D1": "Eintritt",
+       "E1": "Zu zahlen",
+       "G1": "Preisliste",
+       "G2": "unter 6 Jahren",
+       "H2": "0",
+       "G3": "unter 18 Jahren",
+       "H3": "2,5",
+       "G4": "Erwachsene",
+       "H4": "4,5",
+       "G5": "Ermäßigung mit Ausweis",
+       "H5": "50%",
+       "A2": "Mia",
+       "B2": "5",
+       "C2": "nein",
+       "A3": "Ben",
+       "B3": "6",
+       "C3": "ja",
+       "A4": "Lea",
+       "B4": "17",
+       "C4": "ja",
+       "A5": "Tom",
+       "B5": "18",
+       "C5": "nein",
+       "A6": "Ali",
+       "B6": "35",
+       "C6": "nein",
+       "A7": "Zoe",
+       "B7": "12",
+       "C7": "ja",
+       "A8": "Max",
+       "B8": "19",
+       "C8": "ja",
+       "A9": "Ida",
+       "B9": "72",
+       "C9": "nein"
+      },
+      "widths": {
+       "A": 80,
+       "B": 70,
+       "C": 80,
+       "D": 90,
+       "E": 100,
+       "G": 230,
+       "H": 80
+      },
+      "fmt": {
+       "H2:H4": "eur",
+       "H5": "pct",
+       "D2:E9": "eur"
+      },
+      "styles": {
+       "A1:E1": "head",
+       "G1": "head",
+       "H2:H5": "inp"
+      },
+      "title": "Freibad"
+     },
+     "rules": [
+      {
+       "kind": "fuell",
+       "ref": "E2:E9",
+       "val": "=WENN(C2=\"ja\";D2*(1-$H$5);D2)",
+       "set": "",
+       "msg": "Prüfe deine Formel in E2 und das Ausfüllen bis E9 – denk an die $-Zeichen."
+      }
+     ],
+     "ok": "Gehackt! Alle Zellen rechnen richtig.",
+     "xp": 15
+    }
+   ]
+  },
+  {
+   "id": "i7waane",
+   "title": "Merch-Shop",
+   "sub": "Tabelle",
+   "check": false,
+   "blocks": [
+    {
+     "id": "sqgjol2",
+     "type": "fptask",
+     "title": "Versand",
+     "html": "Versand kostet 4,90 €. Ab 50 € Warenwert ist er gratis. Formel in <b>B3</b>.",
+     "xp": 10,
+     "app": {
+      "kind": "formel",
+      "cell": "B3",
+      "target": "=WENN(B1>=50;0;4,9)",
+      "tabelle": "Merch-Shop",
+      "dfd": ""
+     },
+     "sheet": {
+      "cells": {
+       "A1": "Warenwert",
+       "B1": "42",
+       "A2": "Gutschein-Code",
+       "B2": "HACK10",
+       "A3": "Versand",
+       "A4": "Rabatt",
+       "A5": "Bonuspunkte"
+      },
+      "widths": {
+       "A": 160,
+       "B": 100
+      },
+      "fmt": {
+       "B1": "eur",
+       "B3": "eur",
+       "B4": "eur"
+      },
+      "styles": {
+       "B1:B2": "inp",
+       "B3:B5": "out"
+      },
+      "title": "Merch-Shop"
+     },
+     "tips": [],
+     "solution": "",
+     "img": ""
+    },
+    {
+     "id": "wjnz8kf",
+     "type": "fptask",
+     "title": "Gutschein",
+     "html": "Mit dem Code <code>HACK10</code> gibt es 10 % Rabatt auf den Warenwert – aber <b>höchstens 8 €</b>. Ohne gültigen Code gibt es nichts. Formel in <b>B4</b>.",
+     "xp": 10,
+     "app": {
+      "kind": "formel",
+      "cell": "B4",
+      "target": "=WENN(B2=\"HACK10\";MIN(B1*10%;8);0)",
+      "tabelle": "Merch-Shop",
+      "dfd": ""
+     },
+     "sheet": {
+      "cells": {
+       "A1": "Warenwert",
+       "B1": "42",
+       "A2": "Gutschein-Code",
+       "B2": "HACK10",
+       "A3": "Versand",
+       "A4": "Rabatt",
+       "A5": "Bonuspunkte"
+      },
+      "widths": {
+       "A": 160,
+       "B": 100
+      },
+      "fmt": {
+       "B1": "eur",
+       "B3": "eur",
+       "B4": "eur"
+      },
+      "styles": {
+       "B1:B2": "inp",
+       "B3:B5": "out"
+      },
+      "title": "Merch-Shop"
+     },
+     "tips": [],
+     "solution": "",
+     "img": ""
+    },
+    {
+     "id": "9tm5n7f",
+     "type": "fptask",
+     "title": "Bonuspunkte",
+     "html": "Für je <b>volle</b> 10 € Warenwert gibt es einen Bonuspunkt. Ab 100 € Warenwert gibt es doppelt so viele Punkte. Diagramm für <b>B5</b>.",
+     "xp": 15,
+     "app": {
+      "kind": "diagramm",
+      "cell": "B5",
+      "target": "=GANZZAHL(B1/10)*WENN(B1>=100;2;1)",
+      "tabelle": "Merch-Shop",
+      "dfd": "leer"
+     },
+     "sheet": {
+      "cells": {
+       "A1": "Warenwert",
+       "B1": "42",
+       "A2": "Gutschein-Code",
+       "B2": "HACK10",
+       "A3": "Versand",
+       "A4": "Rabatt",
+       "A5": "Bonuspunkte"
+      },
+      "widths": {
+       "A": 160,
+       "B": 100
+      },
+      "fmt": {
+       "B1": "eur",
+       "B3": "eur",
+       "B4": "eur"
+      },
+      "styles": {
+       "B1:B2": "inp",
+       "B3:B5": "out"
+      },
+      "title": "Merch-Shop"
+     },
+     "tips": [],
+     "solution": "",
+     "img": ""
+    }
+   ]
+  },
+  {
+   "id": "2h9hq0o",
+   "title": "Rangrechner",
+   "sub": "Tabelle",
+   "check": false,
+   "blocks": [
+    {
+     "id": "i459d43",
+     "type": "image",
+     "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGFyaWEtbGFiZWw9IkRhdGVuZmx1c3NkaWFncmFtbSIgcm9sZT0iaW1nIiBzdHlsZT0ibWF4LXdpZHRoOjc4M3B4O21pbi13aWR0aDo1NjNweCIgdmlld0JveD0iNi42NTc3NTQwMTA2OTUxODYgOSA3ODIuNTI0MDY0MTcxMTIzIDUwMiI+PHN0eWxlPnN2Z3tmb250LWZhbWlseToiSmV0QnJhaW5zIE1vbm8iLHVpLW1vbm9zcGFjZSxNZW5sbyxtb25vc3BhY2V9LmVke2ZpbGw6bm9uZTtzdHJva2U6IzMzNDE1YTtzdHJva2Utd2lkdGg6Mi4yfS5haHtmaWxsOiMzMzQxNWF9cmVjdC5pbntmaWxsOiNlNmVmZmY7c3Ryb2tlOiMyYTZmZDY7c3Ryb2tlLXdpZHRoOjIuMn1yZWN0Lm91dHtmaWxsOiNlM2Y2ZWE7c3Ryb2tlOiMxZjhmNTU7c3Ryb2tlLXdpZHRoOjIuMn1lbGxpcHNlLGVsbGlwc2UuZm57ZmlsbDojZmZmM2M0O3N0cm9rZTojYTg3NDAwO3N0cm9rZS13aWR0aDoyLjR9LnNwe2ZpbGw6IzFjMjUzM310ZXh0e3RleHQtYW5jaG9yOm1pZGRsZTtmb250LXNpemU6MTVweDtmb250LXdlaWdodDo3MDB9LnQtaW57ZmlsbDojMTQzMTVhfS50LW91dHtmaWxsOiMxNDVhMzJ9LnQtZm57ZmlsbDojNWEzZTAwfS50LWt7ZmlsbDojMWMyNTMzO2ZvbnQtc2l6ZToxN3B4fS5zbntmaWxsOiNhODc0MDA7Zm9udC1zaXplOjExcHh9PC9zdHlsZT48ZGVmcz48bWFya2VyIGlkPSJhaCIgbWFya2VySGVpZ2h0PSI3IiBtYXJrZXJXaWR0aD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiIHJlZlg9IjkiIHJlZlk9IjUiIHZpZXdCb3g9IjAgMCAxMCAxMCI+PHBhdGggY2xhc3M9ImFoIiBkPSJNMCAwTDEwIDVMMCAxMHoiPjwvcGF0aD48L21hcmtlcj48L2RlZnM+PHBhdGggY2xhc3M9ImVkIiBkPSJNODkuNjU3NzU0MDEwNjk1MTksNjUgQzg5LjY1Nzc1NDAxMDY5NTE5LDk1IDg5LjY1Nzc1NDAxMDY5NTE5LDk0IDg5LjY1Nzc1NDAxMDY5NTE5LDEyNCIgbWFya2VyLWVuZD0idXJsKCNhaCkiPjwvcGF0aD48cGF0aCBjbGFzcz0iZWQiIGQ9Ik04OS42NTc3NTQwMTA2OTUxOSwxMzcgQzg5LjY1Nzc1NDAxMDY5NTE5LDIwOS4xNzk2NjU3MzY2MTY5MyAxMjkuNjk1MTg3MTY1Nzc1NCwyMDkuMTc5NjY1NzM2NjE2OTMgMTI5LjY5NTE4NzE2NTc3NTQsMjgxLjM1OTMzMTQ3MzIzMzg1IiBtYXJrZXItZW5kPSJ1cmwoI2FoKSI+PC9wYXRoPjx0ZXh0IGNsYXNzPSJzbiIgeD0iMTE4LjY5NTE4NzE2NTc3NTQiIHk9IjI3Mi4zNTkzMzE0NzMyMzM4NSI+MTwvdGV4dD48cGF0aCBjbGFzcz0iZWQiIGQ9Ik0xOTguODQ0OTE5Nzg2MDk2MjYsMjQ5IEMxOTguODQ0OTE5Nzg2MDk2MjYsMjc5IDE1OS42OTUxODcxNjU3NzU0LDI1MS4zNTkzMzE0NzMyMzM4NSAxNTkuNjk1MTg3MTY1Nzc1NCwyODEuMzU5MzMxNDczMjMzODUiIG1hcmtlci1lbmQ9InVybCgjYWgpIj48L3BhdGg+PHRleHQgY2xhc3M9InNuIiB4PSIxNDguNjk1MTg3MTY1Nzc1NCIgeT0iMjcyLjM1OTMzMTQ3MzIzMzg1Ij4yPC90ZXh0PjxwYXRoIGNsYXNzPSJlZCIgZD0iTTE0NC42OTUxODcxNjU3NzU0LDMyNiBDMTQ0LjY5NTE4NzE2NTc3NTQsMzU2IDI4Ni4wMjEzOTAzNzQzMzE1MywzMzguMDgxNDE1NzEyOTU3OSAyODYuMDIxMzkwMzc0MzMxNTMsMzY4LjA4MTQxNTcxMjk1NzkiIG1hcmtlci1lbmQ9InVybCgjYWgpIj48L3BhdGg+PHRleHQgY2xhc3M9InNuIiB4PSIyNzUuMDIxMzkwMzc0MzMxNTMiIHk9IjM1OS4wODE0MTU3MTI5NTc5Ij4xPC90ZXh0PjxwYXRoIGNsYXNzPSJlZCIgZD0iTTMwOS44MDc0ODY2MzEwMTYwNSwzMzUgQzMwOS44MDc0ODY2MzEwMTYwNSwzNjUgMzE2LjAyMTM5MDM3NDMzMTUzLDMzNSAzMTYuMDIxMzkwMzc0MzMxNTMsMzY1IiBtYXJrZXItZW5kPSJ1cmwoI2FoKSI+PC9wYXRoPjx0ZXh0IGNsYXNzPSJzbiIgeD0iMzA1LjAyMTM5MDM3NDMzMTUzIiB5PSIzNTYiPjI8L3RleHQ+PHBhdGggY2xhc3M9ImVkIiBkPSJNODkuNjU3NzU0MDEwNjk1MTksMTM3IEM4OS42NTc3NTQwMTA2OTUxOSwxNjcgMjQwLjY1Nzc1NDAxMDY5NTIsMTY0LjU5NDUzNDk5MjU5NTM2IDI0MC42NTc3NTQwMTA2OTUyLDE5NC41OTQ1MzQ5OTI1OTUzNiIgbWFya2VyLWVuZD0idXJsKCNhaCkiPjwvcGF0aD48dGV4dCBjbGFzcz0ic24iIHg9IjIyOS42NTc3NTQwMTA2OTUyIiB5PSIxODUuNTk0NTM0OTkyNTk1MzYiPjE8L3RleHQ+PHBhdGggY2xhc3M9ImVkIiBkPSJNNDIxLjY1Nzc1NDAxMDY5NTE2LDE2MyBDNDIxLjY1Nzc1NDAxMDY5NTE2LDE5MyAyNzAuNjU3NzU0MDEwNjk1MTYsMTY0LjU5NDUzNDk5MjU5NTM2IDI3MC42NTc3NTQwMTA2OTUxNiwxOTQuNTk0NTM0OTkyNTk1MzYiIG1hcmtlci1lbmQ9InVybCgjYWgpIj48L3BhdGg+PHRleHQgY2xhc3M9InNuIiB4PSIyNTkuNjU3NzU0MDEwNjk1MTYiIHk9IjE4NS41OTQ1MzQ5OTI1OTUzNiI+MjwvdGV4dD48cGF0aCBjbGFzcz0iZWQiIGQ9Ik0yNTUuNjU3NzU0MDEwNjk1MiwyNDAgQzI1NS42NTc3NTQwMTA2OTUyLDI3MCA0NjIuNjczNzk2NzkxNDQzODYsMjUyLjA4MTQxNTcxMjk1NzkgNDYyLjY3Mzc5Njc5MTQ0Mzg2LDI4Mi4wODE0MTU3MTI5NTc5IiBtYXJrZXItZW5kPSJ1cmwoI2FoKSI+PC9wYXRoPjx0ZXh0IGNsYXNzPSJzbiIgeD0iNDUxLjY3Mzc5Njc5MTQ0Mzg2IiB5PSIyNzMuMDgxNDE1NzEyOTU3OSI+MTwvdGV4dD48cGF0aCBjbGFzcz0iZWQiIGQ9Ik01MjguMTgxODE4MTgxODE4MSwyNDkgQzUyOC4xODE4MTgxODE4MTgxLDI3OSA0OTIuNjczNzk2NzkxNDQzODYsMjQ5IDQ5Mi42NzM3OTY3OTE0NDM4NiwyNzkiIG1hcmtlci1lbmQ9InVybCgjYWgpIj48L3BhdGg+PHRleHQgY2xhc3M9InNuIiB4PSI0ODEuNjczNzk2NzkxNDQzODYiIHk9IjI3MCI+MjwvdGV4dD48cGF0aCBjbGFzcz0iZWQiIGQ9Ik02OTQuMTgxODE4MTgxODE4MSwyNDkgQzY5NC4xODE4MTgxODE4MTgxLDI3OSA1MjIuNjczNzk2NzkxNDQzOSwyNTIuMDgxNDE1NzEyOTU3OSA1MjIuNjczNzk2NzkxNDQzOSwyODIuMDgxNDE1NzEyOTU3OSIgbWFya2VyLWVuZD0idXJsKCNhaCkiPjwvcGF0aD48dGV4dCBjbGFzcz0ic24iIHg9IjUxMS42NzM3OTY3OTE0NDM5IiB5PSIyNzMuMDgxNDE1NzEyOTU3OSI+MzwvdGV4dD48cGF0aCBjbGFzcz0iZWQiIGQ9Ik00OTIuNjczNzk2NzkxNDQzODYsMzI2IEM0OTIuNjczNzk2NzkxNDQzODYsMzU2IDM0Ni4wMjEzOTAzNzQzMzE1MywzMzguMDgxNDE1NzEyOTU3OSAzNDYuMDIxMzkwMzc0MzMxNTMsMzY4LjA4MTQxNTcxMjk1NzkiIG1hcmtlci1lbmQ9InVybCgjYWgpIj48L3BhdGg+PHRleHQgY2xhc3M9InNuIiB4PSIzMzUuMDIxMzkwMzc0MzMxNTMiIHk9IjM1OS4wODE0MTU3MTI5NTc5Ij4zPC90ZXh0PjxwYXRoIGNsYXNzPSJlZCIgZD0iTTMxNi4wMjEzOTAzNzQzMzE1Myw0MTIgQzMxNi4wMjEzOTAzNzQzMzE1Myw0NDIgMzE2LjAyMTM5MDM3NDMzMTUzLDQyNCAzMTYuMDIxMzkwMzc0MzMxNTMsNDU0IiBtYXJrZXItZW5kPSJ1cmwoI2FoKSI+PC9wYXRoPjxlbGxpcHNlIGNsYXNzPSJmbiIgY3g9IjMxNi4wMjEzOTAzNzQzMzE1MyIgY3k9IjM4OSIgcng9IjYwIiByeT0iMjMiPjwvZWxsaXBzZT48dGV4dCBjbGFzcz0idC1mbiIgeD0iMzE2LjAyMTM5MDM3NDMzMTUzIiB5PSIzOTQiPldFTk48L3RleHQ+PGVsbGlwc2UgY2xhc3M9ImZuIiBjeD0iMTQ0LjY5NTE4NzE2NTc3NTQiIGN5PSIzMDMiIHJ4PSIzNCIgcnk9IjIzIj48L2VsbGlwc2U+PHRleHQgY2xhc3M9InQtZm4iIHg9IjE0NC42OTUxODcxNjU3NzU0IiB5PSIzMDgiPiZndDs8L3RleHQ+PHJlY3QgY2xhc3M9ImluIiBoZWlnaHQ9IjQwIiB3aWR0aD0iMTM0IiB4PSIyMi42NTc3NTQwMTA2OTUxODYiIHk9IjI1Ij48L3JlY3Q+PHRleHQgY2xhc3M9InQtaW4iIHg9Ijg5LjY1Nzc1NDAxMDY5NTE5IiB5PSI1MCI+UHJvemVudCAoQjEpPC90ZXh0PjxjaXJjbGUgY2xhc3M9InNwIiBjeD0iODkuNjU3NzU0MDEwNjk1MTkiIGN5PSIxMzEiIHI9IjYiPjwvY2lyY2xlPjx0ZXh0IGNsYXNzPSJ0LWsiIHg9IjE5OC44NDQ5MTk3ODYwOTYyNiIgeT0iMjQ1Ij44NTwvdGV4dD48dGV4dCBjbGFzcz0idC1rIiB4PSIzMDkuODA3NDg2NjMxMDE2MDUiIHk9IjMzMSI+IkFscGhhIEhhY2tlciI8L3RleHQ+PGVsbGlwc2UgY2xhc3M9ImZuIiBjeD0iNDkyLjY3Mzc5Njc5MTQ0Mzg2IiBjeT0iMzAzIiByeD0iNjAiIHJ5PSIyMyI+PC9lbGxpcHNlPjx0ZXh0IGNsYXNzPSJ0LWZuIiB4PSI0OTIuNjczNzk2NzkxNDQzODYiIHk9IjMwOCI+V0VOTjwvdGV4dD48ZWxsaXBzZSBjbGFzcz0iZm4iIGN4PSIyNTUuNjU3NzU0MDEwNjk1MiIgY3k9IjIxNyIgcng9IjQxIiByeT0iMjMiPjwvZWxsaXBzZT48dGV4dCBjbGFzcz0idC1mbiIgeD0iMjU1LjY1Nzc1NDAxMDY5NTIiIHk9IjIyMiI+Jmd0Oz08L3RleHQ+PHRleHQgY2xhc3M9InQtayIgeD0iNDIxLjY1Nzc1NDAxMDY5NTE2IiB5PSIxNTkiPjU1PC90ZXh0Pjx0ZXh0IGNsYXNzPSJ0LWsiIHg9IjUyOC4xODE4MTgxODE4MTgxIiB5PSIyNDUiPiJUcnVlIEhhY2tlciI8L3RleHQ+PHRleHQgY2xhc3M9InQtayIgeD0iNjk0LjE4MTgxODE4MTgxODEiIHk9IjI0NSI+IkxpdHRsZSBIYWNrZXIiPC90ZXh0PjxyZWN0IGNsYXNzPSJvdXQiIGhlaWdodD0iNDAiIHdpZHRoPSIxMDciIHg9IjI2Mi41MjEzOTAzNzQzMzE1MyIgeT0iNDU1Ij48L3JlY3Q+PHRleHQgY2xhc3M9InQtb3V0IiB4PSIzMTYuMDIxMzkwMzc0MzMxNTMiIHk9IjQ4MCI+UmFuZyAoQjIpPC90ZXh0Pjwvc3ZnPg==",
+     "alt": "Datenflussdiagramm",
+     "caption": "",
+     "size": "voll"
+    },
+    {
+     "id": "j5p5k8a",
+     "type": "fptask",
+     "title": "Geheimer Rangrechner",
+     "html": "Welche Formel steckt in diesem Diagramm? Schreibe sie in <b>B2</b>.",
+     "xp": 10,
+     "app": {
+      "kind": "formel",
+      "cell": "B2",
+      "target": "=WENN(B1>85;\"Alpha Hacker\";WENN(B1>=55;\"True Hacker\";\"Little Hacker\"))",
+      "tabelle": "Rangrechner",
+      "dfd": ""
+     },
+     "sheet": {
+      "cells": {
+       "A1": "Prozent",
+       "B1": "73",
+       "A2": "Rang"
+      },
+      "widths": {
+       "A": 120,
+       "B": 150
+      },
+      "styles": {
+       "B1": "inp",
+       "B2": "out"
+      },
+      "title": "Rangrechner"
+     },
+     "tips": [],
+     "solution": "",
+     "img": ""
+    }
+   ]
+  },
+  {
+   "id": "ku35s3x",
+   "title": "Achterbahn",
+   "sub": "Tabelle",
+   "check": false,
+   "blocks": [
+    {
+     "id": "10elxbb",
+     "type": "fptask",
+     "title": "Achterbahn",
+     "html": "Mitfahren darf, wer mindestens 140 cm groß ist – oder mindestens 120 cm groß <b>und</b> in Begleitung (<code>ja</code>). In <b>B3</b> soll <code>ja</code> oder <code>nein</code> stehen.",
+     "xp": 10,
+     "app": {
+      "kind": "formel",
+      "cell": "B3",
+      "target": "=WENN(ODER(B1>=140;UND(B1>=120;B2=\"ja\"));\"ja\";\"nein\")",
+      "tabelle": "Achterbahn",
+      "dfd": ""
+     },
+     "sheet": {
+      "cells": {
+       "A1": "Größe (cm)",
+       "B1": "128",
+       "A2": "Begleitung",
+       "B2": "ja",
+       "A3": "Darf mitfahren"
+      },
+      "widths": {
+       "A": 170,
+       "B": 80
+      },
+      "styles": {
+       "B1:B2": "inp",
+       "B3": "out"
+      },
+      "title": "Achterbahn"
+     },
+     "tips": [],
+     "solution": "",
+     "img": ""
+    },
+    {
+     "id": "cvg645j",
+     "type": "info",
+     "kind": "abschluss",
+     "title": "Grid gehackt!",
+     "html": "Alle Aufgaben gelöst. Sichere dein Projekt (oben rechts in FlowPad) – und dann ab zur nächsten Station auf der Lernlandkarte.",
+     "img": "",
+     "name": ""
+    }
+   ]
+  }
+ ],
+ "cert": {
+  "on": true,
+  "need": "alle",
+  "pct": 80,
+  "text": "hat die Challenge gemeistert.",
+  "show": {
+   "zeit": true,
+   "tipps": true,
+   "quiz": true,
+   "xp": true
+  }
+ }
+}

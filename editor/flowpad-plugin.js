@@ -125,6 +125,7 @@ XP: 30
       make: () => ({ title: 'Tabelle laden', html: '', sheet: null, rules: [], ok: '', xp: 10 }),
       check: b => (b.rules || []).length > 0,
       label: b => 'das Rechenblatt „' + (b.title || '') + '“',
+      tag: b => ({ k: 'fill', l: 'Ausfüllen', where: b.title ? `Tabelle „${b.title}“` : '' }), // Schild im Stil „Hack the Grid“
       render(b, x) {
         const cells = b.sheet?.cells || {}, n = Object.keys(cells).length, rules = b.rules || [], res = x.prog.quiz[b.id], ok = x.prog.solved[b.id];
         return `<div class="lp-card lp-sheet${ok ? ' ok' : ''}"><div class="hd">${x.ce('title', b.title, 'Tabelle laden', { tag: 'b', cls: 'lp-ctitle' })}${x.xpTag(b)}<span class="lp-state">${ok ? '✓ geschafft' : ''}</span></div>${x.ce('html', b.html, 'Auftrag oder Beschreibung (optional)', { rich: true })}${miniTable(cells, b.sheet?.fmt)}`
@@ -134,7 +135,7 @@ XP: 30
       },
       exportAs(b) {
         const tab = miniTable(b.sheet?.cells || {}, b.sheet?.fmt);
-        if ((b.rules || []).length) return { type: 'task', title: b.title, html: `${b.html || ''}${tab}<i>Bearbeite die Tabelle in einer Tabellenkalkulation und hake danach ab.</i>`, xp: b.xp || 10, tips: [], solution: '', img: '' };
+        if ((b.rules || []).length) return { type: 'task', tag: b.tag || 'Ausfüllen', where: b.title ? `Tabelle „${b.title}“` : '', title: b.title, html: `${b.html || ''}${tab}<i>Bearbeite die Tabelle in einer Tabellenkalkulation und hake danach ab.</i>`, xp: b.xp || 10, tips: [], solution: '', img: '' };
         return { type: 'html', html: `<div class="lp-card lp-sheet"><b class="lp-ctitle">${esc(b.title)}</b>${b.html ? `<div>${b.html}</div>` : ''}${tab}</div>` };
       },
       form: [{ k: 'title', l: 'Titel (auch Name des Reiters in FlowPad)', t: 'text' }, { k: 'sheet', l: 'Tabelle', t: 'fp-sheet' }, { k: 'rules', l: 'Prüfregeln (der Reihe nach – die erste, die nicht passt, wird gemeldet)', t: 'fp-rules' }, { k: 'ok', l: 'Meldung, wenn alles stimmt', t: 'text', show: b => (b.rules || []).length > 0 }, XP],
@@ -155,6 +156,7 @@ XP: 30
       n: 'Formel-Aufgabe', ic: 'fx', g: 'FlowPad', h: 'Zielzelle + Zielformel, FlowPad prüft', openForm: true, make: taskMake('formel'),
       check: () => true,
       label: b => (b.title || 'die Aufgabe') + (b.app?.cell ? ` (${b.app.cell})` : ''),
+      tag: b => { const a = b.app || {}, where = a.tabelle ? `Tabelle „${a.tabelle}“` : ''; return a.dfd === 'vorgegeben' ? { k: 'lesen', l: 'Lesen', where } : a.kind === 'diagramm' ? { k: 'diagramm', l: 'Diagramm', where } : { k: 'formel', l: 'Formel', where }; },
       render(b, x) {
         const a = b.app || {}, ok = x.prog.solved[b.id];
         const buttons = `<button class="lp-btn alt" data-run="task">${a.kind === 'diagramm' ? '⬭ Diagramm-Aufgabe in FlowPad öffnen' : '▶ Aufgabe in FlowPad öffnen'}</button>`
@@ -167,7 +169,7 @@ XP: 30
         const res = a.cell && a.target ? resultOf(cells, a.cell, a.target) : null;
         const tab = miniTable(cells, sheet?.fmt);
         const ask = res != null ? `<p><b>Selbstkontrolle:</b> Rechne mit den Werten der Tabelle. Welches Ergebnis steht in <b>${esc(a.cell)}</b>?</p>` : '';
-        return { type: 'task', title: b.title, html: `${b.html || ''}${tab}${ask}`, answer: res ?? '', answerPh: a.cell ? 'Ergebnis in ' + a.cell : 'Ergebnis', xp: b.xp, tips: b.tips || [], solution: b.solution || (a.target ? `<code>${esc(a.target)}</code>` : ''), img: b.img || '' };
+        return { type: 'task', tag: b.tag || (a.dfd === 'vorgegeben' ? 'Lesen' : a.kind === 'diagramm' ? 'Diagramm' : 'Formel'), where: a.tabelle ? `Tabelle „${a.tabelle}“` : '', title: b.title, html: `${b.html || ''}${tab}${ask}`, answer: res ?? '', answerPh: a.cell ? 'Ergebnis in ' + a.cell : 'Ergebnis', xp: b.xp, tips: b.tips || [], solution: b.solution || (a.target ? `<code>${esc(a.target)}</code>` : ''), img: b.img || '' };
       },
       form: [
         { k: 'title', l: 'Titel', t: 'text' },
